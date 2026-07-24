@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Hasil - Smart Diagnostic TKA</title>
+    <meta name="description" content="Visualisasi contoh hasil diagnostik siswa (data prototype) - Smart Diagnostic TKA.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+    <!-- Shared Design System -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Page Specific -->
+    <link rel="stylesheet" href="assets/css/hasil-diagnostik.css">
+</head>
+<body data-page="hasil-diagnostik">
+    <div class="app-shell">
+        <div data-include="sidebar"></div>
+        <div class="sidebar-overlay"></div>
+
+        <div class="app-shell__main">
+            <div data-include="topbar"></div>
+
+            <main class="content">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="dashboard.html">Beranda</a>
+                    <span class="breadcrumb__sep">/</span>
+                    <span class="breadcrumb__current" aria-current="page">Dashboard Hasil</span>
+                </nav>
+
+                <!-- Header -->
+                <div class="page-header">
+                    <div class="page-header__text">
+                        <h1 class="page-header__title">Dashboard Hasil</h1>
+                        <p class="page-header__desc">Visualisasi contoh hasil diagnostik siswa. Data yang ditampilkan adalah data prototype sebagai simulasi tampilan hasil, bukan hasil pengerjaan Wordwall yang sebenarnya.</p>
+                    </div>
+                </div>
+
+                <!-- Empty State (shown only when hasil.js is empty) -->
+                <div class="card-light" id="hasilEmptyState" hidden>
+                    <div class="empty-state">
+                        <div class="empty-state__icon"><i data-lucide="bar-chart-3"></i></div>
+                        <h3 class="empty-state__title">Belum ada data hasil diagnostik</h3>
+                        <p class="empty-state__desc">Silakan lakukan asesmen terlebih dahulu.</p>
+                    </div>
+                </div>
+
+                <div id="hasilContent">
+                    <!-- 4 Summary Cards -->
+                    <section class="dashboard-section" aria-label="Ringkasan Hasil Diagnostik">
+                        <div class="hasil-summary-grid" id="hasilSummaryGrid"></div>
+                    </section>
+
+                    <!-- 1 Grafik Sederhana: Tuntas vs Belum Tuntas -->
+                    <section class="dashboard-section" aria-label="Grafik Tuntas vs Belum Tuntas">
+                        <div class="card-light hasil-chart">
+                            <h2 class="section-heading__title">Tuntas vs Belum Tuntas</h2>
+                            <div class="hasil-chart__bars" id="hasilChart"></div>
+                        </div>
+                    </section>
+
+                    <!-- Tabel Hasil -->
+                    <section class="dashboard-section" aria-label="Tabel Hasil Diagnostik">
+                        <div class="card-light hasil-table-card">
+                            <h2 class="section-heading__title">Tabel Hasil</h2>
+                            <div class="data-table-wrapper">
+                                <table class="data-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Nama Siswa</th>
+                                            <th>Materi</th>
+                                            <th>Tanggal</th>
+                                            <th>Nilai</th>
+                                            <th>Status</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="hasilTableBody"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Shared Shell Script -->
+    <script src="assets/js/main.js"></script>
+    <!-- Page Specific (ES module — imports its data from assets/data/hasil.js) -->
+    <script type="module" src="assets/js/hasil-diagnostik.js"></script>
+</body>
+</html>

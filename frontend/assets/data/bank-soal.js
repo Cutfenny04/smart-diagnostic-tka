@@ -183,6 +183,39 @@ export const paketSoalData = [
     }
 ];
 
+/* --------------------------------------------------------------------------
+   Persistence — there is no backend yet, so Create/Edit/Delete are persisted
+   to localStorage instead of only living in memory. This is what makes CRUD
+   survive navigating from bank-soal.html to detail-soal.html and back.
+   When a real backend exists, every function below just becomes a fetch()
+   call — callers already treat all of them as async.
+   -------------------------------------------------------------------------- */
+var STORAGE_KEY = 'sdtka:paketSoal';
+
+function loadFromStorage() {
+    try {
+        var raw = window.localStorage.getItem(STORAGE_KEY);
+        return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+        return null;
+    }
+}
+
+function saveToStorage(list) {
+    try {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(list));
+    } catch (e) {
+        // Storage unavailable (private mode / quota) — prototype falls back
+        // to in-memory only for this session, which is an acceptable
+        // degradation for a dummy-data demo.
+    }
+}
+
+function getCurrentList() {
+    var stored = loadFromStorage();
+    return stored || paketSoalData;
+}
+
 /**
  * Future backend: replace the body with
  *   return fetch('/api/bank-soal').then(function (res) { return res.json(); });
@@ -191,7 +224,52 @@ export const paketSoalData = [
 export function fetchPaketSoal() {
     return new Promise(function (resolve) {
         window.setTimeout(function () {
-            resolve(paketSoalData);
+            resolve(getCurrentList());
         }, 700);
+    });
+}
+
+/**
+ * Future backend: replace the body with
+ *   return fetch('/api/bank-soal/' + id).then(function (res) { return res.json(); });
+ */
+export function fetchPaketById(id) {
+    return new Promise(function (resolve) {
+        window.setTimeout(function () {
+            var found = getCurrentList().filter(function (p) { return p.id === id; })[0];
+            resolve(found || null);
+        }, 300);
+    });
+}
+
+/**
+ * Create (no matching id) or update (matching id) a paket.
+ * Future backend: replace the body with a POST/PUT request; callers already
+ * await this, so no other file needs to change.
+ */
+export function savePaket(paket) {
+    return new Promise(function (resolve) {
+        var list = getCurrentList();
+        var index = list.findIndex(function (p) { return p.id === paket.id; });
+        var updated;
+        if (index === -1) {
+            updated = list.concat([paket]);
+        } else {
+            updated = list.slice();
+            updated[index] = paket;
+        }
+        saveToStorage(updated);
+        resolve(paket);
+    });
+}
+
+/**
+ * Future backend: replace the body with a DELETE request.
+ */
+export function deletePaket(id) {
+    return new Promise(function (resolve) {
+        var updated = getCurrentList().filter(function (p) { return p.id !== id; });
+        saveToStorage(updated);
+        resolve(updated);
     });
 }

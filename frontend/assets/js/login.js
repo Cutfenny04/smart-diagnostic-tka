@@ -147,8 +147,6 @@ function initFormControls() {
             btnText.textContent = 'Memverifikasi...';
             if (btnArrow) btnArrow.style.display = 'none';
 
-            console.log('Sending login data:', { email: emailValue, password: passwordValue });
-            
             setTimeout(() => {
                 window.location.href = 'dashboard.html';
             }, 1200);

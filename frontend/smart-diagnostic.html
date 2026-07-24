@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Diagnostic - Smart Diagnostic TKA</title>
+    <meta name="description" content="Pilih paket soal budaya Aceh yang telah dipublikasikan dan mulai aktivitas diagnostik melalui Wordwall.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+    <!-- Shared Design System -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Page Specific -->
+    <link rel="stylesheet" href="assets/css/smart-diagnostic.css">
+</head>
+<body data-page="smart-diagnostic">
+    <div class="app-shell">
+        <div data-include="sidebar"></div>
+        <div class="sidebar-overlay"></div>
+
+        <div class="app-shell__main">
+            <div data-include="topbar"></div>
+
+            <main class="content">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="dashboard.html">Beranda</a>
+                    <span class="breadcrumb__sep">/</span>
+                    <span class="breadcrumb__current" aria-current="page">Smart Diagnostic</span>
+                </nav>
+
+                <!-- Header -->
+                <div class="page-header">
+                    <div class="page-header__text">
+                        <h1 class="page-header__title">Smart Diagnostic</h1>
+                        <p class="page-header__desc">Pilih paket soal budaya Aceh yang sudah dipublikasikan, lalu mulai aktivitas diagnostik melalui Wordwall.</p>
+                    </div>
+                </div>
+
+                <!-- View 1: Daftar Paket Published -->
+                <section id="diagnosticListView" aria-label="Daftar Paket Soal Published">
+                    <div class="diagnostic-grid" id="diagnosticGrid"></div>
+                </section>
+
+                <!-- View 2: Stimulus Budaya Aceh (pengantar sebelum Wordwall) -->
+                <section id="diagnosticStimulusView" aria-label="Stimulus Budaya Aceh" hidden>
+                    <div class="card-light diagnostic-stimulus" id="diagnosticStimulusContent"></div>
+                </section>
+
+                <!-- View 3: Embed Wordwall / Empty State -->
+                <section id="diagnosticEmbedView" aria-label="Aktivitas Wordwall" hidden>
+                    <div class="card-light diagnostic-embed" id="diagnosticEmbedContent"></div>
+                </section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Shared Shell Script -->
+    <script src="assets/js/main.js"></script>
+    <!-- Page Specific (ES module — imports its data from assets/data/bank-soal.js) -->
+    <script type="module" src="assets/js/smart-diagnostic.js"></script>
+</body>
+</html>

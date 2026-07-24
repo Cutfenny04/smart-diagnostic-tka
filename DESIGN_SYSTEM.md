@@ -193,6 +193,8 @@ Note: large-radius `filter: blur()` on decorative background glow blobs (as in l
 | `.btn-secondary` | transparent | `--color-primary-dark` (light) / beige (dark) | 1.5px solid `--color-moss` | Secondary actions |
 | `.btn-ghost` | transparent | inherits | none, Rosy Brown underline/color on hover | Tertiary / "Lihat semua" links |
 | `.btn-icon` | `--surface-card` / transparent | icon color inherits | `--border-on-light`, Rosy Brown on hover | Icon-only controls (notif, collapse) |
+| `.btn-danger` (added Phase 2.2) | transparent | `--color-danger` | 1.5px solid `--color-danger` | Destructive text actions (e.g. "Ya, Hapus" in Confirm Modal) |
+| `.btn-icon--danger` (added Phase 2.2) | modifier on `.btn-icon` | — | `--color-danger` on hover (instead of Rosy Brown) | Icon-only destructive triggers (e.g. delete in a Preview Panel action row) |
 
 All buttons: `border-radius: var(--radius-pill)`, height 44px (compact) / 52-60px (hero, matches login `.btn-submit`), `--transition-fast`.
 
@@ -203,8 +205,9 @@ All buttons: `border-radius: var(--radius-pill)`, height 44px (compact) / 52-60p
 | Variant | Surface | Border | Shadow | Use |
 |---|---|---|---|---|
 | `.card-light` | `--surface-card` | `--border-on-light` | `--shadow-sm`, `--shadow-md` on hover | Standard dashboard/content cards |
-| `.card-glass-dark` | `--surface-glass-dark` + `backdrop-filter: blur(24px)` | `--border-on-dark` + soft beige/moss gradient border accent | `--shadow-premium` | Login card, any immersive overlay panel |
 | `.card-stat` | `--surface-card-tint` | `--border-on-light` | `--shadow-sm` | KPI/stat tiles on dashboard home |
+
+Login's card uses its own bespoke `.login-card` (in `login.css`) rather than a shared component — it predates the shared shell and was never migrated. `--surface-glass-dark` / `--shadow-premium` remain defined in `style.css`'s token block for palette completeness but currently have no consumer (Phase 5 cleanup removed the unused `.card-glass-dark` rule that used to reference them).
 
 Radius: `--radius-xl` default, `--radius-2xl` for hero-scale cards.
 
@@ -272,9 +275,31 @@ A detail panel that updates in place when a card/row is selected, instead of nav
 - The panel's `.is-open` class toggle is harmless to call at every breakpoint — it only has a visual effect inside the mobile media query, so one `selectItem(id)` handler works everywhere without branching on screen size.
 - Any page-specific grid-column-count breakpoints (e.g. Bank Stimulus's 4→3→2→1 card grid) must align to the same `1023px`/`768px` boundaries, or the grid and the preview panel visually disagree about which "tier" the page is in.
 
-### 7.13 Dropdown Menu (added Phase 5)
+### 7.14 Form Field (added Phase 2.2, for Detail Paket Soal create/edit)
 
-`.dropdown-menu` + `.dropdown-menu__item` (+ `--danger` modifier) — a per-item action menu (e.g. Bank Soal's Preview/Edit/Duplikasi/Hapus on each question card). Same tokens as the topbar's profile/notification dropdowns (`--surface-card`, `--border-on-light`, `--shadow-lg`, `--radius-lg`), but a standalone class since it's used in page content, not shell chrome — the topbar itself was left untouched. Trigger button reuses `.btn-icon`; toggle `hidden` + `aria-expanded` on click, close on outside-click and Escape.
+`.form-field` — a labeled data-entry unit: `.form-field__label` (with a Rosy Brown `.form-field__required` asterisk or a muted `.form-field__optional` tag), one of `.form-field__input` / `.form-field__select` / `.form-field__textarea` (same visual language as `.catalog-search__input`: `--surface-card-tint` background, `--border-on-light` border, `--radius-md`, Rosy Brown focus ring), an optional `.form-field__hint` (muted helper text), and a `.form-field__error` (hidden by default, shown only when the parent carries `.has-error` — border turns `--color-danger` too). `.form-row` is a 3-column grid for grouping short fields (e.g. Bidang IPA / Jenjang / Level HOTS), collapsing to 1 column at the Mobile breakpoint (`max-width: 768px`). `.form-actions` right-aligns Batal/Simpan, with a top border separating it from the fields; stacks to full-width column-reverse on Mobile so the primary action (Simpan) stays on top.
+
+This is a **generic reusable component**, not specific to Bank Soal — any future create/edit form should reuse it rather than writing new field markup.
+
+### 7.15 Confirm Modal (added Phase 2.2, for destructive actions)
+
+`.confirm-modal-backdrop` (+ `.is-open`) / `.confirm-modal` — a centered dialog for confirming irreversible actions (currently: "Hapus Paket Soal?" in Bank Soal). Built entirely from existing tokens — no new colors or shadows: `--surface-card`, `--radius-xl`, `--shadow-lg`, `--space-6` padding. Contains `.confirm-modal__title`, `.confirm-modal__desc` (dynamic — fills in the item's name), and `.confirm-modal__actions` (Batal as `.btn-secondary`, destructive confirm as `.btn-danger`). Wire backdrop-click, Escape, and a Batal button to close without acting; only the explicit confirm button performs the destructive call.
+
+### 7.16 Embed Frame (added Phase 3, for Smart Diagnostic's Wordwall iframe)
+
+`.embed-frame` — a responsive wrapper for embedding external content (currently: the Wordwall activity iframe in Smart Diagnostic). `position: relative`, `aspect-ratio: 16 / 9`, `--surface-card-tint` background (visible as a placeholder tone while the iframe loads), `--border-on-light`, `--radius-md`. The `iframe` inside is absolutely positioned to fill the wrapper (`inset: 0; width: 100%; height: 100%; border: 0`) so it scales with the wrapper at every breakpoint instead of needing per-breakpoint width/height rules. No new tokens — reuses the same surface/border/radius vocabulary as `.card-light`. Generic and reusable: any future page that embeds external content (not just Wordwall) should reuse this instead of writing new iframe-sizing CSS.
+
+### 7.17 Data Table (added Phase 4, for Dashboard Hasil's results table)
+
+`.data-table-wrapper` (+ `overflow-x: auto`) / `.data-table` — a plain read-only table for simple tabular listings (currently: Nama Siswa / Materi / Tanggal / Nilai / Status in Dashboard Hasil). Header cells (`th`) are uppercase, `--text-micro`, `--text-muted-on-light`, matching the micro-label style used elsewhere (`.module-card__category`, `.soal-preview__eyebrow`). Body cells (`td`) sit on `--border-on-light` row dividers with a `--surface-card-tint` row hover. `white-space: nowrap` on every cell plus the wrapper's horizontal scroll is the intentional overflow strategy on narrow screens — per Requirement Pivot Revisi 7 the table is deliberately simple (no sorting, filtering, pagination, or column resizing), so horizontal scroll is sufficient rather than a responsive card-per-row transform. Reuses only existing tokens. Any future read-only listing should reuse this instead of writing new table CSS.
+
+### 7.18 Simple Bar Chart (added Phase 4, built from the shared `.progress-bar`, not a new component)
+
+Dashboard Hasil's "Tuntas vs Belum Tuntas" chart is **not** a new component — it is two `.progress-bar` rows (§7.7) with a label row above each, and a page-specific fill-color modifier (`.hasil-chart__fill--tuntas` = `--color-moss`, `.hasil-chart__fill--belum` = `--text-muted-on-light`) so the bar colors match the same semantics as `.badge--selesai` / `.badge--belum`. Per Requirement Pivot Revisi 7 (§5: "tidak perlu dashboard analytics yang kompleks... gunakan solusi paling ringan"), this avoids pulling in a charting library for one simple two-value comparison — reuse this pattern (label + `.progress-bar`) for any future single-metric prototype visualization instead of adding a chart dependency.
+
+### 7.19 Profil Info Row (added Phase 5, for the Profil page)
+
+Page-specific composition, not a new shared component: `.profil-avatar` (72px circle, `--gradient-midnight`, initial letter — same visual language as the topbar's `.topbar__avatar`, just larger) plus a `.profil-info-row` list, each row pairing a 44px icon circle (`rgba(131, 153, 88, 0.12)` background + `--color-moss` icon, matching `.empty-state__icon`'s tone) with a micro-label/value pair (same type scale as `.card-stat__label` / `.card-stat__value`). View-only — no edit form, since Phase 5 is final-polish, not new features. Lives in `assets/css/profil.css`.
 
 ---
 
@@ -388,3 +413,21 @@ Every page with dummy content follows this split — no exceptions, no arrays in
 - **`assets/js/<page>.js`** — logic only: `import`s the data module, then handles rendering, search, filter, sort, pagination, and event listeners. Never hardcodes a data array. Split rendering into small named functions per section (`renderStats()`, `renderQuickAccess()`, `renderRecentActivity()`, `renderEmptyState()`, `renderSkeleton()`, …) — never one large render blob.
 - Both files are loaded as **ES modules** (`<script type="module" src="assets/js/<page>.js">`), so `assets/js/<page>.js` can `import { fetch<Page>, ... } from '../data/<page>.js'`. `main.js` stays a classic script (shell behavior only, no data, no module needed).
 - Flow: `fetch<Page>()` → resolved data → `render*()` functions. Established in `materi.js`/`dashboard.js`; follow the same shape for `stimulus.js`, `soal.js`, `profile.js`, and any page after.
+
+---
+
+## 15. Status Implementasi Final
+
+```
+Phase 1 ✔
+Phase 2 ✔
+Phase 3 ✔
+Phase 4 ✔
+Phase 5 ✔
+
+Project Status:
+FINAL PROTOTYPE
+READY FOR DEMONSTRATION
+```
+
+Phase 5 (final polish) also removed dead CSS that had accumulated across earlier phases — `.dropdown-menu`, `.card-glass-dark`, `.skeleton--card`, and `materi.css`'s stale `.recommended-grid` breakpoint references — and promoted `.dashboard-section`/`.kpi-grid` from `dashboard.css` to `style.css` after finding they were used by Bank Soal, Materi, and Bank Stimulus without ever being loaded on those pages (a real cross-page spacing bug, now fixed). See `PIVOT_PLAN.md` §13 for the full final-status summary and known gaps.

@@ -77,6 +77,18 @@
                     <aside class="soal-preview preview-panel card-light" id="soalPreview" aria-label="Pratinjau Paket Soal"></aside>
                 </div>
                 <div class="preview-panel-backdrop" id="soalPreviewBackdrop"></div>
+
+                <!-- Confirm Modal: Hapus Paket Soal -->
+                <div class="confirm-modal-backdrop" id="deleteConfirmBackdrop">
+                    <div class="confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
+                        <h2 class="confirm-modal__title" id="deleteConfirmTitle">Hapus Paket Soal?</h2>
+                        <p class="confirm-modal__desc" id="deleteConfirmDesc">Paket soal ini akan dihapus secara permanen dan tidak dapat dikembalikan.</p>
+                        <div class="confirm-modal__actions">
+                            <button type="button" class="btn btn-secondary" id="deleteCancelBtn">Batal</button>
+                            <button type="button" class="btn btn-danger" id="deleteConfirmBtn">Ya, Hapus</button>
+                        </div>
+                    </div>
+                </div>
             </main>
         </div>
     </div>

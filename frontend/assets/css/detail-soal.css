@@ -1,0 +1,9 @@
+/* ==========================================================================
+   DETAIL PAKET SOAL (Tambah/Edit) — Page-specific composition only.
+   Form field mechanics (.form-field, .form-row, .form-actions) live in
+   assets/css/style.css. This file only sizes the form's containing card.
+   ========================================================================== */
+.detail-soal-form {
+    max-width: 720px;
+    padding: var(--space-6);
+}

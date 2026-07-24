@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Tambah Paket Soal - Smart Diagnostic TKA</title>
+    <meta name="description" content="Tambah atau ubah paket soal berbasis budaya Aceh - Smart Diagnostic TKA.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+    <!-- Shared Design System -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Page Specific -->
+    <link rel="stylesheet" href="assets/css/detail-soal.css">
+</head>
+<body data-page="bank-soal">
+    <div class="app-shell">
+        <div data-include="sidebar"></div>
+        <div class="sidebar-overlay"></div>
+
+        <div class="app-shell__main">
+            <div data-include="topbar"></div>
+
+            <main class="content">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="dashboard.html">Beranda</a>
+                    <span class="breadcrumb__sep">/</span>
+                    <a href="bank-soal.html">Bank Soal Berbasis Budaya Aceh</a>
+                    <span class="breadcrumb__sep">/</span>
+                    <span class="breadcrumb__current" aria-current="page" id="breadcrumbCurrent">Tambah Paket Soal</span>
+                </nav>
+
+                <!-- Header -->
+                <div class="page-header">
+                    <div class="page-header__text">
+                        <h1 class="page-header__title" id="formHeading">Tambah Paket Soal</h1>
+                        <p class="page-header__desc">Lengkapi informasi paket soal. Soal HOTS tetap didigitalkan langsung di Wordwall oleh guru — halaman ini hanya menyimpan informasi dan tautan aktivitasnya.</p>
+                    </div>
+                </div>
+
+                <!-- Form Paket Soal -->
+                <div class="card-light detail-soal-form">
+                    <form id="paketForm" novalidate>
+                        <div class="form-field" id="field-title">
+                            <label class="form-field__label" for="title">Judul Materi<span class="form-field__required">*</span></label>
+                            <input type="text" id="title" name="title" class="form-field__input" placeholder="Contoh: Kopi Gayo" maxlength="80">
+                            <span class="form-field__error">Judul materi wajib diisi.</span>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-field" id="field-subject">
+                                <label class="form-field__label" for="subject">Bidang IPA<span class="form-field__required">*</span></label>
+                                <select id="subject" name="subject" class="form-field__select">
+                                    <option value="">Pilih Bidang</option>
+                                    <option value="Biologi">Biologi</option>
+                                    <option value="Fisika">Fisika</option>
+                                    <option value="Kimia">Kimia</option>
+                                </select>
+                                <span class="form-field__error">Bidang IPA wajib dipilih.</span>
+                            </div>
+
+                            <div class="form-field" id="field-grade">
+                                <label class="form-field__label" for="grade">Jenjang<span class="form-field__required">*</span></label>
+                                <select id="grade" name="grade" class="form-field__select">
+                                    <option value="">Pilih Jenjang</option>
+                                    <option value="SMP">SMP</option>
+                                    <option value="SMA">SMA</option>
+                                </select>
+                                <span class="form-field__error">Jenjang wajib dipilih.</span>
+                            </div>
+
+                            <div class="form-field" id="field-hotsLevel">
+                                <label class="form-field__label" for="hotsLevel">Level HOTS<span class="form-field__required">*</span></label>
+                                <select id="hotsLevel" name="hotsLevel" class="form-field__select">
+                                    <option value="">Pilih Level</option>
+                                    <option value="C4">C4 - Analisis</option>
+                                    <option value="C5">C5 - Evaluasi</option>
+                                    <option value="C6">C6 - Kreasi</option>
+                                </select>
+                                <span class="form-field__error">Level HOTS wajib dipilih.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-field" id="field-stimulus">
+                            <label class="form-field__label" for="stimulus">Stimulus Budaya Aceh<span class="form-field__required">*</span></label>
+                            <textarea id="stimulus" name="stimulus" class="form-field__textarea" placeholder="Tuliskan narasi kontekstual budaya Aceh yang menjadi stimulus paket soal ini..."></textarea>
+                            <span class="form-field__error">Stimulus budaya Aceh wajib diisi.</span>
+                        </div>
+
+                        <div class="form-field" id="field-wordwallUrl">
+                            <label class="form-field__label" for="wordwallUrl">Link Wordwall<span class="form-field__optional" id="wordwallOptionalTag">(opsional untuk Draft)</span></label>
+                            <input type="url" id="wordwallUrl" name="wordwallUrl" class="form-field__input" placeholder="https://wordwall.net/resource/...">
+                            <span class="form-field__error" id="wordwallError">Link Wordwall wajib diisi jika status Published.</span>
+                            <span class="form-field__hint">Soal HOTS dibuat langsung di Wordwall. Halaman ini hanya menyimpan tautannya.</span>
+                        </div>
+
+                        <div class="form-field" id="field-status">
+                            <label class="form-field__label" for="status">Status</label>
+                            <select id="status" name="status" class="form-field__select">
+                                <option value="draft">Draft</option>
+                                <option value="published">Published</option>
+                            </select>
+                            <span class="form-field__hint">Paket Published akan tampil sebagai pilihan di Smart Diagnostic.</span>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="bank-soal.html" class="btn btn-secondary">Batal</a>
+                            <button type="submit" class="btn btn-primary"><i data-lucide="save"></i> Simpan</button>
+                        </div>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Shared Shell Script -->
+    <script src="assets/js/main.js"></script>
+    <!-- Page Specific (ES module — imports its data from assets/data/bank-soal.js) -->
+    <script type="module" src="assets/js/detail-soal.js"></script>
+</body>
+</html>

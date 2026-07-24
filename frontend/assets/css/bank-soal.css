@@ -140,6 +140,10 @@
     flex: 1;
 }
 
+.soal-preview__action .btn-icon {
+    flex: 0 0 44px;
+}
+
 /* ==========================================================================
    RESPONSIVE
    Desktop/Laptop: list + sticky preview panel side-by-side
@@ -148,6 +152,10 @@
    ========================================================================== */
 @media (max-width: 768px) {
     .soal-card__head {
+        flex-direction: column;
+    }
+
+    .soal-preview__action {
         flex-direction: column;
     }
 }

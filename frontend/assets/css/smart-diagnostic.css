@@ -1,0 +1,154 @@
+/* ==========================================================================
+   SMART DIAGNOSTIC — Page-specific composition only.
+   Tokens, shell, buttons, cards, badges, empty state, and the embed frame all
+   live in assets/css/style.css. This file only arranges/extends them for the
+   three views of this page: Daftar Paket Published -> Stimulus -> Embed.
+   ========================================================================== */
+
+/* --- View 1: Daftar Paket Published --- */
+.diagnostic-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-5);
+}
+
+.diagnostic-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3);
+}
+
+.diagnostic-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.diagnostic-card__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h3);
+    font-weight: 400;
+    color: var(--text-on-light);
+}
+
+.diagnostic-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    font-size: var(--text-micro);
+    color: var(--text-muted-on-light);
+}
+
+.diagnostic-card__meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.diagnostic-card__meta svg {
+    width: 14px;
+    height: 14px;
+}
+
+.diagnostic-card__summary {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    flex: 1;
+}
+
+.diagnostic-card__action {
+    margin-top: var(--space-2);
+}
+
+.diagnostic-card__action .btn {
+    width: 100%;
+}
+
+/* --- View 2: Stimulus Budaya Aceh --- */
+.diagnostic-stimulus {
+    max-width: 720px;
+    margin: 0 auto;
+}
+
+.diagnostic-stimulus__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h2);
+    font-weight: 400;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-3);
+}
+
+.diagnostic-stimulus__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+}
+
+.diagnostic-stimulus__section-title {
+    font-size: var(--text-small);
+    font-weight: 700;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-2);
+}
+
+.diagnostic-stimulus__text {
+    font-size: var(--text-body);
+    color: var(--text-on-light);
+    line-height: 1.7;
+}
+
+.diagnostic-stimulus__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border-on-light);
+}
+
+/* --- View 3: Embed Wordwall / Empty State --- */
+.diagnostic-embed {
+    max-width: 960px;
+    margin: 0 auto;
+}
+
+.diagnostic-embed__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-5);
+}
+
+.diagnostic-embed__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h3);
+    font-weight: 400;
+    color: var(--text-on-light);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 1280px) {
+    .diagnostic-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 768px) {
+    .diagnostic-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .diagnostic-stimulus__actions {
+        flex-direction: column-reverse;
+    }
+
+    .diagnostic-embed__head {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
