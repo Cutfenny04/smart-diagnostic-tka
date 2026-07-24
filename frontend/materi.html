@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Materi & Modul Pelatihan - Smart Diagnostic TKA</title>
+    <meta name="description" content="Learning Hub materi penyusunan soal HOTS IPA berbasis budaya Aceh - Smart Diagnostic TKA.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+    <!-- Shared Design System -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Page Specific -->
+    <link rel="stylesheet" href="assets/css/materi.css">
+</head>
+<body data-page="materi">
+    <div class="app-shell">
+        <div data-include="sidebar"></div>
+        <div class="sidebar-overlay"></div>
+
+        <div class="app-shell__main">
+            <div data-include="topbar"></div>
+
+            <main class="content">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="dashboard.html">Beranda</a>
+                    <span class="breadcrumb__sep">/</span>
+                    <span class="breadcrumb__current" aria-current="page">Materi &amp; Modul Pelatihan</span>
+                </nav>
+
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="page-header__text">
+                        <h1 class="page-header__title">Materi &amp; Modul Pelatihan</h1>
+                        <p class="page-header__desc">Pelajari seluruh materi penyusunan soal HOTS IPA berbasis budaya Aceh secara bertahap.</p>
+                    </div>
+                </div>
+
+                <!-- Learning Progress (rendered from materiOverallProgress in assets/data/materi.js) -->
+                <section class="dashboard-section card-light" id="learningOverviewSection" aria-label="Progress Belajar Keseluruhan"></section>
+
+                <!-- Continue Learning -->
+                <section class="dashboard-section" id="continueLearningSection" aria-label="Lanjutkan Belajar" hidden></section>
+
+                <!-- Search & Filter -->
+                <section class="catalog-controls card-light" aria-label="Cari dan Saring Materi">
+                    <div class="catalog-search">
+                        <span class="catalog-search__icon" aria-hidden="true"><i data-lucide="search"></i></span>
+                        <input type="search" id="materiSearchInput" class="catalog-search__input" placeholder="Cari materi..." aria-label="Cari materi">
+                    </div>
+
+                    <div class="filter-group" role="group" aria-label="Saring berdasarkan status">
+                        <button type="button" class="filter-chip is-active" data-filter="semua" aria-pressed="true">Semua</button>
+                        <button type="button" class="filter-chip" data-filter="belum" aria-pressed="false">Belum Dipelajari</button>
+                        <button type="button" class="filter-chip" data-filter="sedang" aria-pressed="false">Sedang Dipelajari</button>
+                        <button type="button" class="filter-chip" data-filter="selesai" aria-pressed="false">Selesai</button>
+                    </div>
+
+                    <div class="catalog-sort">
+                        <label for="materiSortSelect" class="catalog-sort__label">Urutkan</label>
+                        <select id="materiSortSelect" class="catalog-sort__select" aria-label="Urutkan materi">
+                            <option value="terbaru">Terbaru</option>
+                            <option value="terlama">Terlama</option>
+                            <option value="nama">Nama (A-Z)</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- Modul Grid (populated by materi.js — grouped by category by default, flat when filtering) -->
+                <div id="moduleSections"></div>
+
+                <!-- Recommended Modules -->
+                <section class="dashboard-section" id="recommendedSection" aria-label="Rekomendasi Materi" hidden></section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Shared Shell Script -->
+    <script src="assets/js/main.js"></script>
+    <!-- Page Specific (ES module — imports its data from assets/data/materi.js) -->
+    <script type="module" src="assets/js/materi.js"></script>
+</body>
+</html>

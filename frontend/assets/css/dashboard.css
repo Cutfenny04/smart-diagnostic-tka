@@ -1,0 +1,272 @@
+/* ==========================================================================
+   DASHBOARD — Page-specific composition only.
+   Tokens, shell, buttons, cards, badges, progress bars, section headings all
+   live in assets/css/style.css. This file only arranges them for this page.
+   ========================================================================== */
+
+/* --- 1. Welcome Hero --- */
+.welcome-hero {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-bottom: var(--space-6);
+}
+
+.welcome-hero__eyebrow {
+    font-size: var(--text-small);
+    font-weight: 600;
+    color: var(--color-moss);
+    text-transform: capitalize;
+    margin-bottom: var(--space-2);
+}
+
+.welcome-hero__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h1);
+    font-weight: 400;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-3);
+}
+
+.welcome-hero__message {
+    font-size: var(--text-body);
+    color: var(--text-muted-on-light);
+    max-width: 65ch;
+    margin-bottom: var(--space-5);
+}
+
+.welcome-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+/* --- Shared section spacing --- */
+.dashboard-section {
+    margin-bottom: var(--space-6);
+}
+
+/* --- 2. Statistik Ringkas --- */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-5);
+}
+
+.card-stat--progress .progress-bar {
+    margin-top: var(--space-3);
+}
+
+/* --- 3. Quick Access --- */
+.quick-access-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: var(--space-5);
+}
+
+.quick-access-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+}
+
+.quick-access-card__icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(131, 153, 88, 0.12);
+    color: var(--color-moss);
+    margin-bottom: var(--space-2);
+}
+
+.quick-access-card__icon svg {
+    width: 22px;
+    height: 22px;
+}
+
+.quick-access-card__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h3);
+    font-weight: 400;
+    color: var(--text-on-light);
+}
+
+.quick-access-card__desc {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+}
+
+/* --- Two-column layout: Recent Activity | (Pengumuman + Progress Belajar) --- */
+.dashboard-columns {
+    display: grid;
+    grid-template-columns: 1.4fr 1fr;
+    gap: var(--space-5);
+    align-items: start;
+}
+
+.dashboard-columns__side {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+/* --- 4. Recent Activity (vertical timeline) --- */
+.timeline {
+    list-style: none;
+    position: relative;
+}
+
+.timeline__item {
+    display: flex;
+    gap: var(--space-4);
+    position: relative;
+    padding-bottom: var(--space-5);
+}
+
+.timeline__item:last-child {
+    padding-bottom: 0;
+}
+
+.timeline__item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: 0;
+    width: 1px;
+    background: var(--border-on-light);
+}
+
+.timeline__icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(131, 153, 88, 0.12);
+    color: var(--color-moss);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+}
+
+.timeline__icon svg {
+    width: 18px;
+    height: 18px;
+}
+
+.timeline__text {
+    font-size: var(--text-body);
+    color: var(--text-on-light);
+    margin-bottom: var(--space-1);
+}
+
+.timeline__time {
+    font-size: var(--text-micro);
+    color: var(--text-muted-on-light);
+}
+
+/* --- 5. Pengumuman --- */
+.announcement-list {
+    list-style: none;
+}
+
+.announcement-item {
+    padding: var(--space-4) 0;
+    border-bottom: 1px solid var(--border-on-light);
+}
+
+.announcement-item:first-child {
+    padding-top: 0;
+}
+
+.announcement-item:last-child {
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.announcement-item__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+}
+
+.announcement-item__date {
+    font-size: var(--text-micro);
+    color: var(--text-muted-on-light);
+}
+
+.announcement-item__title {
+    font-size: var(--text-body);
+    font-weight: 600;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-1);
+}
+
+.announcement-item__desc {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+}
+
+/* --- 6. Progress Belajar --- */
+.learning-progress-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.learning-progress-item__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: var(--text-small);
+    color: var(--text-on-light);
+    font-weight: 500;
+    margin-bottom: var(--space-2);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+
+/* Laptop */
+@media (max-width: 1024px) {
+    .dashboard-columns {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Tablet — statistics drop to 2 columns */
+@media (max-width: 768px) {
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .quick-access-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .welcome-hero__actions {
+        align-self: stretch;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .welcome-hero__actions .btn {
+        width: 100%;
+    }
+}
+
+/* Mobile — everything stacks to a single column */
+@media (max-width: 480px) {
+    .kpi-grid,
+    .quick-access-grid {
+        grid-template-columns: 1fr;
+    }
+}

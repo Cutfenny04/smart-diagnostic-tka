@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Soal HOTS IPA - Smart Diagnostic TKA</title>
+    <meta name="description" content="Question Management System untuk mengelola soal HOTS IPA berbasis budaya Aceh - Smart Diagnostic TKA.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+    <!-- Shared Design System -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Page Specific -->
+    <link rel="stylesheet" href="assets/css/bank-soal.css">
+</head>
+<body data-page="bank-soal">
+    <div class="app-shell">
+        <div data-include="sidebar"></div>
+        <div class="sidebar-overlay"></div>
+
+        <div class="app-shell__main">
+            <div data-include="topbar"></div>
+
+            <main class="content">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="dashboard.html">Beranda</a>
+                    <span class="breadcrumb__sep">/</span>
+                    <span class="breadcrumb__current" aria-current="page">Bank Soal HOTS IPA</span>
+                </nav>
+
+                <!-- 1. Header -->
+                <div class="page-header">
+                    <div class="page-header__text">
+                        <h1 class="page-header__title">Bank Soal HOTS IPA</h1>
+                        <p class="page-header__desc">Kelola seluruh soal HOTS IPA yang telah Anda susun berbasis stimulus budaya Aceh.</p>
+                    </div>
+                    <div class="page-header__actions">
+                        <a href="detail-soal.html" class="btn btn-primary">
+                            <i data-lucide="plus-circle"></i> Buat Soal Baru
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 2. Statistik Ringkas -->
+                <section class="dashboard-section" aria-label="Statistik Bank Soal">
+                    <div class="kpi-grid" id="soalStats"></div>
+                </section>
+
+                <!-- 3. Catalog Controls -->
+                <section class="catalog-controls card-light" aria-label="Cari dan Saring Soal">
+                    <div class="catalog-search">
+                        <span class="catalog-search__icon" aria-hidden="true"><i data-lucide="search"></i></span>
+                        <input type="search" id="soalSearchInput" class="catalog-search__input" placeholder="Cari judul, pertanyaan, atau kompetensi..." aria-label="Cari soal">
+                    </div>
+
+                    <div id="soalFilters" aria-label="Saring soal"></div>
+
+                    <div class="catalog-sort">
+                        <label for="soalSortSelect" class="catalog-sort__label">Urutkan</label>
+                        <select id="soalSortSelect" class="catalog-sort__select" aria-label="Urutkan soal">
+                            <option value="terbaru">Terbaru</option>
+                            <option value="terlama">Terlama</option>
+                            <option value="az">A-Z</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- 4, 5 & 6. Question List + Action Menu + Preview Panel -->
+                <div class="catalog-layout">
+                    <div class="soal-main">
+                        <div id="questionList" class="soal-list"></div>
+                    </div>
+
+                    <aside class="soal-preview preview-panel card-light" id="soalPreview" aria-label="Pratinjau Soal"></aside>
+                </div>
+                <div class="preview-panel-backdrop" id="soalPreviewBackdrop"></div>
+
+                <!-- 7. Recommendation -->
+                <section class="dashboard-section" id="recommendationSection" aria-label="Rekomendasi" hidden></section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Shared Shell Script -->
+    <script src="assets/js/main.js"></script>
+    <!-- Page Specific (ES module — imports its data from assets/data/bank-soal.js) -->
+    <script type="module" src="assets/js/bank-soal.js"></script>
+</body>
+</html>

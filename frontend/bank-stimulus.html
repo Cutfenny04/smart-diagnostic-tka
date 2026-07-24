@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Stimulus Budaya Aceh - Smart Diagnostic TKA</title>
+    <meta name="description" content="Digital library stimulus kontekstual budaya Aceh untuk menyusun soal HOTS IPA - Smart Diagnostic TKA.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+    <!-- Shared Design System -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Page Specific -->
+    <link rel="stylesheet" href="assets/css/bank-stimulus.css">
+</head>
+<body data-page="bank-stimulus">
+    <div class="app-shell">
+        <div data-include="sidebar"></div>
+        <div class="sidebar-overlay"></div>
+
+        <div class="app-shell__main">
+            <div data-include="topbar"></div>
+
+            <main class="content">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="dashboard.html">Beranda</a>
+                    <span class="breadcrumb__sep">/</span>
+                    <span class="breadcrumb__current" aria-current="page">Bank Stimulus Budaya Aceh</span>
+                </nav>
+
+                <!-- 1. Header -->
+                <div class="page-header">
+                    <div class="page-header__text">
+                        <h1 class="page-header__title">Bank Stimulus Budaya Aceh</h1>
+                        <p class="page-header__desc">Digital library stimulus kontekstual budaya Aceh sebagai sumber referensi guru dalam menyusun soal HOTS IPA.</p>
+                    </div>
+                    <div class="page-header__actions">
+                        <button type="button" class="btn btn-secondary" title="Fitur akan segera hadir">
+                            <i data-lucide="plus-circle"></i> Ajukan Stimulus Baru
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 2. Featured Stimulus -->
+                <section class="dashboard-section" id="featuredSection" aria-label="Stimulus Unggulan"></section>
+
+                <!-- 3 & 4 & 5. Search, Filter, Sort -->
+                <section class="catalog-controls card-light" aria-label="Cari dan Saring Stimulus">
+                    <div class="catalog-search">
+                        <span class="catalog-search__icon" aria-hidden="true"><i data-lucide="search"></i></span>
+                        <input type="search" id="stimulusSearchInput" class="catalog-search__input" placeholder="Cari stimulus, kata kunci, atau kategori..." aria-label="Cari stimulus">
+                    </div>
+
+                    <div id="stimulusFilters" aria-label="Saring stimulus"></div>
+
+                    <div class="catalog-sort">
+                        <label for="stimulusSortSelect" class="catalog-sort__label">Urutkan</label>
+                        <select id="stimulusSortSelect" class="catalog-sort__select" aria-label="Urutkan stimulus">
+                            <option value="terbaru">Terbaru</option>
+                            <option value="populer">Populer</option>
+                            <option value="az">A-Z</option>
+                        </select>
+                    </div>
+                </section>
+
+                <!-- 6 & 7. Stimulus Grid + Preview Panel -->
+                <div class="catalog-layout">
+                    <div class="stimulus-main">
+                        <div id="stimulusGrid" class="stimulus-grid"></div>
+                    </div>
+
+                    <aside class="stimulus-preview preview-panel card-light" id="stimulusPreview" aria-label="Pratinjau Stimulus"></aside>
+                </div>
+                <div class="preview-panel-backdrop" id="stimulusPreviewBackdrop"></div>
+
+                <!-- 8. Recommendation -->
+                <section class="dashboard-section" id="recommendationSection" aria-label="Rekomendasi Stimulus" hidden></section>
+            </main>
+        </div>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Shared Shell Script -->
+    <script src="assets/js/main.js"></script>
+    <!-- Page Specific (ES module — imports its data from assets/data/stimulus.js) -->
+    <script type="module" src="assets/js/stimulus.js"></script>
+</body>
+</html>

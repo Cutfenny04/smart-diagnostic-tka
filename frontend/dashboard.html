@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Smart Diagnostic TKA</title>
+    <meta name="description" content="Dashboard Smart Diagnostic TKA - Platform Pelatihan HOTS IPA Berbasis Budaya Aceh.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+    <!-- Shared Design System -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Page Specific -->
+    <link rel="stylesheet" href="assets/css/dashboard.css">
+</head>
+<body data-page="dashboard">
+    <div class="app-shell">
+        <div data-include="sidebar"></div>
+        <div class="sidebar-overlay"></div>
+
+        <div class="app-shell__main">
+            <div data-include="topbar"></div>
+
+            <main class="content">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="dashboard.html">Beranda</a>
+                    <span class="breadcrumb__sep">/</span>
+                    <span class="breadcrumb__current" aria-current="page">Dashboard</span>
+                </nav>
+
+                <!-- 1. Welcome Hero (name/message rendered from assets/data/dashboard.js) -->
+                <section class="welcome-hero card-light" aria-label="Sambutan">
+                    <span class="welcome-hero__eyebrow" id="welcomeDate"></span>
+                    <h1 class="welcome-hero__title" id="welcomeTitle"></h1>
+                    <p class="welcome-hero__message" id="welcomeMessage"></p>
+                    <div class="welcome-hero__actions">
+                        <a href="materi.html" class="btn btn-primary">
+                            <i data-lucide="play-circle"></i> Lanjutkan Pelatihan
+                        </a>
+                        <a href="smart-diagnostic.html" class="btn btn-secondary">
+                            <i data-lucide="activity"></i> Mulai Smart Diagnostic
+                        </a>
+                    </div>
+                </section>
+
+                <!-- 2. Statistik Ringkas -->
+                <section class="dashboard-section" aria-label="Statistik Ringkas">
+                    <div class="kpi-grid" id="kpiGrid"></div>
+                </section>
+
+                <!-- 3. Quick Access -->
+                <section class="dashboard-section" aria-label="Akses Cepat">
+                    <div class="section-heading">
+                        <h2 class="section-heading__title">Akses Cepat</h2>
+                    </div>
+                    <div class="quick-access-grid" id="quickAccessGrid"></div>
+                </section>
+
+                <div class="dashboard-columns">
+                    <!-- 4. Recent Activity -->
+                    <section class="dashboard-section card-light" aria-label="Aktivitas Terbaru">
+                        <div class="section-heading">
+                            <h2 class="section-heading__title">Aktivitas Terbaru</h2>
+                        </div>
+                        <ul class="timeline" id="recentActivityList"></ul>
+                    </section>
+
+                    <div class="dashboard-columns__side">
+                        <!-- 5. Pengumuman -->
+                        <section class="dashboard-section card-light" aria-label="Pengumuman">
+                            <div class="section-heading">
+                                <h2 class="section-heading__title">Pengumuman</h2>
+                            </div>
+                            <ul class="announcement-list" id="announcementList"></ul>
+                        </section>
+
+                        <!-- 6. Progress Belajar -->
+                        <section class="dashboard-section card-light" aria-label="Progress Belajar">
+                            <div class="section-heading">
+                                <h2 class="section-heading__title">Progress Belajar</h2>
+                            </div>
+                            <div class="learning-progress-list" id="learningProgressList"></div>
+                        </section>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Shared Shell Script -->
+    <script src="assets/js/main.js"></script>
+    <!-- Page Specific (ES module — imports its data from assets/data/dashboard.js) -->
+    <script type="module" src="assets/js/dashboard.js"></script>
+</body>
+</html>

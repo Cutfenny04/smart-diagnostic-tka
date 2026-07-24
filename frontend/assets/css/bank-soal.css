@@ -1,0 +1,191 @@
+/* ==========================================================================
+   BANK SOAL HOTS IPA — Page-specific composition only.
+   Tokens, shell, buttons, cards, badges, KPI stats, catalog controls, catalog
+   layout, preview panel, and dropdown menu all live in assets/css/style.css.
+   This file only arranges/extends them for this page's question list, action
+   menu content, and preview content.
+   ========================================================================== */
+
+/* --- Question List --- */
+.soal-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.soal-card {
+    position: relative;
+    padding: var(--space-5);
+    cursor: pointer;
+}
+
+.soal-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+.soal-card__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h3);
+    font-weight: 400;
+    color: var(--text-on-light);
+}
+
+.soal-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    font-size: var(--text-micro);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-3);
+}
+
+.soal-card__meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.soal-card__meta svg {
+    width: 14px;
+    height: 14px;
+}
+
+.soal-card__summary {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-3);
+}
+
+.soal-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+/* --- Action Menu (per card) --- */
+.soal-card__menu {
+    position: relative;
+    flex-shrink: 0;
+}
+
+/* --- Recommendation --- */
+.recommendation-list {
+    margin: 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-body);
+    color: var(--text-on-light);
+}
+
+.recommendation-list li {
+    margin-bottom: var(--space-2);
+}
+
+.recommendation-list li:last-child {
+    margin-bottom: 0;
+}
+
+/* --- Preview Panel content (mechanics live in style.css as .preview-panel) --- */
+.soal-preview__eyebrow {
+    font-size: var(--text-micro);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-rosy);
+    margin-bottom: var(--space-2);
+}
+
+.soal-preview__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h2);
+    font-weight: 400;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-3);
+}
+
+.soal-preview__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.soal-preview__section-title {
+    font-size: var(--text-small);
+    font-weight: 700;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-2);
+    margin-top: var(--space-4);
+}
+
+.soal-preview__question {
+    font-size: var(--text-body);
+    color: var(--text-on-light);
+    margin-bottom: var(--space-2);
+}
+
+.soal-preview__stimulus-link {
+    font-size: var(--text-small);
+    color: var(--color-moss);
+    font-weight: 600;
+}
+
+.soal-preview__options {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.soal-preview__option {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    border-radius: var(--radius-md);
+    margin-bottom: var(--space-2);
+    border: 1px solid var(--border-on-light);
+}
+
+.soal-preview__option--correct {
+    border-color: var(--color-moss);
+    background: rgba(131, 153, 88, 0.12);
+    color: var(--text-on-light);
+    font-weight: 600;
+}
+
+.soal-preview__option-letter {
+    flex-shrink: 0;
+    font-weight: 700;
+}
+
+.soal-preview__explanation {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+}
+
+.soal-preview__action {
+    margin-top: var(--space-5);
+    display: flex;
+    gap: var(--space-3);
+}
+
+.soal-preview__action .btn {
+    flex: 1;
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   Desktop/Laptop: list + sticky preview panel side-by-side
+   Tablet: preview moves below the list (handled globally by .preview-panel)
+   Mobile: preview becomes a bottom sheet (handled globally by .preview-panel)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .soal-card__head {
+        flex-direction: column;
+    }
+}

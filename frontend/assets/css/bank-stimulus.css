@@ -1,0 +1,281 @@
+/* ==========================================================================
+   BANK STIMULUS BUDAYA ACEH — Page-specific composition only.
+   Tokens, shell, buttons, cards, badges, section headings, catalog controls,
+   and the recommendation grid all live in assets/css/style.css. This file
+   only arranges/extends them for this page's featured card, grid, and the
+   preview panel (sidebar -> below-grid -> bottom-sheet as the page narrows).
+   ========================================================================== */
+
+/* --- Featured Stimulus --- */
+.featured-stimulus {
+    display: grid;
+    grid-template-columns: 260px 1fr;
+    gap: var(--space-6);
+}
+
+.featured-stimulus__thumb {
+    border-radius: var(--radius-xl);
+    min-height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-beige);
+}
+
+.featured-stimulus__thumb svg {
+    width: 64px;
+    height: 64px;
+}
+
+.featured-stimulus__body {
+    display: flex;
+    flex-direction: column;
+}
+
+.featured-stimulus__eyebrow {
+    font-size: var(--text-micro);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-rosy);
+    margin-bottom: var(--space-2);
+}
+
+.featured-stimulus__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h1);
+    font-weight: 400;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-3);
+}
+
+.featured-stimulus__desc {
+    font-size: var(--text-body);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-4);
+    max-width: 65ch;
+}
+
+.featured-stimulus__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.featured-stimulus__competencies {
+    margin: 0 0 var(--space-5);
+    padding-left: var(--space-5);
+    color: var(--text-muted-on-light);
+    font-size: var(--text-small);
+}
+
+.featured-stimulus__competencies li {
+    margin-bottom: var(--space-1);
+}
+
+/* Category filter groups (.filter-groups-stack / .filter-group-row) now live
+   in style.css, shared with Bank Soal's filter groups. */
+
+/* Grid + Preview two-column layout now lives in style.css as .catalog-layout */
+
+.stimulus-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: var(--space-5);
+}
+
+/* --- Stimulus card --- */
+.stimulus-card {
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    overflow: hidden;
+    cursor: pointer;
+}
+
+.stimulus-card__thumb {
+    height: 110px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-beige);
+}
+
+.stimulus-card__thumb svg {
+    width: 36px;
+    height: 36px;
+}
+
+.stimulus-card__thumb--tradisi { background: var(--gradient-sidebar); }
+.stimulus-card__thumb--kuliner { background: var(--gradient-rosy); }
+.stimulus-card__thumb--alam { background: var(--gradient-midnight); }
+.stimulus-card__thumb--kerajinan { background: var(--color-moss); }
+.stimulus-card__thumb--kearifan { background: var(--color-primary-mid); }
+
+.stimulus-card__body {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-5);
+    flex: 1;
+}
+
+.stimulus-card__tags {
+    display: flex;
+    gap: var(--space-3);
+    font-size: var(--text-micro);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: var(--space-2);
+}
+
+.stimulus-card__category {
+    color: var(--color-moss);
+}
+
+.stimulus-card__subject {
+    color: var(--text-muted-on-light);
+}
+
+.stimulus-card__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h3);
+    font-weight: 400;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-2);
+}
+
+.stimulus-card__summary {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-4);
+    flex: 1;
+}
+
+.stimulus-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+}
+
+/* --- Preview Panel content (mechanics — sticky/static/bottom-sheet — live in
+   style.css as .preview-panel; this page adds the .stimulus-preview content
+   classes on the same element) --- */
+.stimulus-preview__placeholder {
+    text-align: center;
+}
+
+.stimulus-preview__image {
+    height: 160px;
+    border-radius: var(--radius-lg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--color-beige);
+    margin-bottom: var(--space-4);
+}
+
+.stimulus-preview__image svg {
+    width: 48px;
+    height: 48px;
+}
+
+.stimulus-preview__eyebrow {
+    font-size: var(--text-micro);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-rosy);
+    margin-bottom: var(--space-2);
+}
+
+.stimulus-preview__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h2);
+    font-weight: 400;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-3);
+}
+
+.stimulus-preview__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.stimulus-preview__section-title {
+    font-size: var(--text-small);
+    font-weight: 700;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-2);
+    margin-top: var(--space-4);
+}
+
+.stimulus-preview__desc,
+.stimulus-preview__example {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-2);
+}
+
+.stimulus-preview__list {
+    margin: 0;
+    padding-left: var(--space-5);
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+}
+
+.stimulus-preview__list li {
+    margin-bottom: var(--space-1);
+}
+
+.stimulus-preview__action {
+    margin-top: var(--space-5);
+}
+
+.stimulus-preview__action .btn {
+    width: 100%;
+}
+
+/* Preview panel mechanics (sticky/static/bottom-sheet, .preview-panel-backdrop)
+   now live in style.css as .preview-panel / .preview-panel-backdrop. */
+
+/* ==========================================================================
+   RESPONSIVE
+   Desktop(1440+): grid 4 cols · Laptop(1024-1439): grid 3 cols
+   Tablet(768-1023): grid 2 cols · Mobile(<768): grid 1 col
+   (Preview panel's own sidebar -> below -> bottom-sheet behavior is handled
+   globally by style.css's .preview-panel responsive rules.)
+   ========================================================================== */
+
+/* Laptop */
+@media (max-width: 1280px) {
+    .stimulus-grid,
+    .recommended-grid {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+/* Tablet only (max-width: 1023px) — matches the .preview-panel/.catalog-layout
+   breakpoint in style.css, so Laptop (1024-1439) stays fully 3-col + sidebar. */
+@media (max-width: 1023px) {
+    .featured-stimulus {
+        grid-template-columns: 1fr;
+    }
+
+    .stimulus-grid,
+    .recommended-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .stimulus-grid,
+    .recommended-grid {
+        grid-template-columns: 1fr;
+    }
+}
