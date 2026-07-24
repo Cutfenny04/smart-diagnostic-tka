@@ -27,8 +27,6 @@ export const materiCategoryMeta = {
 
 export const materiCategoryOrder = ['hots', 'budaya', 'soal'];
 
-export const materiRecommendedIds = ['kopi-gayo', 'rumoh-aceh'];
-
 export const materiOverallProgress = { completed: 12, total: 18, percent: 67 };
 
 /**

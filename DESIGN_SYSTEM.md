@@ -18,6 +18,18 @@ Design inspiration: Apple, Linear, Notion, Framer, Stripe — the interface must
 
 **Always:** elegant, spacious, calm, premium, minimal, soft, academic, interactive.
 
+### 0.1 Product Scope & Implementation Principles (locked, per pivot — see `PIVOT_PLAN.md`)
+
+The product pivoted from a standalone question-authoring system to a Wordwall-based assessment tool. These principles are permanent and apply to every future page:
+
+- **No AI.** No auto-recommendation, no smart analysis, no chatbot, no soal generator, no "AI" feature of any kind.
+- **No soal editor.** The website never stores or renders individual questions, options, or answers. Soal HOTS are digitized directly in Wordwall by the guru — the website only stores paket-level metadata (title, subject, grade, HOTS level, stimulus, Wordwall link, status).
+- **Wordwall is the assessment medium.** Smart Diagnostic's only job is to embed the Wordwall activity for a Published paket via iframe — it does not grade, score, or store question content itself.
+- **Bank Soal manages *paket soal*, not questions.** "Bank Soal Berbasis Budaya Aceh" is a page for CRUD over question-package records (add/edit/delete/view), each representing one Wordwall activity plus its Acehnese cultural stimulus and materi metadata — not a form for composing quiz questions.
+- **Bank Stimulus was refactored into Bank Soal, not deleted.** The standalone stimulus library page/menu no longer exists as a separate product surface; its cultural content and UI patterns (card, search, filter, Preview Panel) live on inside Bank Soal Berbasis Budaya Aceh. The old `bank-stimulus.*` files remain on disk (not deleted, not linked from navigation) since their content was migrated, not discarded.
+
+This is not a Learning Management System. Do not add features beyond what the current proposal and dosen guidance call for — see `PIVOT_PLAN.md` for the full requirement analysis, data model, and phase plan behind this pivot.
+
 ---
 
 ## 1. Color
@@ -225,7 +237,7 @@ Status variants (added Phase 2.1, for announcements/notices — same tokens, cle
 
 ### 7.8 Section Heading (added Phase 2.1)
 
-`.section-heading` + `.section-heading__title` — generic sub-section title (serif, `--text-h2`) used to introduce a block of content within a page (e.g. "Akses Cepat", "Aktivitas Terbaru"). Reuse this instead of ad-hoc headings on any future page. `.section-heading__desc` (added Phase 4) is the optional muted one-liner underneath (`--text-small`, `--text-muted-on-light`) — used for recommendation reasons ("Karena Anda telah menyelesaikan…") on both Materi and Bank Stimulus.
+`.section-heading` + `.section-heading__title` — generic sub-section title (serif, `--text-h2`) used to introduce a block of content within a page (e.g. "Akses Cepat", "Aktivitas Terbaru"). Reuse this instead of ad-hoc headings on any future page. `.section-heading__desc` (added Phase 4) is the optional muted one-liner underneath (`--text-small`, `--text-muted-on-light`). **Note:** the Recommendation sections that originally used this pattern (Materi, Bank Soal) were removed per the product pivot (§0.1) — no auto-recommendation features anywhere. `.section-heading__desc` itself stays as a generic component for any future non-recommendation subtitle use.
 
 ### 7.9 Card-stat icon slot (added Phase 2.1)
 
@@ -355,7 +367,9 @@ Footer (optional)
 
 ## 13. Pages Using This Design System
 
-Login · Dashboard · Materi & Modul · Bank Stimulus · Bank Soal · Detail Soal · Smart Diagnostic · Dashboard Hasil · Profil — every page uses this system without exception.
+Login · Dashboard · Materi & Modul · Bank Soal Berbasis Budaya Aceh · Detail Soal (paket soal) · Smart Diagnostic · Dashboard Hasil · Profil — every page uses this system without exception.
+
+**Bank Stimulus is no longer a separate page** — refactored into Bank Soal Berbasis Budaya Aceh per the product pivot (§0.1, `PIVOT_PLAN.md`). Its files remain on disk but are not part of the active navigation.
 
 ---
 

@@ -12,15 +12,14 @@ export const dashboardGreeting = {
 
 export const dashboardStats = [
     { id: 'materi', icon: 'book-open', label: 'Total Materi Dipelajari', value: 18, unit: '/24 Modul' },
-    { id: 'soal', icon: 'pencil-line', label: 'Soal HOTS Dibuat', value: 32, unit: 'Soal' },
+    { id: 'soal', icon: 'landmark', label: 'Paket Soal Dikelola', value: 15, unit: 'Paket' },
     { id: 'diagnostic', icon: 'activity', label: 'Smart Diagnostic Selesai', value: 5, unit: 'Sesi' },
     { id: 'progress', icon: 'target', label: 'Progress Pelatihan', value: 72, unit: '%', isProgress: true }
 ];
 
 export const quickAccessItems = [
     { href: 'materi.html', icon: 'book-open', title: 'Materi &amp; Modul', desc: 'Video, PDF, dan artikel pelatihan HOTS IPA.' },
-    { href: 'bank-stimulus.html', icon: 'landmark', title: 'Bank Stimulus', desc: 'Konteks budaya Aceh untuk menyusun soal HOTS.' },
-    { href: 'bank-soal.html', icon: 'puzzle', title: 'Bank Soal HOTS', desc: 'Katalog soal interaktif level C4-C6.' },
+    { href: 'bank-soal.html', icon: 'landmark', title: 'Bank Soal Berbasis Budaya Aceh', desc: 'Kelola paket soal budaya Aceh yang terhubung Wordwall.' },
     { href: 'smart-diagnostic.html', icon: 'activity', title: 'Smart Diagnostic', desc: 'Uji kompetensi penyusunan soal HOTS Anda.' },
     { href: 'hasil-diagnostik.html', icon: 'bar-chart-3', title: 'Dashboard Hasil', desc: 'Grafik dan rekomendasi capaian pelatihan.' },
     { href: 'profil.html', icon: 'user-circle', title: 'Profil', desc: 'Kelola data diri, sekolah, dan kata sandi.' }
@@ -28,7 +27,7 @@ export const quickAccessItems = [
 
 export const recentActivity = [
     { icon: 'check-circle', text: 'Menyelesaikan Modul HOTS: <strong>Fotosintesis &amp; Ekosistem Hutan Leuser</strong>', time: '2 jam yang lalu' },
-    { icon: 'file-plus', text: 'Membuat 10 soal HOTS baru berbasis stimulus <strong>Kopi Gayo</strong>', time: 'Kemarin, 15.40' },
+    { icon: 'file-plus', text: 'Menambahkan paket soal baru berbasis stimulus <strong>Kopi Gayo</strong>', time: 'Kemarin, 15.40' },
     { icon: 'activity', text: 'Menyelesaikan sesi <strong>Smart Diagnostic Fisika</strong>', time: '2 hari yang lalu' },
     { icon: 'download', text: 'Mengunduh modul <strong>Kimia: Reaksi dalam Kehidupan Sehari-hari</strong>', time: '3 hari yang lalu' }
 ];
@@ -41,7 +40,7 @@ export const announcements = [
 
 export const learningProgress = [
     { label: 'Modul HOTS', percent: 80 },
-    { label: 'Stimulus Budaya', percent: 60 },
+    { label: 'Bank Soal Budaya Aceh', percent: 60 },
     { label: 'Smart Diagnostic', percent: 100 }
 ];
 

@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bank Soal HOTS IPA - Smart Diagnostic TKA</title>
-    <meta name="description" content="Question Management System untuk mengelola soal HOTS IPA berbasis budaya Aceh - Smart Diagnostic TKA.">
+    <title>Bank Soal Berbasis Budaya Aceh - Smart Diagnostic TKA</title>
+    <meta name="description" content="Kelola paket soal berbasis budaya Aceh yang terhubung dengan aktivitas Wordwall - Smart Diagnostic TKA.">
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -28,39 +28,39 @@
                 <nav class="breadcrumb" aria-label="Breadcrumb">
                     <a href="dashboard.html">Beranda</a>
                     <span class="breadcrumb__sep">/</span>
-                    <span class="breadcrumb__current" aria-current="page">Bank Soal HOTS IPA</span>
+                    <span class="breadcrumb__current" aria-current="page">Bank Soal Berbasis Budaya Aceh</span>
                 </nav>
 
-                <!-- 1. Header -->
+                <!-- Header -->
                 <div class="page-header">
                     <div class="page-header__text">
-                        <h1 class="page-header__title">Bank Soal HOTS IPA</h1>
-                        <p class="page-header__desc">Kelola seluruh soal HOTS IPA yang telah Anda susun berbasis stimulus budaya Aceh.</p>
+                        <h1 class="page-header__title">Bank Soal Berbasis Budaya Aceh</h1>
+                        <p class="page-header__desc">Kelola paket soal berbasis budaya Aceh yang terhubung dengan aktivitas Wordwall untuk digunakan pada Smart Diagnostic.</p>
                     </div>
                     <div class="page-header__actions">
                         <a href="detail-soal.html" class="btn btn-primary">
-                            <i data-lucide="plus-circle"></i> Buat Soal Baru
+                            <i data-lucide="plus-circle"></i> Tambah Paket Soal
                         </a>
                     </div>
                 </div>
 
-                <!-- 2. Statistik Ringkas -->
+                <!-- Statistik Ringkas -->
                 <section class="dashboard-section" aria-label="Statistik Bank Soal">
                     <div class="kpi-grid" id="soalStats"></div>
                 </section>
 
-                <!-- 3. Catalog Controls -->
-                <section class="catalog-controls card-light" aria-label="Cari dan Saring Soal">
+                <!-- Catalog Controls -->
+                <section class="catalog-controls card-light" aria-label="Cari dan Saring Paket Soal">
                     <div class="catalog-search">
                         <span class="catalog-search__icon" aria-hidden="true"><i data-lucide="search"></i></span>
-                        <input type="search" id="soalSearchInput" class="catalog-search__input" placeholder="Cari judul, pertanyaan, atau kompetensi..." aria-label="Cari soal">
+                        <input type="search" id="soalSearchInput" class="catalog-search__input" placeholder="Cari judul materi atau stimulus..." aria-label="Cari paket soal">
                     </div>
 
-                    <div id="soalFilters" aria-label="Saring soal"></div>
+                    <div id="soalFilters" aria-label="Saring paket soal"></div>
 
                     <div class="catalog-sort">
                         <label for="soalSortSelect" class="catalog-sort__label">Urutkan</label>
-                        <select id="soalSortSelect" class="catalog-sort__select" aria-label="Urutkan soal">
+                        <select id="soalSortSelect" class="catalog-sort__select" aria-label="Urutkan paket soal">
                             <option value="terbaru">Terbaru</option>
                             <option value="terlama">Terlama</option>
                             <option value="az">A-Z</option>
@@ -68,18 +68,15 @@
                     </div>
                 </section>
 
-                <!-- 4, 5 & 6. Question List + Action Menu + Preview Panel -->
+                <!-- Daftar Paket Soal + Preview Panel -->
                 <div class="catalog-layout">
                     <div class="soal-main">
                         <div id="questionList" class="soal-list"></div>
                     </div>
 
-                    <aside class="soal-preview preview-panel card-light" id="soalPreview" aria-label="Pratinjau Soal"></aside>
+                    <aside class="soal-preview preview-panel card-light" id="soalPreview" aria-label="Pratinjau Paket Soal"></aside>
                 </div>
                 <div class="preview-panel-backdrop" id="soalPreviewBackdrop"></div>
-
-                <!-- 7. Recommendation -->
-                <section class="dashboard-section" id="recommendationSection" aria-label="Rekomendasi" hidden></section>
             </main>
         </div>
     </div>

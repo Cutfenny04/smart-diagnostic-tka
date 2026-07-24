@@ -7,7 +7,6 @@ import {
     fetchMateri,
     materiCategoryMeta as CATEGORY_META,
     materiCategoryOrder as CATEGORY_ORDER,
-    materiRecommendedIds as RECOMMENDED_IDS,
     materiOverallProgress as OVERALL_PROGRESS
 } from '../data/materi.js';
 
@@ -201,25 +200,6 @@ function renderContinueLearning() {
     initProgressBars(section);
 }
 
-function renderRecommendation() {
-    var section = document.getElementById('recommendedSection');
-    var items = allModules.filter(function (m) { return RECOMMENDED_IDS.indexOf(m.id) !== -1; });
-    if (!items.length) {
-        section.hidden = true;
-        return;
-    }
-    section.hidden = false;
-    section.innerHTML = (
-        '<div class="section-heading">' +
-            '<h2 class="section-heading__title">Rekomendasi Untuk Anda</h2>' +
-            '<p class="section-heading__desc">Karena Anda telah menyelesaikan kategori HOTS, kami merekomendasikan materi berikut.</p>' +
-        '</div>' +
-        '<div class="recommended-grid">' + items.map(renderModuleCard).join('') + '</div>'
-    );
-    initIcons();
-    initProgressBars(section);
-}
-
 /* --- Shared small helpers --- */
 
 function initIcons() {
@@ -292,7 +272,6 @@ async function init() {
 
     renderModuleSections();
     renderContinueLearning();
-    renderRecommendation();
 }
 
 document.addEventListener('DOMContentLoaded', init);

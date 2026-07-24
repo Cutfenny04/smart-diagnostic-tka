@@ -1,12 +1,12 @@
 /* ==========================================================================
-   BANK SOAL HOTS IPA — Page-specific composition only.
+   BANK SOAL BERBASIS BUDAYA ACEH — Page-specific composition only.
    Tokens, shell, buttons, cards, badges, KPI stats, catalog controls, catalog
-   layout, preview panel, and dropdown menu all live in assets/css/style.css.
-   This file only arranges/extends them for this page's question list, action
-   menu content, and preview content.
+   layout, and preview panel mechanics all live in assets/css/style.css. This
+   file only arranges/extends them for this page's paket list and preview
+   content.
    ========================================================================== */
 
-/* --- Question List --- */
+/* --- Daftar Paket Soal --- */
 .soal-list {
     display: flex;
     flex-direction: column;
@@ -66,28 +66,6 @@
     gap: var(--space-2);
 }
 
-/* --- Action Menu (per card) --- */
-.soal-card__menu {
-    position: relative;
-    flex-shrink: 0;
-}
-
-/* --- Recommendation --- */
-.recommendation-list {
-    margin: 0;
-    padding-left: var(--space-5);
-    font-size: var(--text-body);
-    color: var(--text-on-light);
-}
-
-.recommendation-list li {
-    margin-bottom: var(--space-2);
-}
-
-.recommendation-list li:last-child {
-    margin-bottom: 0;
-}
-
 /* --- Preview Panel content (mechanics live in style.css as .preview-panel) --- */
 .soal-preview__eyebrow {
     font-size: var(--text-micro);
@@ -127,44 +105,28 @@
     margin-bottom: var(--space-2);
 }
 
-.soal-preview__stimulus-link {
-    font-size: var(--text-small);
-    color: var(--color-moss);
-    font-weight: 600;
-}
-
-.soal-preview__options {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-
-.soal-preview__option {
-    display: flex;
-    align-items: flex-start;
+.soal-preview__wordwall-indicator {
+    display: inline-flex;
+    align-items: center;
     gap: var(--space-2);
-    padding: var(--space-2) var(--space-3);
     font-size: var(--text-small);
-    color: var(--text-muted-on-light);
-    border-radius: var(--radius-md);
-    margin-bottom: var(--space-2);
-    border: 1px solid var(--border-on-light);
-}
-
-.soal-preview__option--correct {
-    border-color: var(--color-moss);
-    background: rgba(131, 153, 88, 0.12);
-    color: var(--text-on-light);
     font-weight: 600;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
 }
 
-.soal-preview__option-letter {
-    flex-shrink: 0;
-    font-weight: 700;
+.soal-preview__wordwall-indicator svg {
+    width: 16px;
+    height: 16px;
 }
 
-.soal-preview__explanation {
-    font-size: var(--text-small);
+.soal-preview__wordwall-indicator.is-connected {
+    background: rgba(131, 153, 88, 0.14);
+    color: #5C6B3A;
+}
+
+.soal-preview__wordwall-indicator.is-disconnected {
+    background: rgba(10, 51, 35, 0.06);
     color: var(--text-muted-on-light);
 }
 
