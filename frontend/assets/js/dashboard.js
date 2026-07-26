@@ -6,6 +6,11 @@
    ========================================================================== */
 import { fetchDashboardData } from '../data/dashboard.js';
 
+const token = localStorage.getItem('token');
+if (!token) {
+    window.location.href = 'login.html';
+}
+
 var STATUS_BADGE_CLASS = { important: 'badge--important', new: 'badge--new', info: 'badge--info' };
 
 /* --- Render functions: each renders one section, from data it's given --- */
@@ -13,6 +18,10 @@ var STATUS_BADGE_CLASS = { important: 'badge--important', new: 'badge--new', inf
 function renderGreeting(greeting) {
     document.getElementById('welcomeTitle').textContent = 'Selamat Datang, ' + greeting.name;
     document.getElementById('welcomeMessage').textContent = greeting.message;
+}
+
+function renderProfil(greeting) {
+    document.getElementById('profileName').textContent = greeting.name;
 }
 
 function renderTodayDate() {
@@ -177,8 +186,14 @@ async function init() {
     renderSkeleton();
 
     var data = await fetchDashboardData();
+    var guruData = JSON.parse(localStorage.getItem('guru'));
+        if (guruData) {
+            data.greeting.name = guruData.nama;
+        }
 
+    console.log(data);
     renderGreeting(data.greeting);
+    renderProfil(data.greeting);
     renderStats(data.stats);
     renderQuickAccess(data.quickAccess);
     renderRecentActivity(data.recentActivity);
