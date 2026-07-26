@@ -112,7 +112,7 @@ function initFormControls() {
     });
 
     // --- Submit Action ---
-    loginForm.addEventListener('submit', (e) => {
+    loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
         let isValid = true;
@@ -139,21 +139,47 @@ function initFormControls() {
         }
 
         if (isValid) {
-            // Disable button & show spinner state
-            submitBtn.disabled = true;
-            const btnText = submitBtn.querySelector('.btn-text');
-            const btnArrow = submitBtn.querySelector('.btn-arrow');
-            
-            btnText.textContent = 'Memverifikasi...';
-            if (btnArrow) btnArrow.style.display = 'none';
+        // Disable button & show spinner state
+        submitBtn.disabled = true;
+        const btnText = submitBtn.querySelector('.btn-text');
+        const btnArrow = submitBtn.querySelector('.btn-arrow');
+        
+        btnText.textContent = 'Memverifikasi...';
+        if (btnArrow) btnArrow.style.display = 'none';
 
-            console.log('Sending login data:', { email: emailValue, password: passwordValue });
-            
-            setTimeout(() => {
-                window.location.href = 'dashboard.html';
-            }, 1200);
+        try {
+            const response = await fetch('http://localhost:5001/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: emailValue, password: passwordValue })
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                // Login gagal (email/password salah)
+                showError(passwordInput, passwordError, data.message || 'Email atau password salah.');
+                submitBtn.disabled = false;
+                btnText.textContent = 'Masuk';
+                if (btnArrow) btnArrow.style.display = '';
+                return;
+            }
+
+            // Login berhasil - simpan token & data guru
+            localStorage.setItem('token', data.token);
+            localStorage.setItem('guru', JSON.stringify(data.guru));
+
+            window.location.href = 'dashboard.html';
+
+        } catch (err) {
+            console.error('Login error:', err);
+            showError(passwordInput, passwordError, 'Tidak bisa terhubung ke server. Pastikan backend menyala.');
+            submitBtn.disabled = false;
+            btnText.textContent = 'Masuk';
+            if (btnArrow) btnArrow.style.display = '';
         }
-    });
+    }
+        });
 
     // --- Button Click Ripple Effect ---
     submitBtn.addEventListener('click', function(e) {
