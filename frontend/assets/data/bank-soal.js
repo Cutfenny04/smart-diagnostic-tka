@@ -57,7 +57,7 @@ export function fetchPaketById(id) {
  * Create (paket.id kosong) atau Update (paket.id ada) satu paket soal.
  */
 export function savePaket(paket) {
-    var isEdit = !!paket.id;
+    var isEdit = paket.id;
     var url = window.API_BASE_URL + '/api/paket-soal' + (isEdit ? '/' + paket.id : '');
 
     return fetch(url, {
