@@ -3,6 +3,8 @@ const cors = require('cors');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth.routes');
+const materiRoutes = require('./routes/materi.routes');
+const bankSoalRoutes = require('./routes/bank-soal.routes');
 
 const app = express();
 
@@ -16,6 +18,8 @@ app.get('/', (req, res) => {
 
 // Semua route auth ada di prefix /api/auth
 app.use('/api/auth', authRoutes);
+app.use('/api/materi', materiRoutes);
+app.use('/api/bank-soal', bankSoalRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

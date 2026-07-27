@@ -189,9 +189,10 @@ export const paketSoalData = [
  * Callers already treat this as async, so no other file needs to change.
  */
 export function fetchPaketSoal() {
-    return new Promise(function (resolve) {
-        window.setTimeout(function () {
-            resolve(paketSoalData);
-        }, 700);
+    var token = localStorage.getItem('token');
+    return fetch('http://localhost:5001/api/bank-soal', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function (res) {
+        return res.json();
     });
 }
