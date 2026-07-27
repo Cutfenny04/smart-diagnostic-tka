@@ -108,7 +108,7 @@ function renderStimulus(item) {
 }
 
 function openStimulus(id) {
-    var item = publishedPaket.filter(function (p) { return p.id === id; })[0];
+    var item = publishedPaket.filter(function (p) { return String(p.id) === String(id); })[0];
     if (!item) return;
     selectedPaket = item;
     renderStimulus(item);
@@ -167,7 +167,7 @@ function bindEvents() {
 function openFromQueryParam() {
     var id = new URLSearchParams(window.location.search).get('paket');
     if (!id) return false;
-    var item = publishedPaket.filter(function (p) { return p.id === id; })[0];
+    var item = publishedPaket.filter(function (p) { return String(p.id) === String(id); })[0];
     if (!item) return false;
     openStimulus(item.id);
     return true;

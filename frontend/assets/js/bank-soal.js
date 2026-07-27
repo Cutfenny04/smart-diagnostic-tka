@@ -10,7 +10,7 @@
    Tambah/Edit/Hapus paket dibangun di Phase 2; di sini baru Search, Filter,
    Sort, dan Preview Panel (lihat PIVOT_PLAN.md).
    ========================================================================== */
-import { fetchPaketSoal } from '../data/bank-soal.js';
+import { fetchPaketSoal, deletePaket } from '../data/bank-soal.js';
 
 /* Filter taxonomy is UI configuration, not dummy content — stays in page logic. */
 var FILTER_GROUPS = [
@@ -41,6 +41,7 @@ var FILTER_GROUPS = [
 
 var state = { query: '', status: 'semua', hotsLevel: 'semua', subject: 'semua', sort: 'terbaru' };
 var allPaket = [];
+var pendingDeleteId = null;
 
 function hotsBadgeClass(level) {
     return { C4: 'badge--c4', C5: 'badge--c5', C6: 'badge--c6' }[level] || 'badge--c4';
@@ -122,7 +123,7 @@ function renderStats() {
 
 function renderPaketCard(item) {
     return (
-        '<article class="soal-card card-light" data-id="' + item.id + '">' +
+        '<article class="soal-card card-light" data-id="' + item.id + '" tabindex="0" role="button" aria-label="Lihat detail paket soal ' + item.title + '">' +
             '<div class="soal-card__head">' +
                 '<h3 class="soal-card__title">' + item.title + '</h3>' +
                 '<span class="badge ' + statusBadgeClass(item.status) + '">' + statusLabel(item.status) + '</span>' +
@@ -216,16 +217,24 @@ function renderPreview(item) {
         '<div class="soal-preview__action">' +
             '<a href="detail-soal.html?id=' + item.id + '" class="btn btn-secondary"><i data-lucide="pencil"></i> Edit</a>' +
             smartDiagnosticButton +
+            '<button type="button" class="btn-icon btn-icon--danger" id="soalDeleteBtn" data-id="' + item.id + '" data-title="' + item.title + '" aria-label="Hapus Paket Soal" title="Hapus Paket Soal"><i data-lucide="trash-2"></i></button>' +
         '</div>'
     );
     initIcons();
 
     var closeBtn = document.getElementById('soalPreviewClose');
     if (closeBtn) closeBtn.addEventListener('click', closeMobilePreview);
+
+    var deleteBtn = document.getElementById('soalDeleteBtn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function () {
+            openDeleteConfirm(deleteBtn.getAttribute('data-id'), deleteBtn.getAttribute('data-title'));
+        });
+    }
 }
 
 function selectPaket(id) {
-    var item = allPaket.filter(function (p) { return p.id === id; })[0];
+    var item = allPaket.filter(function (p) { return String(p.id) === String(id); })[0];
     if (!item) return;
     renderPreview(item);
     openMobilePreview();
@@ -239,6 +248,32 @@ function openMobilePreview() {
 function closeMobilePreview() {
     document.getElementById('soalPreview').classList.remove('is-open');
     document.getElementById('soalPreviewBackdrop').classList.remove('is-open');
+}
+
+/* --- Delete Confirmation Modal --- */
+
+function openDeleteConfirm(id, title) {
+    pendingDeleteId = id;
+    document.getElementById('deleteConfirmDesc').textContent =
+        'Paket soal "' + title + '" akan dihapus secara permanen dan tidak dapat dikembalikan.';
+    document.getElementById('deleteConfirmBackdrop').classList.add('is-open');
+}
+
+function closeDeleteConfirm() {
+    pendingDeleteId = null;
+    document.getElementById('deleteConfirmBackdrop').classList.remove('is-open');
+}
+
+async function confirmDelete() {
+    if (!pendingDeleteId) return;
+
+    allPaket = await deletePaket(pendingDeleteId);
+    closeDeleteConfirm();
+    closeMobilePreview();
+
+    renderStats();
+    renderPaketList();
+    renderPreview(null);
 }
 
 /* --- Shared small helpers --- */
@@ -306,10 +341,29 @@ function bindEvents() {
         if (card) selectPaket(card.getAttribute('data-id'));
     });
 
+    document.getElementById('questionList').addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter' && e.key !== ' ') return;
+        var card = e.target.closest('.soal-card');
+        if (!card) return;
+        e.preventDefault();
+        selectPaket(card.getAttribute('data-id'));
+    });
+
     document.getElementById('soalPreviewBackdrop').addEventListener('click', closeMobilePreview);
 
+    document.getElementById('deleteCancelBtn').addEventListener('click', closeDeleteConfirm);
+    document.getElementById('deleteConfirmBtn').addEventListener('click', confirmDelete);
+    document.getElementById('deleteConfirmBackdrop').addEventListener('click', function (e) {
+        if (e.target.id === 'deleteConfirmBackdrop') closeDeleteConfirm();
+    });
+
     document.addEventListener('keydown', function (e) {
-        if (e.key === 'Escape') closeMobilePreview();
+        if (e.key !== 'Escape') return;
+        if (document.getElementById('deleteConfirmBackdrop').classList.contains('is-open')) {
+            closeDeleteConfirm();
+        } else {
+            closeMobilePreview();
+        }
     });
 }
 

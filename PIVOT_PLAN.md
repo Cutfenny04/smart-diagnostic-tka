@@ -1,6 +1,6 @@
-# Smart Diagnostic TKA — Requirement Pivot: Analysis & Implementation Plan (REVISI 6)
+# Smart Diagnostic TKA — Requirement Pivot: Analysis & Implementation Plan (REVISI 7)
 
-Status: **PLANNING ONLY — belum ada satu pun file kode yang diubah.** Menggantikan Revisi 5.
+Status: **Phase 1 selesai & diverifikasi.** Revisi 7 memperkaya detail Phase 2 (belum dimulai) berdasarkan 5 catatan pra-Phase-2 Anda: View tetap Preview Panel (tidak ada halaman baru), Delete pakai confirmation modal, Create/Edit satu file dua mode, status default Draft saat Create, dan aturan validasi Wordwall wajib diisi kalau status Published. Lihat "Detail Phase 2" di §10.
 
 ---
 
@@ -218,9 +218,41 @@ Phase 5
   3. Menyesuaikan struktur data menjadi informasi paket soal (§3).
   4. Menyesuaikan tampilan card, filter, preview panel (§4), dan pencarian.
 
-**Detail Phase 2:**
-- Bangun `detail-soal.html` (§7) — satu file, mode Tambah/Edit, form 6 field + status.
-- Delete dan View Detail memakai pola yang sudah ada di Bank Soal (tombol hapus di card/menu aksi, Preview Panel untuk lihat detail) — tidak perlu halaman terpisah untuk ini.
+**Detail Phase 2 (diperbarui dengan catatan pra-Phase 2 Anda):**
+
+- **View = Preview Panel, titik.** Tidak ada halaman/file terpisah untuk melihat detail (tidak ada `view-soal.html`). Card → klik → Preview Panel → tombol Edit / Smart Diagnostic. Ini sudah berjalan sejak Phase 1, dipertahankan.
+- **Create & Edit = satu file, dua mode** — `detail-soal.html`:
+  - `detail-soal.html` (tanpa query param) → mode Create, header "Tambah Paket Soal".
+  - `detail-soal.html?id=paket-03` → mode Edit, header "Edit Paket Soal", form terisi otomatis dari paket terkait.
+  - Tidak ada file kedua yang di-copy.
+- **Status default saat Create = Draft.** Guru baru bisa ubah ke Published setelah link Wordwall ditempel — konsisten dengan aturan status di §5.
+- **Validasi form (sederhana):**
+  - Wajib diisi: Judul, Bidang, Jenjang, Level HOTS, Stimulus.
+  - Link Wordwall: boleh kosong jika status Draft.
+  - **Kalau status diubah ke Published, Link Wordwall wajib diisi** — validasi ini yang paling penting, langsung mencerminkan alur proposal (Published berarti siap dipakai Smart Diagnostic, yang butuh link Wordwall).
+- **Delete = confirmation modal**, bukan langsung hapus saat tombol diklik:
+  ```
+  Hapus Paket?
+  [ Batal ]  [ Ya, Hapus ]
+  ```
+  Sesederhana mungkin — reuse tombol `.btn-secondary` (Batal) dan `.btn-primary`/varian danger (Ya, Hapus) yang sudah ada di Design System. Modal ini komponen baru kecil (belum ada di Design System sebelumnya) — akan didokumentasikan sebagai `.confirm-modal` begitu dibangun, dari token yang sudah ada saja (tidak ada warna/shadow/radius baru).
+
+**Target akhir Phase 2** — hanya 2 file halaman total, sesuai Revisi 6:
+
+```
+Bank Soal (bank-soal.html)
+    │
+    ├── Tambah Paket → detail-soal.html (mode create)
+    │
+    ├── Card
+    │      └── Preview Panel
+    │              ├── Edit → detail-soal.html?id=... (mode edit)
+    │              └── Smart Diagnostic (hanya jika Published)
+    │
+    └── Delete → confirmation modal → hapus dari data in-memory
+```
+
+Setelah Phase 2 selesai, guru bisa melakukan seluruh CRUD paket soal (Create/Read/Update/Delete) tanpa halaman tambahan selain `bank-soal.html` dan `detail-soal.html`.
 
 **Detail Phase 3:**
 - Bangun `smart-diagnostic.html`: pilih paket **Published saja** (§5) → stimulus budaya Aceh (halaman pembuka) → tombol "Mulai Diagnostik" → embed iframe Wordwall.
@@ -260,6 +292,20 @@ Implementasi dianggap selesai apabila:
 
 ---
 
-## Menunggu Persetujuan
+## 13. Status Implementasi Final
 
-Belum ada satu pun file kode yang diubah. Kalau §3 (struktur data), §5 (aturan status), dan §8 (Batasan Sistem) sudah sesuai, saya siap mulai Phase 1.
+```
+Phase 1 ✔
+Phase 2 ✔
+Phase 3 ✔
+Phase 4 ✔
+Phase 5 ✔
+
+Project Status:
+FINAL PROTOTYPE
+READY FOR DEMONSTRATION
+```
+
+Seluruh 8 halaman final (Login, Dashboard, Materi & Modul Pelatihan, Bank Soal Berbasis Budaya Aceh, Detail Paket Soal, Smart Diagnostic, Dashboard Hasil, Profil) sudah dibangun dan diuji. Phase 5 menambahkan: halaman Profil (sebelumnya kosong, kini menampilkan data prototype guru), perbaikan cross-page (`.kpi-grid`/`.dashboard-section` yang sebelumnya hanya berlaku di Dashboard kini dipromosikan ke `style.css` sehingga Bank Soal/Materi/Bank Stimulus ikut mendapat spacing yang konsisten), aksesibilitas keyboard pada kartu Bank Soal, dan cleanup CSS/JS (komponen `.dropdown-menu`/`.card-glass-dark`/`.skeleton--card` yang sudah tidak terpakai dihapus, `console.log` yang membocorkan password di `login.js` dihapus).
+
+**Known gap (di luar cakupan Requirement Pivot Revisi 7 dan di luar 8 halaman final):** `detail-materi.html`, `detail-stimulus.html`, dan `ubah-password.html` masih berupa file kosong dari scaffold awal proyek — tidak pernah menjadi bagian dari 8 halaman final pivot, dan tidak dibangun di Phase 5 karena Phase 5 secara eksplisit membatasi diri pada polish, bukan fitur baru. Materi & Modul Pelatihan sendiri (kartu, progress, filter) berfungsi penuh; hanya link "Mulai Belajar/Lanjutkan" menuju modul detail yang belum memiliki halaman tujuan.

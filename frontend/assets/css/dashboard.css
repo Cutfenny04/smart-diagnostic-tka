@@ -41,18 +41,10 @@
     gap: var(--space-3);
 }
 
-/* --- Shared section spacing --- */
-.dashboard-section {
-    margin-bottom: var(--space-6);
-}
-
-/* --- 2. Statistik Ringkas --- */
-.kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: var(--space-5);
-}
-
+/* --- 2. Statistik Ringkas ---
+   .dashboard-section and .kpi-grid now live in assets/css/style.css —
+   they're shared across Dashboard, Materi, Bank Soal, Bank Stimulus, and
+   Dashboard Hasil, not specific to this page. */
 .card-stat--progress .progress-bar {
     margin-top: var(--space-3);
 }
@@ -242,12 +234,8 @@
     }
 }
 
-/* Tablet — statistics drop to 2 columns */
+/* Tablet — statistics drop to 2 columns (kpi-grid breakpoint lives in style.css) */
 @media (max-width: 768px) {
-    .kpi-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
-
     .quick-access-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -263,9 +251,8 @@
     }
 }
 
-/* Mobile — everything stacks to a single column */
+/* Mobile — everything stacks to a single column (kpi-grid breakpoint lives in style.css) */
 @media (max-width: 480px) {
-    .kpi-grid,
     .quick-access-grid {
         grid-template-columns: 1fr;
     }

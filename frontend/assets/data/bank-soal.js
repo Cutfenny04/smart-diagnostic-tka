@@ -1,198 +1,83 @@
 /* ==========================================================================
    BANK SOAL BERBASIS BUDAYA ACEH — Data layer.
-   Pure data + a fetch-style accessor. No rendering, no DOM, no HTML here.
+   Backed by the real backend (backend/routes/paketSoal.routes.js,
+   backend/controllers/paketSoal.controller.js) instead of localStorage.
+   Every function below keeps the exact same shape it always had — pages
+   that import these (assets/js/bank-soal.js, detail-soal.js,
+   smart-diagnostic.js) needed no rendering changes for this swap.
 
-   Setiap paket HANYA menyimpan informasi paket soal (judul, bidang, jenjang,
-   HOTS, stimulus, link Wordwall, status). Tidak ada pertanyaan/opsi/jawaban
-   di sini — soal HOTS didigitalisasi langsung di Wordwall oleh guru; website
-   ini murni mengelola informasi paket + link aktivitas Wordwall-nya.
-   Lihat PIVOT_PLAN.md untuk arsitektur lengkap.
-
-   Konten stimulus budaya Aceh di bawah ini diserap langsung dari Bank
-   Stimulus (assets/data/stimulus.js) — bukan ditulis ulang dari nol.
-
-   Swap the body of fetchPaketSoal() for a real `fetch('/api/bank-soal')`
-   later — every caller already treats it as an async source.
+   Requires the guru to be logged in (see assets/js/login.js) — the JWT
+   token from localStorage is sent as a Bearer token on every request.
+   window.API_BASE_URL comes from assets/js/api-config.js.
    ========================================================================== */
 
-export const paketSoalData = [
-    {
-        id: 'kopi-gayo',
-        title: 'Kopi Gayo',
-        subject: 'Kimia',
-        grade: 'SMP',
-        hotsLevel: 'C4',
-        stimulus: 'Kopi Gayo yang tumbuh di dataran tinggi Aceh Tengah melalui proses fermentasi biji sebelum disangrai. Proses ini melibatkan reaksi kimia dan aktivitas mikroorganisme yang dapat dijadikan konteks pembelajaran fermentasi, perubahan zat, dan sifat larutan asam-basa pada kopi.',
-        wordwallUrl: 'https://wordwall.net/resource/00000001/kopi-gayo',
-        status: 'published',
-        createdAt: '2026-07-10'
-    },
-    {
-        id: 'tari-saman',
-        title: 'Tari Saman',
-        subject: 'Fisika',
-        grade: 'SMP',
-        hotsLevel: 'C5',
-        stimulus: 'Tari Saman dari Gayo Lues menampilkan gerakan tangan, tepuk dada, dan paha yang serentak mengikuti irama syair. Pola gerak dan bunyi yang dihasilkan dapat digunakan untuk membahas konsep gerak, gaya, serta getaran dan gelombang bunyi dalam Fisika.',
-        wordwallUrl: 'https://wordwall.net/resource/00000002/tari-saman',
-        status: 'published',
-        createdAt: '2026-06-15'
-    },
-    {
-        id: 'rumoh-aceh',
-        title: 'Rumoh Aceh',
-        subject: 'Fisika',
-        grade: 'SMA',
-        hotsLevel: 'C5',
-        stimulus: 'Rumoh Aceh dibangun berbentuk panggung dengan sambungan kayu tanpa paku yang fleksibel terhadap guncangan. Struktur ini relevan untuk membahas gaya, keseimbangan, dan prinsip bangunan tahan gempa di wilayah rawan seismik seperti Aceh.',
-        wordwallUrl: 'https://wordwall.net/resource/00000003/rumoh-aceh',
-        status: 'draft',
-        createdAt: '2026-06-20'
-    },
-    {
-        id: 'danau-laut-tawar',
-        title: 'Danau Laut Tawar',
-        subject: 'Biologi',
-        grade: 'SMP',
-        hotsLevel: 'C4',
-        stimulus: 'Danau Laut Tawar menjadi habitat ikan endemik seperti ikan depik dan mendukung kehidupan masyarakat sekitar. Kondisi ekosistemnya dapat dijadikan konteks pembelajaran interaksi makhluk hidup, rantai makanan, dan pencemaran lingkungan perairan.',
-        wordwallUrl: null,
-        status: 'draft',
-        createdAt: '2026-05-28'
-    },
-    {
-        id: 'gunung-seulawah',
-        title: 'Gunung Seulawah',
-        subject: 'Fisika',
-        grade: 'SMA',
-        hotsLevel: 'C4',
-        stimulus: 'Gunung Seulawah Agam merupakan gunung berapi aktif yang menyimpan potensi energi panas bumi. Fenomena ini dapat digunakan untuk membahas perpindahan kalor, perubahan wujud zat, serta pemanfaatan energi alternatif.',
-        wordwallUrl: null,
-        status: 'draft',
-        createdAt: '2026-05-20'
-    },
-    {
-        id: 'hutan-leuser',
-        title: 'Hutan Leuser',
-        subject: 'Biologi',
-        grade: 'SMP',
-        hotsLevel: 'C6',
-        stimulus: 'Hutan Leuser menjadi rumah bagi flora dan fauna langka seperti orangutan Sumatra dan bunga Rafflesia. Keanekaragamannya menjadi konteks yang kaya untuk membahas klasifikasi makhluk hidup, keseimbangan ekosistem, hingga upaya konservasi.',
-        wordwallUrl: 'https://wordwall.net/resource/00000006/hutan-leuser',
-        status: 'published',
-        createdAt: '2026-07-05'
-    },
-    {
-        id: 'kerajinan-rotan',
-        title: 'Kerajinan Rotan',
-        subject: 'Fisika',
-        grade: 'SMP',
-        hotsLevel: 'C4',
-        stimulus: 'Rotan diolah melalui proses perendaman dan pelenturan sebelum dianyam menjadi furnitur dan kerajinan. Proses ini relevan untuk membahas sifat elastisitas, kekuatan bahan, serta perubahan fisika akibat perlakuan panas dan air.',
-        wordwallUrl: null,
-        status: 'draft',
-        createdAt: '2026-04-18'
-    },
-    {
-        id: 'garam-tradisional-aceh',
-        title: 'Garam Tradisional Aceh',
-        subject: 'Kimia',
-        grade: 'SMP',
-        hotsLevel: 'C5',
-        stimulus: 'Masyarakat pesisir Aceh mengolah air laut menjadi garam melalui penjemuran dan penguapan alami di bawah sinar matahari. Proses ini menjadi konteks nyata untuk membahas perubahan wujud zat, kristalisasi, serta konsep larutan jenuh.',
-        wordwallUrl: 'https://wordwall.net/resource/00000008/garam-tradisional-aceh',
-        status: 'published',
-        createdAt: '2026-05-02'
-    },
-    {
-        id: 'perahu-nelayan',
-        title: 'Perahu Nelayan',
-        subject: 'Fisika',
-        grade: 'SMP',
-        hotsLevel: 'C5',
-        stimulus: 'Perahu nelayan tradisional dirancang agar tetap mengapung membawa muatan hasil tangkapan. Bentuk lambung dan distribusi bebannya dapat dijadikan konteks pembelajaran gaya apung, tekanan zat cair, dan hukum Archimedes.',
-        wordwallUrl: null,
-        status: 'draft',
-        createdAt: '2026-06-01'
-    },
-    {
-        id: 'museum-tsunami',
-        title: 'Museum Tsunami Aceh',
-        subject: 'Fisika',
-        grade: 'SMA',
-        hotsLevel: 'C6',
-        stimulus: 'Museum Tsunami Aceh dirancang menyerupai gelombang sekaligus berfungsi sebagai escape building saat bencana. Bangunan ini menjadi konteks pembelajaran tentang gelombang, energi gempa dan tsunami, serta pentingnya mitigasi bencana.',
-        wordwallUrl: 'https://wordwall.net/resource/00000010/museum-tsunami',
-        status: 'published',
-        createdAt: '2026-07-12'
-    },
-    {
-        id: 'kerajinan-anyaman',
-        title: 'Kerajinan Anyaman Pandan',
-        subject: 'Biologi',
-        grade: 'SMP',
-        hotsLevel: 'C4',
-        stimulus: 'Daun pandan dikeringkan dan dianyam menjadi tikar serta kerajinan khas Aceh. Proses ini dapat dijadikan konteks pembelajaran struktur jaringan tumbuhan, serat alami, serta pemanfaatan sumber daya hayati secara berkelanjutan.',
-        wordwallUrl: null,
-        status: 'draft',
-        createdAt: '2026-04-10'
-    },
-    {
-        id: 'ulee-lheue',
-        title: 'Ulee Lheue',
-        subject: 'Fisika',
-        grade: 'SMA',
-        hotsLevel: 'C5',
-        stimulus: 'Kawasan pesisir Ulee Lheue mengalami perubahan bentang alam akibat abrasi dan hantaman gelombang tsunami. Fenomena ini menjadi konteks pembelajaran tentang energi gelombang, tekanan air, dan upaya perlindungan garis pantai.',
-        wordwallUrl: 'https://wordwall.net/resource/00000012/ulee-lheue',
-        status: 'draft',
-        createdAt: '2026-05-15'
-    },
-    {
-        id: 'sungai-krueng-aceh',
-        title: 'Sungai Krueng Aceh',
-        subject: 'Kimia',
-        grade: 'SMP',
-        hotsLevel: 'C4',
-        stimulus: 'Sungai Krueng Aceh menjadi sumber air sekaligus penerima limbah aktivitas warga di sekitarnya. Kondisi airnya dapat digunakan sebagai konteks pengujian pH, kekeruhan, serta dampak pencemaran terhadap kualitas air sungai.',
-        wordwallUrl: null,
-        status: 'draft',
-        createdAt: '2026-04-25'
-    },
-    {
-        id: 'padi-aceh',
-        title: 'Padi Aceh',
-        subject: 'Biologi',
-        grade: 'SMP',
-        hotsLevel: 'C4',
-        stimulus: 'Sawah-sawah di Aceh menghasilkan padi sebagai sumber pangan utama masyarakat. Proses pertumbuhannya menjadi konteks nyata untuk membahas fotosintesis, faktor pertumbuhan tumbuhan, serta siklus air dalam pertanian.',
-        wordwallUrl: 'https://wordwall.net/resource/00000014/padi-aceh',
-        status: 'published',
-        createdAt: '2026-05-08'
-    },
-    {
-        id: 'air-terjun-suhom',
-        title: 'Air Terjun Suhom',
-        subject: 'Fisika',
-        grade: 'SMA',
-        hotsLevel: 'C5',
-        stimulus: 'Air Terjun Suhom di Aceh Besar memiliki aliran air yang jatuh dari ketinggian cukup besar. Fenomena ini menjadi konteks pembelajaran perubahan energi potensial menjadi energi kinetik serta potensi pemanfaatannya sebagai sumber energi listrik.',
-        wordwallUrl: null,
-        status: 'draft',
-        createdAt: '2026-06-10'
+function authHeaders() {
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + window.localStorage.getItem('token')
+    };
+}
+
+async function handleResponse(response) {
+    if (response.status === 401 || response.status === 403) {
+        window.location.href = 'login.html';
+        throw new Error('Sesi berakhir, silakan login kembali.');
     }
-];
+    var data = await response.json();
+    if (!response.ok) {
+        throw new Error(data.message || 'Terjadi kesalahan pada server.');
+    }
+    return data;
+}
 
 /**
- * Future backend: replace the body with
- *   return fetch('/api/bank-soal').then(function (res) { return res.json(); });
- * Callers already treat this as async, so no other file needs to change.
+ * Semua paket soal milik guru yang sedang login (Draft dan Published).
+ * Smart Diagnostic memfilter status === 'published' sendiri setelah ini.
  */
 export function fetchPaketSoal() {
-    var token = localStorage.getItem('token');
-    return fetch('http://localhost:5001/api/bank-soal', {
-        headers: { 'Authorization': 'Bearer ' + token }
-    }).then(function (res) {
-        return res.json();
+
+    return fetch(window.API_BASE_URL + '/api/paket-soal', {
+        headers: authHeaders()
+    }).then(handleResponse);
+}
+
+/**
+ * Satu paket soal berdasarkan id. Dipakai detail-soal.html mode Edit.
+ * Resolve null kalau tidak ditemukan (bukan reject) -- sesuai kontrak lama.
+ */
+export function fetchPaketById(id) {
+    return fetch(window.API_BASE_URL + '/api/paket-soal/' + id, {
+        headers: authHeaders()
+    }).then(function (response) {
+        if (response.status === 404) return null;
+        return handleResponse(response);
+    });
+}
+
+/**
+ * Create (paket.id kosong) atau Update (paket.id ada) satu paket soal.
+ */
+export function savePaket(paket) {
+    var isEdit = paket.id;
+    var url = window.API_BASE_URL + '/api/paket-soal' + (isEdit ? '/' + paket.id : '');
+
+    return fetch(url, {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: authHeaders(),
+        body: JSON.stringify(paket)
+    }).then(handleResponse);
+}
+
+/**
+ * Hapus satu paket soal, lalu resolve dengan daftar paket terbaru --
+ * sesuai kontrak lama (bank-soal.js langsung re-render dari hasil ini).
+ */
+export function deletePaket(id) {
+    return fetch(window.API_BASE_URL + '/api/paket-soal/' + id, {
+        method: 'DELETE',
+        headers: authHeaders()
+    }).then(handleResponse).then(function () {
+        return fetchPaketSoal();
+
     });
 }

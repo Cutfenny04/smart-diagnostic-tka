@@ -201,8 +201,6 @@
     flex-shrink: 0;
 }
 
-/* .recommended-grid base rule now lives in style.css (shared across catalog pages) */
-
 /* ==========================================================================
    RESPONSIVE
    Desktop: 3 cards/row · Laptop: 2-3 · Tablet: 2 · Mobile: 1
@@ -210,8 +208,7 @@
 
 /* Laptop */
 @media (max-width: 1280px) {
-    .module-grid,
-    .recommended-grid {
+    .module-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 }
@@ -232,8 +229,7 @@
 }
 
 @media (max-width: 768px) {
-    .module-grid,
-    .recommended-grid {
+    .module-grid {
         grid-template-columns: repeat(2, 1fr);
     }
 
@@ -245,8 +241,7 @@
 
 /* Mobile */
 @media (max-width: 480px) {
-    .module-grid,
-    .recommended-grid {
+    .module-grid {
         grid-template-columns: 1fr;
     }
 

@@ -403,6 +403,11 @@ input:focus-visible,
     height: 20px;
 }
 
+.btn-icon--danger:hover {
+    border-color: var(--color-danger);
+    color: var(--color-danger);
+}
+
 /* Topbar sits on the dark gradient — its icon buttons need the dark-surface treatment */
 .topbar .btn-icon {
     background: rgba(255, 255, 255, 0.06);
@@ -739,15 +744,17 @@ input:focus-visible,
     margin-left: var(--space-1);
 }
 
-.card-glass-dark {
-    background: var(--surface-glass-dark);
-    backdrop-filter: blur(24px);
-    -webkit-backdrop-filter: blur(24px);
-    border: 1.5px solid var(--border-on-dark);
-    border-radius: var(--radius-2xl);
-    box-shadow: var(--shadow-premium);
-    color: var(--text-on-dark);
-    padding: var(--space-6);
+/* Shared section spacing — every page's stacked <section> blocks
+   (Dashboard, Materi, Bank Soal, Bank Stimulus, Dashboard Hasil) */
+.dashboard-section {
+    margin-bottom: var(--space-6);
+}
+
+/* KPI/stat-card grid — Dashboard's ringkasan, Bank Soal's stats, etc. */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-5);
 }
 
 /* ==========================================================================
@@ -895,11 +902,6 @@ input:focus-visible,
 
 .skeleton--text:last-child {
     width: 70%;
-}
-
-.skeleton--card {
-    height: 120px;
-    width: 100%;
 }
 
 /* ==========================================================================
@@ -1132,57 +1134,244 @@ input:focus-visible,
     display: none;
 }
 
-/* ==========================================================================
-   DROPDOWN MENU (generic per-item action menu — e.g. Bank Soal question
-   cards. Same tokens as the topbar's profile/notification dropdowns, but a
-   standalone reusable class since it appears in page content, not the shell.)
-   ========================================================================== */
-.dropdown-menu {
-    position: absolute;
-    top: calc(100% + var(--space-2));
-    right: 0;
-    background: var(--surface-card);
-    border: 1px solid var(--border-on-light);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-lg);
-    min-width: 200px;
-    overflow: hidden;
-    z-index: 30;
+.btn-danger {
+    background: transparent;
+    color: var(--color-danger);
+    border: 1.5px solid var(--color-danger);
 }
 
-.dropdown-menu__item {
+.btn-danger:hover {
+    background: rgba(255, 82, 82, 0.10);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(255, 82, 82, 0.2);
+}
+
+.btn-danger:active {
+    transform: translateY(1px);
+}
+
+/* ==========================================================================
+   FORM FIELD (Detail Paket Soal create/edit form, and any future data-entry
+   form — labels, inputs/selects/textareas, error/hint text, row/actions layout)
+   ========================================================================== */
+.form-field {
     display: flex;
-    align-items: center;
-    gap: var(--space-3);
+    flex-direction: column;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+}
+
+.form-field__label {
+    font-size: var(--text-small);
+    font-weight: 600;
+    color: var(--text-on-light);
+}
+
+.form-field__label .form-field__required {
+    color: var(--color-rosy);
+    margin-left: var(--space-1);
+}
+
+.form-field__label .form-field__optional {
+    font-weight: 400;
+    color: var(--text-muted-on-light);
+    margin-left: var(--space-1);
+}
+
+.form-field__input,
+.form-field__select,
+.form-field__textarea {
     width: 100%;
     padding: var(--space-3) var(--space-4);
     font-family: var(--font-body);
     font-size: var(--text-body);
     color: var(--text-on-light);
-    background: none;
-    border: none;
-    text-align: left;
-    min-height: 44px;
-    cursor: pointer;
+    background: var(--surface-card-tint);
+    border: 1px solid var(--border-on-light);
+    border-radius: var(--radius-md);
+    outline: none;
     transition: var(--transition-fast);
 }
 
-.dropdown-menu__item svg {
-    width: 18px;
-    height: 18px;
+.form-field__input {
+    height: 44px;
+}
+
+.form-field__select {
+    height: 44px;
+    cursor: pointer;
+}
+
+.form-field__textarea {
+    min-height: 120px;
+    resize: vertical;
+    line-height: 1.5;
+}
+
+.form-field__input:focus,
+.form-field__select:focus,
+.form-field__textarea:focus {
+    border-color: var(--color-rosy);
+    box-shadow: 0 0 0 3px rgba(211, 150, 140, 0.15);
+}
+
+.form-field.has-error .form-field__input,
+.form-field.has-error .form-field__select,
+.form-field.has-error .form-field__textarea {
+    border-color: var(--color-danger);
+}
+
+.form-field__error {
+    display: none;
+    font-size: var(--text-small);
+    color: var(--color-danger);
+}
+
+.form-field.has-error .form-field__error {
+    display: block;
+}
+
+.form-field__hint {
+    font-size: var(--text-small);
     color: var(--text-muted-on-light);
 }
 
-.dropdown-menu__item:hover {
+.form-row {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--space-4);
+}
+
+.form-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--border-on-light);
+}
+
+/* ==========================================================================
+   CONFIRM MODAL (destructive-action confirmation — e.g. Hapus Paket Soal —
+   reuses existing tokens only, no new colors/shadows introduced)
+   ========================================================================== */
+.confirm-modal-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 36, 24, 0.45);
+    z-index: 300;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-5);
+    opacity: 0;
+    transition: opacity var(--duration-base) var(--ease-premium);
+}
+
+.confirm-modal-backdrop.is-open {
+    display: flex;
+    opacity: 1;
+}
+
+.confirm-modal {
+    width: 100%;
+    max-width: 420px;
+    background: var(--surface-card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-6);
+    transform: scale(0.96);
+    transition: transform var(--duration-base) var(--ease-premium);
+}
+
+.confirm-modal-backdrop.is-open .confirm-modal {
+    transform: scale(1);
+}
+
+.confirm-modal__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h3);
+    color: var(--text-on-light);
+    margin-bottom: var(--space-2);
+}
+
+.confirm-modal__desc {
+    font-size: var(--text-body);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-6);
+}
+
+.confirm-modal__actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: var(--space-3);
+}
+
+/* ==========================================================================
+   EMBED FRAME (added Phase 3, for Smart Diagnostic's Wordwall iframe — any
+   future responsive external-content embed can reuse this)
+   ========================================================================== */
+.embed-frame {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
     background: var(--surface-card-tint);
+    border: 1px solid var(--border-on-light);
+    border-radius: var(--radius-md);
+    overflow: hidden;
 }
 
-.dropdown-menu__item--danger {
-    color: var(--color-danger);
+.embed-frame iframe {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: 0;
 }
 
-.dropdown-menu__item--danger svg {
-    color: var(--color-danger);
+/* ==========================================================================
+   DATA TABLE (added Phase 4, for Dashboard Hasil's results table — any
+   future simple read-only tabular listing can reuse this)
+   ========================================================================== */
+.data-table-wrapper {
+    overflow-x: auto;
+}
+
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-small);
+}
+
+.data-table th,
+.data-table td {
+    text-align: left;
+    padding: var(--space-3) var(--space-4);
+    white-space: nowrap;
+}
+
+.data-table th {
+    font-size: var(--text-micro);
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--text-muted-on-light);
+    border-bottom: 1px solid var(--border-on-light);
+}
+
+.data-table td {
+    color: var(--text-on-light);
+    border-bottom: 1px solid var(--border-on-light);
+}
+
+.data-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.data-table tbody tr:hover {
+    background: var(--surface-card-tint);
 }
 
 /* ==========================================================================
@@ -1300,6 +1489,10 @@ input:focus-visible,
         display: none;
     }
 
+    .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
     .catalog-controls {
         flex-direction: column;
         align-items: stretch;
@@ -1356,10 +1549,27 @@ input:focus-visible,
         opacity: 1;
         pointer-events: auto;
     }
+
+    .form-row {
+        grid-template-columns: 1fr;
+    }
+
+    .form-actions {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+
+    .confirm-modal {
+        padding: var(--space-5);
+    }
 }
 
 /* Mobile (max-width: 480px) */
 @media (max-width: 480px) {
+    .kpi-grid {
+        grid-template-columns: 1fr;
+    }
+
     .topbar {
         gap: var(--space-2);
     }
