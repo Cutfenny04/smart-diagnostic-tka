@@ -3,6 +3,7 @@ const cors = require('cors');
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth.routes');
+const paketSoalRoutes = require('./routes/paketSoal.routes');
 
 const app = express();
 
@@ -16,6 +17,9 @@ app.get('/', (req, res) => {
 
 // Semua route auth ada di prefix /api/auth
 app.use('/api/auth', authRoutes);
+
+// Semua route paket soal (Bank Soal) ada di prefix /api/paket-soal
+app.use('/api/paket-soal', paketSoalRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

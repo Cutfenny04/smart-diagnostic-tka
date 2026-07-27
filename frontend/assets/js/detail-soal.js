@@ -78,16 +78,15 @@ function buildPaket(values) {
             wordwallUrl: values.wordwallUrl || null
         });
     }
+    // No id/createdAt here — the backend assigns both when creating a paket.
     return {
-        id: 'paket-' + Date.now(),
         title: values.title,
         subject: values.subject,
         grade: values.grade,
         hotsLevel: values.hotsLevel,
         stimulus: values.stimulus,
         wordwallUrl: values.wordwallUrl || null,
-        status: values.status,
-        createdAt: new Date().toISOString().slice(0, 10)
+        status: values.status
     };
 }
 

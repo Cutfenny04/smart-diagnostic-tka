@@ -234,7 +234,7 @@ function renderPreview(item) {
 }
 
 function selectPaket(id) {
-    var item = allPaket.filter(function (p) { return p.id === id; })[0];
+    var item = allPaket.filter(function (p) { return String(p.id) === String(id); })[0];
     if (!item) return;
     renderPreview(item);
     openMobilePreview();
