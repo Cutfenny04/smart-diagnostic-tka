@@ -35,10 +35,11 @@ export const materiOverallProgress = { completed: 12, total: 18, percent: 67 };
  * Callers already treat this as async, so no other file needs to change.
  */
 export function fetchMateri() {
-    return new Promise(function (resolve) {
-        window.setTimeout(function () {
-            resolve(materiData);
-        }, 700);
+    var token = localStorage.getItem('token');
+    return fetch('http://localhost:5001/api/materi', {
+        headers: { 'Authorization': 'Bearer ' + token }
+    }).then(function (res) {
+        return res.json();
     });
 }
 

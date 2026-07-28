@@ -35,6 +35,7 @@ async function handleResponse(response) {
  * Smart Diagnostic memfilter status === 'published' sendiri setelah ini.
  */
 export function fetchPaketSoal() {
+
     return fetch(window.API_BASE_URL + '/api/paket-soal', {
         headers: authHeaders()
     }).then(handleResponse);
@@ -77,5 +78,6 @@ export function deletePaket(id) {
         headers: authHeaders()
     }).then(handleResponse).then(function () {
         return fetchPaketSoal();
+
     });
 }
