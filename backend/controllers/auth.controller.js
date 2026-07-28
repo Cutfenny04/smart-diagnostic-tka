@@ -70,4 +70,37 @@ async function login(req, res) {
   }
 }
 
-module.exports = { register, login };
+// UBAH PASSWORD - guru yang sudah login mengganti password sendiri
+async function changePassword(req, res) {
+  try {
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+      return res.status(400).json({ message: 'Password lama dan password baru wajib diisi' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password baru minimal 6 karakter' });
+    }
+
+    const [rows] = await pool.query('SELECT * FROM guru WHERE id = ?', [req.guru.id]);
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Akun guru tidak ditemukan' });
+    }
+
+    const guru = rows[0];
+    const passwordCocok = await bcrypt.compare(oldPassword, guru.password_hash);
+    if (!passwordCocok) {
+      return res.status(401).json({ message: 'Password lama salah' });
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    await pool.query('UPDATE guru SET password_hash = ? WHERE id = ?', [passwordHash, guru.id]);
+
+    return res.json({ message: 'Password berhasil diubah' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+}
+
+module.exports = { register, login, changePassword };

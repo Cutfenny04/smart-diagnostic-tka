@@ -1,14 +1,15 @@
 # smart-diagnostic-tka
 Platform Pelatihan Penyusunan Instrumen HOTS IPA Berbasis Smart Diagnostic TKA Terintegrasi Game Digital Budaya Aceh.
 
-**Status: FINAL PROTOTYPE — READY FOR DEMONSTRATION.**
-
-Frontend-only prototype (HTML/CSS/vanilla JS, no framework, no backend) untuk Pengabdian Masyarakat. Lihat `PIVOT_PLAN.md` untuk arsitektur lengkap dan status tiap fase, dan `DESIGN_SYSTEM.md` untuk seluruh token dan komponen UI.
+Prototipe untuk Pengabdian Masyarakat, terdiri dari frontend (HTML/CSS/vanilla JS, tanpa framework) di `frontend/` dan backend nyata (Express + MySQL) di `backend/`. Login/Register dan Bank Soal Berbasis Budaya Aceh sudah terhubung ke backend sungguhan; lihat `PIVOT_PLAN.md` untuk arsitektur lengkap dan status tiap fase, `DESIGN_SYSTEM.md` untuk seluruh token dan komponen UI, dan `backend/README.md` untuk setup database serta daftar endpoint API.
 
 ## Menjalankan secara lokal
 
-Serve folder `frontend/` dengan static file server (mis. `python -m http.server 8642` di dalam folder tersebut), lalu buka `http://localhost:8642/login.html`.
+Backend dan frontend dijalankan terpisah:
+
+1. **Backend** — ikuti `backend/README.md` (install dependency, setup database MySQL dari `backend/sql/schema.sql`, copy `.env.example` ke `.env`, lalu `npm run dev` di dalam folder `backend/`). Server berjalan di `http://localhost:5000`.
+2. **Frontend** — serve folder `frontend/` dengan static file server (mis. `python -m http.server 8642` di dalam folder tersebut), lalu buka `http://localhost:8642/login.html`. Guru harus register/login lebih dulu (lewat backend yang aktif) sebelum bisa mengakses halaman lain.
 
 ## Halaman
 
-Login &middot; Dashboard &middot; Materi & Modul Pelatihan &middot; Bank Soal Berbasis Budaya Aceh &middot; Detail Paket Soal (create/edit) &middot; Smart Diagnostic &middot; Dashboard Hasil &middot; Profil.
+Login &middot; Dashboard &middot; Materi & Modul Pelatihan (+ Detail Materi) &middot; Bank Soal Berbasis Budaya Aceh &middot; Detail Paket Soal (create/edit) &middot; Smart Diagnostic &middot; Dashboard Hasil &middot; Profil (+ Ubah Password).

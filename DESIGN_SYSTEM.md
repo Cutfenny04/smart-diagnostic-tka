@@ -301,6 +301,10 @@ Dashboard Hasil's "Tuntas vs Belum Tuntas" chart is **not** a new component — 
 
 Page-specific composition, not a new shared component: `.profil-avatar` (72px circle, `--gradient-midnight`, initial letter — same visual language as the topbar's `.topbar__avatar`, just larger) plus a `.profil-info-row` list, each row pairing a 44px icon circle (`rgba(131, 153, 88, 0.12)` background + `--color-moss` icon, matching `.empty-state__icon`'s tone) with a micro-label/value pair (same type scale as `.card-stat__label` / `.card-stat__value`). View-only — no edit form, since Phase 5 is final-polish, not new features. Lives in `assets/css/profil.css`.
 
+### 7.20 Topic List (added post-pivot, for Detail Materi)
+
+Page-specific composition, not a new shared component: `.topic-list` is a vertical stack of `.topic-list__item` rows, each a bordered rectangle (`--border-on-light`, `--radius-md`) pairing a Lucide icon (`circle` for pending, `check-circle-2` for done, tinted `--color-moss` via `.is-done`) with the topic label. Read-only — reflects the module's existing `progress` percentage against its `topics` array (`assets/data/materi.js`), it does not let the guru toggle individual topics, since the site is not an LMS (§0.1). Lives in `assets/css/detail-materi.css`.
+
 ---
 
 ## 8. Layout & Breakpoints
@@ -394,7 +398,9 @@ Footer (optional)
 
 Login · Dashboard · Materi & Modul · Bank Soal Berbasis Budaya Aceh · Detail Soal (paket soal) · Smart Diagnostic · Dashboard Hasil · Profil — every page uses this system without exception.
 
-**Bank Stimulus is no longer a separate page** — refactored into Bank Soal Berbasis Budaya Aceh per the product pivot (§0.1, `PIVOT_PLAN.md`). Its files remain on disk but are not part of the active navigation.
+**Bank Stimulus is no longer a separate page** — refactored into Bank Soal Berbasis Budaya Aceh per the product pivot (§0.1, `PIVOT_PLAN.md`). Its files (`bank-stimulus.html`, `detail-stimulus.html`) remain on disk, empty, and are not part of the active navigation or this list — left untouched intentionally, see `PIVOT_PLAN.md` §13.
+
+**Detail Materi and Ubah Password** (`detail-materi.html`, `ubah-password.html`) are two supporting pages outside the 8-page pivot scope but reachable from live links (Materi's "Mulai Belajar"/"Lanjutkan Belajar" buttons, the topbar's profile menu) — built post-pivot so those links aren't dead. They follow this same design system (§7.20 for Detail Materi's topic list; Ubah Password reuses `.form-field` and `.empty-state` as-is, no new components).
 
 ---
 
@@ -431,3 +437,5 @@ READY FOR DEMONSTRATION
 ```
 
 Phase 5 (final polish) also removed dead CSS that had accumulated across earlier phases — `.dropdown-menu`, `.card-glass-dark`, `.skeleton--card`, and `materi.css`'s stale `.recommended-grid` breakpoint references — and promoted `.dashboard-section`/`.kpi-grid` from `dashboard.css` to `style.css` after finding they were used by Bank Soal, Materi, and Bank Stimulus without ever being loaded on those pages (a real cross-page spacing bug, now fixed). See `PIVOT_PLAN.md` §13 for the full final-status summary and known gaps.
+
+**Post-pivot addendum:** a real backend (`backend/`, Express + MySQL, see `backend/README.md`) now backs Login/Register and Bank Soal's CRUD — `assets/data/bank-soal.js` and `login.js` call it over HTTP instead of localStorage/dummy data. `detail-materi.html` and `ubah-password.html`, previously empty scaffold files, are now built out (§7.20) so the live links pointing at them work. `bank-stimulus.html`/`detail-stimulus.html` remain untouched/empty by product decision — they are unreferenced dead pages, not a gap.

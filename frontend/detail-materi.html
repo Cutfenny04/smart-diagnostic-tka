@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="pageTitle">Detail Materi - Smart Diagnostic TKA</title>
+    <meta name="description" content="Detail modul materi penyusunan soal HOTS IPA berbasis budaya Aceh - Smart Diagnostic TKA.">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+
+    <!-- Shared Design System -->
+    <link rel="stylesheet" href="assets/css/style.css">
+    <!-- Page Specific -->
+    <link rel="stylesheet" href="assets/css/detail-materi.css">
+</head>
+<body data-page="materi">
+    <div class="app-shell">
+        <div data-include="sidebar"></div>
+        <div class="sidebar-overlay"></div>
+
+        <div class="app-shell__main">
+            <div data-include="topbar"></div>
+
+            <main class="content">
+                <nav class="breadcrumb" aria-label="Breadcrumb">
+                    <a href="dashboard.html">Beranda</a>
+                    <span class="breadcrumb__sep">/</span>
+                    <a href="materi.html">Materi &amp; Modul Pelatihan</a>
+                    <span class="breadcrumb__sep">/</span>
+                    <span class="breadcrumb__current" aria-current="page" id="breadcrumbCurrent">Detail Materi</span>
+                </nav>
+
+                <!-- Header (filled by detail-materi.js) -->
+                <div class="page-header">
+                    <div class="page-header__text">
+                        <span class="badge badge--info" id="categoryBadge"></span>
+                        <h1 class="page-header__title" id="materiTitle"></h1>
+                        <p class="page-header__desc" id="materiDesc"></p>
+                    </div>
+                </div>
+
+                <div class="card-light detail-materi-card" id="detailMateriCard"></div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Shared Shell Script -->
+    <script src="assets/js/main.js"></script>
+    <!-- Page Specific (ES module — imports its data from assets/data/materi.js) -->
+    <script type="module" src="assets/js/detail-materi.js"></script>
+</body>
+</html>
