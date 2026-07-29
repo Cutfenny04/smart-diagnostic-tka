@@ -10,7 +10,7 @@
    backend's public URL once it exists.
    ========================================================================== */
 (function () {
-    var PRODUCTION_API_BASE_URL = 'https://REPLACE-WITH-YOUR-BACKEND.up.railway.app';
+    var PRODUCTION_API_BASE_URL = 'https://resilient-manifestation-production-6f44.up.railway.app';
     var isLocal = ['localhost', '127.0.0.1'].indexOf(window.location.hostname) !== -1;
     window.API_BASE_URL = isLocal ? 'http://localhost:5000' : PRODUCTION_API_BASE_URL;
 })();
