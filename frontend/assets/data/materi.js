@@ -36,7 +36,7 @@ export const materiOverallProgress = { completed: 12, total: 18, percent: 67 };
  */
 export function fetchMateri() {
     var token = localStorage.getItem('token');
-    return fetch('http://localhost:5001/api/materi', {
+    return fetch(window.API_BASE_URL + '/api/materi', {
         headers: { 'Authorization': 'Bearer ' + token }
     }).then(function (res) {
         return res.json();

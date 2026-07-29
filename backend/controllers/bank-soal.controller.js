@@ -13,21 +13,21 @@ function toSlug(title) {
 async function getAllPaketSoal(req, res) {
   try {
     const { status } = req.query;
-    let sql = `SELECT 
+    let sql = `SELECT
          id, slug, title, subject, grade,
-         hots_level AS hotsLevel, stimulus,
-         wordwall_url AS wordwallUrl, status,
-         created_at AS createdAt
+         hots_level AS "hotsLevel", stimulus,
+         wordwall_url AS "wordwallUrl", status,
+         created_at AS "createdAt"
        FROM paket_soal`;
     const params = [];
 
     if (status) {
-      sql += ' WHERE status = ?';
+      sql += ' WHERE status = $1';
       params.push(status);
     }
     sql += ' ORDER BY created_at DESC';
 
-    const [rows] = await pool.query(sql, params);
+    const { rows } = await pool.query(sql, params);
     return res.json(rows);
   } catch (err) {
     console.error(err);
@@ -39,14 +39,14 @@ async function getAllPaketSoal(req, res) {
 async function getPaketSoalBySlug(req, res) {
   try {
     const { slug } = req.params;
-    const [rows] = await pool.query(
-      `SELECT 
+    const { rows } = await pool.query(
+      `SELECT
          id, slug, title, subject, grade,
-         hots_level AS hotsLevel, stimulus,
-         wordwall_url AS wordwallUrl, status,
-         created_at AS createdAt
+         hots_level AS "hotsLevel", stimulus,
+         wordwall_url AS "wordwallUrl", status,
+         created_at AS "createdAt"
        FROM paket_soal
-       WHERE slug = ?`,
+       WHERE slug = $1`,
       [slug]
     );
 
@@ -72,16 +72,17 @@ async function createPaketSoal(req, res) {
     const slug = toSlug(title);
     const finalStatus = status === 'published' ? 'published' : 'draft';
 
-    const [result] = await pool.query(
+    const { rows } = await pool.query(
       `INSERT INTO paket_soal (slug, title, subject, grade, hots_level, stimulus, wordwall_url, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING id`,
       [slug, title, subject, grade, hotsLevel, stimulus, wordwallUrl || null, finalStatus]
     );
 
-    return res.status(201).json({ message: 'Paket soal berhasil ditambahkan', id: result.insertId, slug });
+    return res.status(201).json({ message: 'Paket soal berhasil ditambahkan', id: rows[0].id, slug });
   } catch (err) {
     console.error(err);
-    if (err.code === 'ER_DUP_ENTRY') {
+    if (err.code === '23505') {
       return res.status(409).json({ message: 'Paket soal dengan judul serupa sudah ada' });
     }
     return res.status(500).json({ message: 'Gagal menambahkan paket soal' });
@@ -94,15 +95,15 @@ async function updatePaketSoal(req, res) {
     const { slug } = req.params;
     const { title, subject, grade, hotsLevel, stimulus, wordwallUrl, status } = req.body;
 
-    const [existing] = await pool.query('SELECT id FROM paket_soal WHERE slug = ?', [slug]);
+    const { rows: existing } = await pool.query('SELECT id FROM paket_soal WHERE slug = $1', [slug]);
     if (existing.length === 0) {
       return res.status(404).json({ message: 'Paket soal tidak ditemukan' });
     }
 
     await pool.query(
-      `UPDATE paket_soal 
-       SET title = ?, subject = ?, grade = ?, hots_level = ?, stimulus = ?, wordwall_url = ?, status = ?
-       WHERE slug = ?`,
+      `UPDATE paket_soal
+       SET title = $1, subject = $2, grade = $3, hots_level = $4, stimulus = $5, wordwall_url = $6, status = $7
+       WHERE slug = $8`,
       [title, subject, grade, hotsLevel, stimulus, wordwallUrl || null, status, slug]
     );
 
@@ -118,8 +119,8 @@ async function deletePaketSoal(req, res) {
   try {
     const { slug } = req.params;
 
-    const [result] = await pool.query('DELETE FROM paket_soal WHERE slug = ?', [slug]);
-    if (result.affectedRows === 0) {
+    const result = await pool.query('DELETE FROM paket_soal WHERE slug = $1', [slug]);
+    if (result.rowCount === 0) {
       return res.status(404).json({ message: 'Paket soal tidak ditemukan' });
     }
 

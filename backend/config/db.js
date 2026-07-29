@@ -1,14 +1,12 @@
-const mysql = require('mysql2/promise');
+const { Pool } = require('pg');
 require('dotenv').config();
 
-// Pool koneksi: lebih efisien daripada buka-tutup koneksi tiap request
-const pool = mysql.createPool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  database: process.env.DB_NAME,
-  waitForConnections: true,
-  connectionLimit: 10,
+// Pool koneksi ke Supabase (PostgreSQL). ssl wajib karena Supabase mewajibkan
+// koneksi terenkripsi; rejectUnauthorized: false karena Supabase pakai
+// certificate chain yang tidak selalu dikenali Node secara default.
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
 });
 
 module.exports = pool;

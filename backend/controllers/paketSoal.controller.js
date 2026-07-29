@@ -39,16 +39,16 @@ function validatePaket(body) {
 async function list(req, res) {
   try {
     const { status } = req.query;
-    let sql = 'SELECT * FROM paket_soal WHERE guru_id = ?';
+    let sql = 'SELECT * FROM paket_soal WHERE guru_id = $1';
     const params = [req.guru.id];
 
     if (status) {
-      sql += ' AND status = ?';
+      sql += ' AND status = $2';
       params.push(status);
     }
     sql += ' ORDER BY created_at DESC';
 
-    const [rows] = await pool.query(sql, params);
+    const { rows } = await pool.query(sql, params);
     return res.json(rows.map(toApiShape));
   } catch (err) {
     console.error(err);
@@ -59,8 +59,8 @@ async function list(req, res) {
 // GET ONE - dipakai detail-soal.html mode Edit
 async function getById(req, res) {
   try {
-    const [rows] = await pool.query(
-      'SELECT * FROM paket_soal WHERE id = ? AND guru_id = ?',
+    const { rows } = await pool.query(
+      'SELECT * FROM paket_soal WHERE id = $1 AND guru_id = $2',
       [req.params.id, req.guru.id]
     );
     if (rows.length === 0) {
@@ -82,13 +82,13 @@ async function create(req, res) {
     }
 
     const { title, subject, grade, hotsLevel, stimulus, wordwallUrl, status } = req.body;
-    const [result] = await pool.query(
+    const { rows } = await pool.query(
       `INSERT INTO paket_soal (guru_id, title, subject, grade, hots_level, stimulus, wordwall_url, status)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+       RETURNING *`,
       [req.guru.id, title, subject, grade, hotsLevel, stimulus, wordwallUrl || null, status || 'draft']
     );
 
-    const [rows] = await pool.query('SELECT * FROM paket_soal WHERE id = ?', [result.insertId]);
     return res.status(201).json(toApiShape(rows[0]));
   } catch (err) {
     console.error(err);
@@ -104,8 +104,8 @@ async function update(req, res) {
       return res.status(400).json({ message: errorMessage });
     }
 
-    const [existing] = await pool.query(
-      'SELECT id FROM paket_soal WHERE id = ? AND guru_id = ?',
+    const { rows: existing } = await pool.query(
+      'SELECT id FROM paket_soal WHERE id = $1 AND guru_id = $2',
       [req.params.id, req.guru.id]
     );
     if (existing.length === 0) {
@@ -113,14 +113,14 @@ async function update(req, res) {
     }
 
     const { title, subject, grade, hotsLevel, stimulus, wordwallUrl, status } = req.body;
-    await pool.query(
+    const { rows } = await pool.query(
       `UPDATE paket_soal
-       SET title = ?, subject = ?, grade = ?, hots_level = ?, stimulus = ?, wordwall_url = ?, status = ?
-       WHERE id = ?`,
+       SET title = $1, subject = $2, grade = $3, hots_level = $4, stimulus = $5, wordwall_url = $6, status = $7
+       WHERE id = $8
+       RETURNING *`,
       [title, subject, grade, hotsLevel, stimulus, wordwallUrl || null, status || 'draft', req.params.id]
     );
 
-    const [rows] = await pool.query('SELECT * FROM paket_soal WHERE id = ?', [req.params.id]);
     return res.json(toApiShape(rows[0]));
   } catch (err) {
     console.error(err);
@@ -131,11 +131,11 @@ async function update(req, res) {
 // DELETE - dipakai confirm modal "Hapus Paket Soal?" di bank-soal.html
 async function remove(req, res) {
   try {
-    const [result] = await pool.query(
-      'DELETE FROM paket_soal WHERE id = ? AND guru_id = ?',
+    const result = await pool.query(
+      'DELETE FROM paket_soal WHERE id = $1 AND guru_id = $2',
       [req.params.id, req.guru.id]
     );
-    if (result.affectedRows === 0) {
+    if (result.rowCount === 0) {
       return res.status(404).json({ message: 'Paket soal tidak ditemukan' });
     }
     return res.json({ message: 'Paket soal berhasil dihapus' });

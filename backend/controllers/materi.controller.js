@@ -5,20 +5,20 @@ async function getAllMateri(req, res) {
   try {
     const guruId = req.guru.id; // didapat dari token (via verifyToken middleware)
 
-    const [rows] = await pool.query(
-      `SELECT 
+    const { rows } = await pool.query(
+      `SELECT
          m.id,
          m.title,
-         m.deskripsi AS \`desc\`,
+         m.deskripsi AS "desc",
          m.category,
          m.duration,
-         m.materi_count AS materiCount,
-         m.created_at AS dateAdded,
+         m.materi_count AS "materiCount",
+         m.created_at AS "dateAdded",
          COALESCE(p.progress, 0) AS progress,
-         p.last_opened AS lastOpened
+         p.last_opened AS "lastOpened"
        FROM materi m
-       LEFT JOIN progress_materi p 
-         ON p.materi_id = m.id AND p.guru_id = ?
+       LEFT JOIN progress_materi p
+         ON p.materi_id = m.id AND p.guru_id = $1
        ORDER BY m.created_at DESC`,
       [guruId]
     );
@@ -36,20 +36,20 @@ async function getMateriById(req, res) {
     const guruId = req.guru.id;
     const { id } = req.params;
 
-    const [rows] = await pool.query(
-      `SELECT 
+    const { rows } = await pool.query(
+      `SELECT
          m.id,
          m.title,
-         m.deskripsi AS \`desc\`,
+         m.deskripsi AS "desc",
          m.category,
          m.duration,
-         m.materi_count AS materiCount,
-         m.konten_url AS kontenUrl,
+         m.materi_count AS "materiCount",
+         m.konten_url AS "kontenUrl",
          COALESCE(p.progress, 0) AS progress
        FROM materi m
-       LEFT JOIN progress_materi p 
-         ON p.materi_id = m.id AND p.guru_id = ?
-       WHERE m.id = ?`,
+       LEFT JOIN progress_materi p
+         ON p.materi_id = m.id AND p.guru_id = $1
+       WHERE m.id = $2`,
       [guruId, id]
     );
 
@@ -75,13 +75,13 @@ async function updateProgress(req, res) {
       return res.status(400).json({ message: 'Progress harus antara 0-100' });
     }
 
-    // INSERT ... ON DUPLICATE KEY UPDATE: kalau belum ada baris progress, buat baru;
+    // INSERT ... ON CONFLICT: kalau belum ada baris progress, buat baru;
     // kalau sudah ada, update aja (karena guru_id + materi_id itu unik)
     await pool.query(
       `INSERT INTO progress_materi (guru_id, materi_id, progress, last_opened)
-       VALUES (?, ?, ?, NOW())
-       ON DUPLICATE KEY UPDATE progress = ?, last_opened = NOW()`,
-      [guruId, id, progress, progress]
+       VALUES ($1, $2, $3, NOW())
+       ON CONFLICT (guru_id, materi_id) DO UPDATE SET progress = $3, last_opened = NOW()`,
+      [guruId, id, progress]
     );
 
     return res.json({ message: 'Progress berhasil disimpan' });

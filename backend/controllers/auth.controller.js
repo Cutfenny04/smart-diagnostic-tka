@@ -12,7 +12,7 @@ async function register(req, res) {
     }
 
     // Cek apakah email sudah terdaftar
-    const [existing] = await pool.query('SELECT id FROM guru WHERE email = ?', [email]);
+    const { rows: existing } = await pool.query('SELECT id FROM guru WHERE email = $1', [email]);
     if (existing.length > 0) {
       return res.status(409).json({ message: 'Email sudah terdaftar' });
     }
@@ -21,7 +21,7 @@ async function register(req, res) {
     const passwordHash = await bcrypt.hash(password, 10);
 
     await pool.query(
-      'INSERT INTO guru (nama, email, password_hash) VALUES (?, ?, ?)',
+      'INSERT INTO guru (nama, email, password_hash) VALUES ($1, $2, $3)',
       [nama, email, passwordHash]
     );
 
@@ -41,7 +41,7 @@ async function login(req, res) {
       return res.status(400).json({ message: 'Email dan password wajib diisi' });
     }
 
-    const [rows] = await pool.query('SELECT * FROM guru WHERE email = ?', [email]);
+    const { rows } = await pool.query('SELECT * FROM guru WHERE email = $1', [email]);
     if (rows.length === 0) {
       return res.status(401).json({ message: 'Email atau password salah' });
     }
@@ -82,7 +82,7 @@ async function changePassword(req, res) {
       return res.status(400).json({ message: 'Password baru minimal 6 karakter' });
     }
 
-    const [rows] = await pool.query('SELECT * FROM guru WHERE id = ?', [req.guru.id]);
+    const { rows } = await pool.query('SELECT * FROM guru WHERE id = $1', [req.guru.id]);
     if (rows.length === 0) {
       return res.status(404).json({ message: 'Akun guru tidak ditemukan' });
     }
@@ -94,7 +94,7 @@ async function changePassword(req, res) {
     }
 
     const passwordHash = await bcrypt.hash(newPassword, 10);
-    await pool.query('UPDATE guru SET password_hash = ? WHERE id = ?', [passwordHash, guru.id]);
+    await pool.query('UPDATE guru SET password_hash = $1 WHERE id = $2', [passwordHash, guru.id]);
 
     return res.json({ message: 'Password berhasil diubah' });
   } catch (err) {
