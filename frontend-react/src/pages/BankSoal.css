@@ -1,0 +1,161 @@
+/* ==========================================================================
+   BANK SOAL BERBASIS BUDAYA ACEH — Page-specific composition only.
+   Tokens, shell, buttons, cards, badges, KPI stats, catalog controls, catalog
+   layout, and preview panel mechanics all live in assets/css/style.css. This
+   file only arranges/extends them for this page's paket list and preview
+   content.
+   ========================================================================== */
+
+/* --- Daftar Paket Soal --- */
+.soal-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+.soal-card {
+    position: relative;
+    padding: var(--space-5);
+    cursor: pointer;
+}
+
+.soal-card__head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-3);
+    margin-bottom: var(--space-2);
+}
+
+.soal-card__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h3);
+    font-weight: 400;
+    color: var(--text-on-light);
+}
+
+.soal-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    font-size: var(--text-micro);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-3);
+}
+
+.soal-card__meta span {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.soal-card__meta svg {
+    width: 14px;
+    height: 14px;
+}
+
+.soal-card__summary {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-3);
+}
+
+.soal-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+/* --- Preview Panel content (mechanics live in style.css as .preview-panel) --- */
+.soal-preview__eyebrow {
+    font-size: var(--text-micro);
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--color-rosy);
+    margin-bottom: var(--space-2);
+}
+
+.soal-preview__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h2);
+    font-weight: 400;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-3);
+}
+
+.soal-preview__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-4);
+}
+
+.soal-preview__section-title {
+    font-size: var(--text-small);
+    font-weight: 700;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-2);
+    margin-top: var(--space-4);
+}
+
+.soal-preview__question {
+    font-size: var(--text-body);
+    color: var(--text-on-light);
+    margin-bottom: var(--space-2);
+}
+
+.soal-preview__wordwall-indicator {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-small);
+    font-weight: 600;
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+}
+
+.soal-preview__wordwall-indicator svg {
+    width: 16px;
+    height: 16px;
+}
+
+.soal-preview__wordwall-indicator.is-connected {
+    background: rgba(131, 153, 88, 0.14);
+    color: #5C6B3A;
+}
+
+.soal-preview__wordwall-indicator.is-disconnected {
+    background: rgba(10, 51, 35, 0.06);
+    color: var(--text-muted-on-light);
+}
+
+.soal-preview__action {
+    margin-top: var(--space-5);
+    display: flex;
+    gap: var(--space-3);
+}
+
+.soal-preview__action .btn {
+    flex: 1;
+}
+
+.soal-preview__action .btn-icon {
+    flex: 0 0 44px;
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   Desktop/Laptop: list + sticky preview panel side-by-side
+   Tablet: preview moves below the list (handled globally by .preview-panel)
+   Mobile: preview becomes a bottom sheet (handled globally by .preview-panel)
+   ========================================================================== */
+@media (max-width: 768px) {
+    .soal-card__head {
+        flex-direction: column;
+    }
+
+    .soal-preview__action {
+        flex-direction: column;
+    }
+}
