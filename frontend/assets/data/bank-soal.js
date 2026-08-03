@@ -68,10 +68,7 @@ export function savePaket(paket) {
     }).then(handleResponse);
 }
 
-/**
- * Hapus satu paket soal, lalu resolve dengan daftar paket terbaru --
- * sesuai kontrak lama (bank-soal.js langsung re-render dari hasil ini).
- */
+
 export function deletePaket(id) {
     return fetch(window.API_BASE_URL + '/api/paket-soal/' + id, {
         method: 'DELETE',

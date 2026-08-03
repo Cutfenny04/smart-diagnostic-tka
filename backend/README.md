@@ -11,12 +11,12 @@ npm install
 ```
 
 ### 2. Setup database
-- Buka phpMyAdmin / MySQL CLI
-- Jalankan isi file `sql/schema.sql` untuk membuat database `guru_aceh_db` dan tabel `guru` + `paket_soal`
+- Buka dashboard Supabase project kamu -> SQL Editor -> New query
+- Copy-paste seluruh isi file `sql/supabase_schema.sql`, lalu klik Run
 
 ### 3. Setup file environment
 - Copy `.env.example` jadi `.env` (`.env` sudah masuk `.gitignore`, jangan pernah di-commit)
-- Isi `DB_PASSWORD` sesuai password MySQL kamu (kalau pakai XAMPP biasanya kosong)
+- Isi `DATABASE_URL` dengan connection string dari dashboard Supabase (Settings > Database > Connection string > URI)
 - Isi `JWT_SECRET` bebas, string acak yang panjang (contoh: `rahasia123banget456`)
 
 ### 4. Jalankan server
@@ -83,7 +83,7 @@ Body (JSON):
 ## Struktur Folder
 ```
 backend-guru-aceh/
-├── config/db.js                    # koneksi ke MySQL
+├── config/db.js                    # koneksi ke Supabase (PostgreSQL)
 ├── controllers/                     # logika bisnis tiap fitur
 │   ├── auth.controller.js
 │   └── paketSoal.controller.js
@@ -92,7 +92,7 @@ backend-guru-aceh/
 ├── routes/                          # daftar endpoint
 │   ├── auth.routes.js
 │   └── paketSoal.routes.js
-├── sql/schema.sql                   # struktur database
+├── sql/supabase_schema.sql          # struktur database
 ├── server.js                        # entry point
 ├── .env.example                     # template -- copy jadi .env, isi sendiri
 └── .env                             # (kamu buat sendiri dari .env.example, tidak di-commit)
@@ -107,6 +107,6 @@ Frontend (`frontend/`) sudah di-wire ke backend ini:
 
 ## Langkah Selanjutnya
 1. Pastikan register, login, dan CRUD paket soal berhasil ditest (lihat bagian Testing Endpoint di atas).
-2. Tambah tabel `materi`, `hasil_diagnostik` di `sql/schema.sql`.
+2. Tambah tabel `hasil_diagnostik` di `sql/supabase_schema.sql`.
 3. Buat controller & route baru per fitur (pola sama seperti `paketSoal.controller.js`/`paketSoal.routes.js`).
 4. Wire `frontend/assets/data/materi.js` dan `frontend/assets/data/hasil.js` ke endpoint barunya, dengan pola yang sama seperti `bank-soal.js`.
