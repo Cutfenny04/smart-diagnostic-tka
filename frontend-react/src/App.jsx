@@ -5,7 +5,11 @@ import Materi from './pages/Materi';
 import DetailMateri from './pages/DetailMateri';
 import BankSoal from './pages/BankSoal';
 import DetailSoal from './pages/DetailSoal';
-import ComingSoon from './pages/ComingSoon';
+import SmartDiagnostic from './pages/SmartDiagnostic';
+import HasilDiagnostik from './pages/HasilDiagnostik';
+import Profil from './pages/Profil';
+import UbahPassword from './pages/UbahPassword';
+import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
 import './styles/style.css';
 
@@ -39,7 +43,11 @@ function App() {
         <Route path="/bank-soal" element={protect(<BankSoal />)} />
         <Route path="/bank-soal/baru" element={protect(<DetailSoal />)} />
         <Route path="/bank-soal/:id/edit" element={protect(<DetailSoalEditRoute />)} />
-        <Route path="*" element={protect(<ComingSoon />)} />
+        <Route path="/smart-diagnostic" element={protect(<SmartDiagnostic />)} />
+        <Route path="/hasil-diagnostik" element={protect(<HasilDiagnostik />)} />
+        <Route path="/profil" element={protect(<Profil />)} />
+        <Route path="/ubah-password" element={protect(<UbahPassword />)} />
+        <Route path="*" element={protect(<NotFound />)} />
       </Routes>
     </BrowserRouter>
   );
