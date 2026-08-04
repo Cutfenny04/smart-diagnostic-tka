@@ -4,6 +4,7 @@ import { Clock, Layers, CheckCircle2, Circle, SearchX } from 'lucide-react';
 import Layout from '../components/Layout';
 import { fetchMateriById, materiCategoryMeta as CATEGORY_META } from '../data/materiData';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './DetailMateri.css';
 
 function statusOf(m) {
@@ -22,12 +23,14 @@ function DetailMateri() {
   const { id } = useParams();
   const [modul, setModul] = useState(undefined); // undefined = loading, null = not found
 
+  // Reset ke loading tiap ganti id ditangani lewat key={id} di App.jsx
+  // (remount penuh), bukan setState manual di sini.
   useEffect(() => {
-    setModul(undefined);
     fetchMateriById(id).then(setModul);
   }, [id]);
 
   useProgressBarAnimation(Boolean(modul));
+  useDocumentTitle(modul ? modul.title + ' - Smart Diagnostic TKA' : 'Detail Materi - Smart Diagnostic TKA');
 
   if (modul === undefined) {
     return (

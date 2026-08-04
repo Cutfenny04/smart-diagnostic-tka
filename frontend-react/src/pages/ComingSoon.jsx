@@ -1,10 +1,13 @@
 import { Link } from 'react-router-dom';
 import { Construction } from 'lucide-react';
 import Layout from '../components/Layout';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 
 /* Placeholder untuk halaman yang belum dimigrasi ke React (mis. Smart
    Diagnostic, Profil) -- supaya link yang menuju ke sana tidak blank. */
 function ComingSoon() {
+  useDocumentTitle('Segera Hadir - Smart Diagnostic TKA');
+
   return (
     <Layout breadcrumb="Segera Hadir">
       <div className="card-light">

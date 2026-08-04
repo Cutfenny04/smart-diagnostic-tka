@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Save } from 'lucide-react';
 import Layout from '../components/Layout';
 import { fetchPaketById, savePaket } from '../data/bankSoalData';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './DetailSoal.css';
 
 const EMPTY_FORM = { title: '', subject: '', grade: '', hotsLevel: '', stimulus: '', wordwallUrl: '', status: 'draft' };
@@ -16,15 +17,20 @@ function DetailSoal() {
   const [form, setForm] = useState(EMPTY_FORM);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(isEditMode);
-  const [notFound, setNotFound] = useState(false);
   const [saving, setSaving] = useState(false);
 
+  const heading = isEditMode ? 'Edit Paket Soal' : 'Tambah Paket Soal';
+  useDocumentTitle(heading + ' - Smart Diagnostic TKA');
+
+  // Reset ke loading tiap ganti id ditangani lewat key={id} di App.jsx
+  // (remount penuh), bukan setState manual di sini.
   useEffect(() => {
     if (!isEditMode) return;
-    setLoading(true);
     fetchPaketById(id).then((paket) => {
       if (!paket) {
-        setNotFound(true);
+        // Sama seperti detail-soal.js vanilla: id tidak ada -> redirect diam-diam
+        // ke Bank Soal, bukan menampilkan halaman error.
+        navigate('/bank-soal', { replace: true });
         return;
       }
       setForm({
@@ -38,7 +44,7 @@ function DetailSoal() {
       });
       setLoading(false);
     });
-  }, [id, isEditMode]);
+  }, [id, isEditMode, navigate]);
 
   function setField(name, value) {
     setForm((f) => ({ ...f, [name]: value }));
@@ -87,21 +93,7 @@ function DetailSoal() {
     navigate('/bank-soal');
   }
 
-  const heading = isEditMode ? 'Edit Paket Soal' : 'Tambah Paket Soal';
   const breadcrumb = [{ label: 'Bank Soal Berbasis Budaya Aceh', to: '/bank-soal' }, { label: heading }];
-
-  if (notFound) {
-    return (
-      <Layout breadcrumb={breadcrumb}>
-        <div className="card-light detail-soal-form">
-          <div className="empty-state">
-            <h3 className="empty-state__title">Paket soal tidak ditemukan</h3>
-            <Link to="/bank-soal" className="btn btn-primary">Kembali ke Bank Soal</Link>
-          </div>
-        </div>
-      </Layout>
-    );
-  }
 
   if (loading) {
     return (

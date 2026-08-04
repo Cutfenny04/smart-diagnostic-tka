@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react';
+import { createElement, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Clock, Layers, PlayCircle, SearchX } from 'lucide-react';
 import Layout from '../components/Layout';
 import { fetchMateri, materiCategoryMeta as CATEGORY_META, materiCategoryOrder as CATEGORY_ORDER, materiOverallProgress as OVERALL_PROGRESS } from '../data/materiData';
 import { getIcon } from '../utils/icon';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Materi.css';
 
 const FILTERS = [
@@ -34,12 +35,11 @@ function sortModules(list, sort) {
 function ModuleCard({ m }) {
   const status = getStatus(m);
   const meta = CATEGORY_META[m.category];
-  const Icon = getIcon(meta.icon);
   const btnClass = status === 'selesai' ? 'btn-secondary' : 'btn-primary';
 
   return (
     <article className="module-card card-light">
-      <div className={'module-card__thumb ' + meta.thumbClass} aria-hidden="true"><Icon size={22} /></div>
+      <div className={'module-card__thumb ' + meta.thumbClass} aria-hidden="true">{createElement(getIcon(meta.icon), { size: 22 })}</div>
       <div className="module-card__body">
         <span className="module-card__category">{meta.label}</span>
         <h3 className="module-card__title">{m.title}</h3>
@@ -73,6 +73,7 @@ function Materi() {
   }, []);
 
   useProgressBarAnimation(Boolean(modules));
+  useDocumentTitle('Materi & Modul Pelatihan - Smart Diagnostic TKA');
 
   const isFilteringActive = query.trim() !== '' || statusFilter !== 'semua';
 

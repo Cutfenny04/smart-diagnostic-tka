@@ -1,20 +1,20 @@
-import { useEffect, useState } from 'react';
+import { createElement, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PlayCircle, Activity } from 'lucide-react';
 import Layout from '../components/Layout';
 import { fetchDashboardData } from '../data/dashboardData';
 import { getIcon } from '../utils/icon';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Dashboard.css';
 
 const STATUS_BADGE_CLASS = { important: 'badge--important', new: 'badge--new', info: 'badge--info' };
 
 function StatCard({ stat }) {
-  const Icon = getIcon(stat.icon);
   return (
     <div className={'card-stat' + (stat.isProgress ? ' card-stat--progress' : '')}>
       <div className="card-stat__header">
-        <span className="card-stat__icon"><Icon size={18} /></span>
+        <span className="card-stat__icon">{createElement(getIcon(stat.icon), { size: 18 })}</span>
         <span className="card-stat__label">{stat.label}</span>
       </div>
       <div className="card-stat__value">
@@ -31,10 +31,9 @@ function StatCard({ stat }) {
 }
 
 function QuickAccessCard({ item }) {
-  const Icon = getIcon(item.icon);
   return (
     <Link to={item.href} className="quick-access-card card-light">
-      <span className="quick-access-card__icon"><Icon size={20} /></span>
+      <span className="quick-access-card__icon">{createElement(getIcon(item.icon), { size: 20 })}</span>
       <span className="quick-access-card__title">{item.title}</span>
       <span className="quick-access-card__desc">{item.desc}</span>
     </Link>
@@ -42,10 +41,9 @@ function QuickAccessCard({ item }) {
 }
 
 function ActivityItem({ item }) {
-  const Icon = getIcon(item.icon);
   return (
     <li className="timeline__item">
-      <span className="timeline__icon"><Icon size={16} /></span>
+      <span className="timeline__icon">{createElement(getIcon(item.icon), { size: 16 })}</span>
       <div className="timeline__body">
         <p className="timeline__text">{item.text}</p>
         <span className="timeline__time">{item.time}</span>
@@ -99,6 +97,7 @@ function Dashboard() {
   }, []);
 
   useProgressBarAnimation(Boolean(data));
+  useDocumentTitle('Dashboard - Smart Diagnostic TKA');
 
   const todayLabel = new Date().toLocaleDateString('id-ID', {
     weekday: 'long', day: 'numeric', month: 'long', year: 'numeric',

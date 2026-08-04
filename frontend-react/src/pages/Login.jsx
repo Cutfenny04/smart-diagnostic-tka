@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../services/api';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Login.css';
 
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -15,6 +16,8 @@ function Login() {
 
   const canvasRef = useRef(null);
   const navigate = useNavigate();
+
+  useDocumentTitle('Masuk - Smart Diagnostic TKA | Pelatihan HOTS IPA Budaya Aceh');
 
   // Entrance animation: sama seperti body.classList.add('loaded') di login.js,
   // tapi dibersihkan lagi saat komponen unmount (pindah halaman) supaya class

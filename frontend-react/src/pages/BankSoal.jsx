@@ -7,6 +7,7 @@ import {
 import Layout from '../components/Layout';
 import { fetchPaketSoal, deletePaket } from '../data/bankSoalData';
 import { getIcon } from '../utils/icon';
+import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './BankSoal.css';
 
 const FILTER_GROUPS = [
@@ -151,6 +152,8 @@ function BankSoal() {
   const [selectedId, setSelectedId] = useState(null);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+
+  useDocumentTitle('Bank Soal Berbasis Budaya Aceh - Smart Diagnostic TKA');
 
   useEffect(() => {
     fetchPaketSoal().then(setAllPaket);
