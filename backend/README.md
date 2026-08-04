@@ -100,10 +100,10 @@ backend-guru-aceh/
 
 ## Sinkron dengan Frontend
 
-Frontend (`frontend/`) sudah di-wire ke backend ini:
-- `frontend/assets/js/api-config.js` -- satu tempat untuk `window.API_BASE_URL` (default `http://localhost:5000`, ganti kalau backend jalan di port lain).
-- `frontend/assets/js/login.js` -- submit form login memanggil `POST /api/auth/login` sungguhan, simpan `token` ke `localStorage`.
-- `frontend/assets/data/bank-soal.js` -- `fetchPaketSoal`/`fetchPaketById`/`savePaket`/`deletePaket` sekarang memanggil endpoint `/api/paket-soal/*` di atas (bukan lagi localStorage/dummy data). Guru **harus login dulu** (dapat token) sebelum membuka `bank-soal.html`, `detail-soal.html`, atau `smart-diagnostic.html` -- kalau tidak, akan otomatis diarahkan kembali ke `login.html`.
+Frontend (`frontend-react/`) sudah di-wire ke backend ini:
+- `frontend-react/src/services/api.js` -- satu tempat untuk `API_BASE_URL` (localhost saat dev, URL Railway saat production).
+- `frontend-react/src/pages/Login.jsx` -- submit form login memanggil `POST /api/auth/login` sungguhan, simpan `token` ke `localStorage`.
+- `frontend-react/src/data/bankSoalData.js` -- `fetchPaketSoal`/`fetchPaketById`/`savePaket`/`deletePaket` memanggil endpoint `/api/paket-soal/*` di atas. Guru **harus login dulu** (dapat token) sebelum membuka halaman `/bank-soal`, `/bank-soal/:id/edit`, atau `/smart-diagnostic` -- kalau tidak, `ProtectedRoute` otomatis mengarahkan kembali ke `/login`.
 
 ## Langkah Selanjutnya
 1. Pastikan register, login, dan CRUD paket soal berhasil ditest (lihat bagian Testing Endpoint di atas).
