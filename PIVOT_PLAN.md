@@ -246,6 +246,45 @@ Fase 7D — Koreksi konsep Bank Soal: TKA boleh CRUD, Non-TKA tetap read-only  �
     sekali di Preview Panel. Tidak ada error console. Data uji dihapus
     setelahnya.
 
+Fase 7E — Wordwall embed sungguhan + cek embeddability                       ✔ selesai (2026-08-11)
+  - Arahan user: Wordwall HARUS dimainkan langsung di dalam website lewat
+    iframe (bukan cuma tombol keluar ke tab baru) -- mekanisme iframe-nya
+    sendiri sudah ada sejak Revisi 7 (`EmbedView` di SmartDiagnostic.jsx),
+    tidak perlu dibangun ulang.
+  - Yang BARU: tidak semua link Wordwall bisa di-embed. Dikonfirmasi dengan
+    2 link asli dari klien lewat `curl -I`:
+    - `wordwall.net/play/...` -> tidak ada X-Frame-Options -> **bisa di-embed**
+    - `wordwall.net/resource/...` -> `X-Frame-Options: SAMEORIGIN` -> **DITOLAK
+      browser kalau di-iframe**
+  - Dibangun endpoint baru `GET /api/wordwall/check-embed?url=...`
+    (`backend/controllers/wordwall.controller.js`) yang mengecek header
+    X-Frame-Options/CSP frame-ancestors server-side sebelum frontend
+    memutuskan render iframe atau fallback. **Wajib dibatasi ke domain
+    wordwall.net saja** -- endpoint ini fetch URL dari client secara
+    server-side, tanpa pembatasan itu rawan SSRF (dites: request ke
+    169.254.169.254/AWS metadata endpoint ditolak 400).
+  - `EmbedView` di SmartDiagnostic.jsx dirombak: cek dulu embeddability saat
+    dibuka (state checking/embeddable/blocked/no-url). Kalau blocked,
+    tampilkan pesan "Aktivitas tidak dapat ditampilkan langsung" + tombol
+    "Buka di Wordwall" (target _blank) -- persis seperti diminta user,
+    fallback bukan alur utama.
+  - **2 paket TKA asli dari klien dimasukkan permanen ke database**
+    (bukan data uji, jangan dihapus lagi): "TKA Kimia"
+    (`wordwall.net/play/116598/269/285`, embeddable) dan "TKA Biologi"
+    (`wordwall.net/id/resource/116552547/...`, tidak embeddable -- pakai
+    fallback). Status published, semua guru bisa langsung lihat & kerjakan.
+  - Diuji end-to-end di browser: TKA Kimia -> iframe langsung tampil dan
+    bisa dimainkan. TKA Biologi -> fallback message + link "Buka di
+    Wordwall" muncul benar, tidak ada iframe kosong. Tidak ada error
+    console. Data uji (akun QA) dihapus, 2 paket TKA asli TETAP ada.
+  - **Catatan optimisasi untuk nanti (bukan sekarang)**: `check-embed`
+    dipanggil ulang setiap kali guru membuka view Embed suatu paket TKA --
+    untuk prototipe ini tidak masalah, tapi kalau jumlah paket TKA dan
+    trafik guru bertambah banyak, sebaiknya hasil cek disimpan (mis. kolom
+    `embeddable` di `paket_soal`, diisi sekali saat paket disimpan/diedit)
+    daripada fetch ke Wordwall setiap kali dibuka. Belum jadi masalah nyata
+    sekarang, jadi belum dikerjakan.
+
 (Paralel, tidak blocking apa pun di atas)
 Modul Panduan Guru (PDF)                                         🟡 belum dikerjakan
 ```

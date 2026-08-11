@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { FlaskConical, GraduationCap, PlayCircle, Inbox, ArrowLeft, Link2Off } from 'lucide-react';
+import { FlaskConical, GraduationCap, PlayCircle, Inbox, ArrowLeft, Link2Off, ExternalLink } from 'lucide-react';
 import Layout from '../components/Layout';
 import NonTkaGame from '../components/NonTkaGame';
 import { fetchPaketSoal } from '../data/bankSoalData';
+import { checkWordwallEmbeddable } from '../data/wordwallData';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './SmartDiagnostic.css';
 
@@ -95,8 +96,33 @@ function StimulusView({ item, onBack, onStart }) {
   );
 }
 
+/* Revisi 8 (arahan user 2026-08-11): Wordwall harus dimainkan LANGSUNG di
+   dalam website lewat iframe, bukan cuma tombol keluar ke tab baru. Tapi
+   tidak semua link Wordwall bisa di-embed -- link berformat /resource/...
+   mengirim X-Frame-Options: SAMEORIGIN yang memblokir iframe lintas origin
+   (sudah dikonfirmasi manual dengan 2 link dari klien), sedangkan link
+   /play/... biasanya tidak. Daripada menampilkan iframe kosong tanpa
+   penjelasan, cek dulu ke backend (GET /api/wordwall/check-embed) sebelum
+   memutuskan render iframe atau fallback "buka di tab baru". */
 function EmbedView({ item, onBack }) {
   const hasUrl = Boolean(item.wordwallUrl);
+  const [embedStatus, setEmbedStatus] = useState(hasUrl ? 'checking' : 'no-url');
+
+  useEffect(() => {
+    if (!hasUrl) return;
+    let cancelled = false;
+    setEmbedStatus('checking');
+    checkWordwallEmbeddable(item.wordwallUrl)
+      .then((result) => {
+        if (!cancelled) setEmbedStatus(result.embeddable ? 'embeddable' : 'blocked');
+      })
+      .catch(() => {
+        // Gagal cek -- tetap coba tampilkan iframe (perilaku lama) daripada
+        // memblokir guru cuma karena endpoint cek-nya sendiri bermasalah.
+        if (!cancelled) setEmbedStatus('embeddable');
+      });
+    return () => { cancelled = true; };
+  }, [hasUrl, item.wordwallUrl]);
 
   return (
     <div className="card-light diagnostic-embed">
@@ -104,11 +130,31 @@ function EmbedView({ item, onBack }) {
         <h2 className="diagnostic-embed__title">{item.title}</h2>
         <button type="button" className="btn btn-secondary" onClick={() => onBack(hasUrl)}><ArrowLeft size={16} /> Kembali</button>
       </div>
-      {hasUrl ? (
+
+      {embedStatus === 'checking' && (
+        <div className="embed-frame embed-frame--loading">
+          <div className="skeleton skeleton--text" style={{ width: '40%' }} />
+        </div>
+      )}
+
+      {embedStatus === 'embeddable' && (
         <div className="embed-frame">
           <iframe src={item.wordwallUrl} title={'Aktivitas Wordwall - ' + item.title} allowFullScreen />
         </div>
-      ) : (
+      )}
+
+      {embedStatus === 'blocked' && (
+        <div className="empty-state">
+          <div className="empty-state__icon"><ExternalLink size={28} /></div>
+          <h3 className="empty-state__title">Aktivitas tidak dapat ditampilkan langsung</h3>
+          <p className="empty-state__desc">Aktivitas ini tidak dapat dimainkan langsung di dalam website karena pengaturan Wordwall. Silakan buka aktivitas melalui Wordwall.</p>
+          <a href={item.wordwallUrl} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+            <ExternalLink size={16} /> Buka di Wordwall
+          </a>
+        </div>
+      )}
+
+      {embedStatus === 'no-url' && (
         <div className="empty-state">
           <div className="empty-state__icon"><Link2Off size={28} /></div>
           <h3 className="empty-state__title">Link Wordwall belum tersedia</h3>
