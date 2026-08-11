@@ -19,7 +19,7 @@ export const dashboardStats = [
 
 export const quickAccessItems = [
   { href: '/materi', icon: 'book-open', title: 'Materi & Modul', desc: 'Video, PDF, dan artikel pelatihan HOTS IPA.' },
-  { href: '/bank-soal', icon: 'landmark', title: 'Bank Soal Berbasis Budaya Aceh', desc: 'Kelola paket soal budaya Aceh yang terhubung Wordwall.' },
+  { href: '/bank-soal', icon: 'landmark', title: 'Bank Soal Berbasis Budaya Aceh', desc: 'Jelajahi paket soal budaya Aceh, TKA maupun Non-TKA.' },
   { href: '/smart-diagnostic', icon: 'activity', title: 'Smart Diagnostic', desc: 'Uji kompetensi penyusunan soal HOTS Anda.' },
   { href: '/hasil-diagnostik', icon: 'bar-chart-3', title: 'Dashboard Hasil', desc: 'Grafik dan rekomendasi capaian pelatihan.' },
   { href: '/profil', icon: 'user-circle', title: 'Profil', desc: 'Kelola data diri, sekolah, dan kata sandi.' },

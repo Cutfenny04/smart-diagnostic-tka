@@ -4,14 +4,21 @@ const pool = require('../config/db');
 // (assets/js/bank-soal.js, detail-soal.js, smart-diagnostic.js) sudah dibangun
 // mengharapkan camelCase (hotsLevel, wordwallUrl, createdAt) -- map di sini
 // supaya tidak ada satu pun file frontend yang perlu diubah.
+//
+// Revisi 8 (lihat PIVOT_PLAN.md §B3): paket_soal.guru_id di-rename jadi
+// created_by_guru_id (audit saja, bukan kepemilikan), dan tambah `type`
+// (TKA/NON_TKA). Bank soal sekarang bacaan bersama untuk semua guru --
+// list/getById TIDAK lagi difilter per akun (lihat perubahan di bawah).
 function toApiShape(row) {
   return {
     id: row.id,
     title: row.title,
+    type: row.type,
     subject: row.subject,
     grade: row.grade,
     hotsLevel: row.hots_level,
     stimulus: row.stimulus,
+    thumbnail: row.thumbnail,
     wordwallUrl: row.wordwall_url,
     status: row.status,
     createdAt: row.created_at,
@@ -34,17 +41,22 @@ function validatePaket(body) {
   return null;
 }
 
-// LIST - semua paket milik guru yang login. Smart Diagnostic memanggil ini
-// dengan ?status=published untuk hanya menampilkan paket yang sudah publish.
+// LIST - bank soal bersama, semua guru melihat paket yang sama (Revisi 8,
+// tidak lagi difilter per akun). ?status=published dipakai Smart Diagnostic;
+// ?type=TKA|NON_TKA opsional untuk filter jenis paket.
 async function list(req, res) {
   try {
-    const { status } = req.query;
-    let sql = 'SELECT * FROM paket_soal WHERE guru_id = $1';
-    const params = [req.guru.id];
+    const { status, type } = req.query;
+    let sql = 'SELECT * FROM paket_soal WHERE 1=1';
+    const params = [];
 
     if (status) {
-      sql += ' AND status = $2';
       params.push(status);
+      sql += ` AND status = $${params.length}`;
+    }
+    if (type) {
+      params.push(type);
+      sql += ` AND type = $${params.length}`;
     }
     sql += ' ORDER BY created_at DESC';
 
@@ -56,12 +68,12 @@ async function list(req, res) {
   }
 }
 
-// GET ONE - dipakai detail-soal.html mode Edit
+// GET ONE - dipakai detail-soal.html mode Edit, dan halaman detail read-only
 async function getById(req, res) {
   try {
     const { rows } = await pool.query(
-      'SELECT * FROM paket_soal WHERE id = $1 AND guru_id = $2',
-      [req.params.id, req.guru.id]
+      'SELECT * FROM paket_soal WHERE id = $1',
+      [req.params.id]
     );
     if (rows.length === 0) {
       return res.status(404).json({ message: 'Paket soal tidak ditemukan' });
@@ -73,7 +85,9 @@ async function getById(req, res) {
   }
 }
 
-// CREATE - dipakai detail-soal.html mode Tambah
+// CREATE - dipakai detail-soal.html mode Tambah. created_by_guru_id dicatat
+// untuk audit saja, bukan kepemilikan (paket yang sudah dibuat tetap
+// terlihat/terkelola oleh semua guru).
 async function create(req, res) {
   try {
     const errorMessage = validatePaket(req.body);
@@ -83,7 +97,7 @@ async function create(req, res) {
 
     const { title, subject, grade, hotsLevel, stimulus, wordwallUrl, status } = req.body;
     const { rows } = await pool.query(
-      `INSERT INTO paket_soal (guru_id, title, subject, grade, hots_level, stimulus, wordwall_url, status)
+      `INSERT INTO paket_soal (created_by_guru_id, title, subject, grade, hots_level, stimulus, wordwall_url, status)
        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
        RETURNING *`,
       [req.guru.id, title, subject, grade, hotsLevel, stimulus, wordwallUrl || null, status || 'draft']
@@ -105,8 +119,8 @@ async function update(req, res) {
     }
 
     const { rows: existing } = await pool.query(
-      'SELECT id FROM paket_soal WHERE id = $1 AND guru_id = $2',
-      [req.params.id, req.guru.id]
+      'SELECT id FROM paket_soal WHERE id = $1',
+      [req.params.id]
     );
     if (existing.length === 0) {
       return res.status(404).json({ message: 'Paket soal tidak ditemukan' });
@@ -132,8 +146,8 @@ async function update(req, res) {
 async function remove(req, res) {
   try {
     const result = await pool.query(
-      'DELETE FROM paket_soal WHERE id = $1 AND guru_id = $2',
-      [req.params.id, req.guru.id]
+      'DELETE FROM paket_soal WHERE id = $1',
+      [req.params.id]
     );
     if (result.rowCount === 0) {
       return res.status(404).json({ message: 'Paket soal tidak ditemukan' });

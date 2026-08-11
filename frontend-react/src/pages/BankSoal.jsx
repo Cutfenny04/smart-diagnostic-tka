@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  PlusCircle, Search, SearchX, FlaskConical, GraduationCap,
-  MousePointerClick, Pencil, PlayCircle, Trash2, X, Link as LinkIcon, Unlink,
+  Search, SearchX, FlaskConical, GraduationCap,
+  MousePointerClick, PlayCircle, X, Link as LinkIcon, Unlink,
 } from 'lucide-react';
 import Layout from '../components/Layout';
-import { fetchPaketSoal, deletePaket } from '../data/bankSoalData';
+import { fetchPaketSoal } from '../data/bankSoalData';
 import { getIcon } from '../utils/icon';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './BankSoal.css';
 
 const FILTER_GROUPS = [
+  { key: 'type', label: 'Tipe', options: [
+    { value: 'semua', label: 'Semua' },
+    { value: 'TKA', label: 'TKA' },
+    { value: 'NON_TKA', label: 'Non-TKA' },
+  ] },
   { key: 'status', label: 'Status', options: [
     { value: 'semua', label: 'Semua' },
     { value: 'draft', label: 'Draft' },
@@ -38,6 +43,9 @@ function statusBadgeClass(status) {
 }
 function statusLabel(status) {
   return status === 'published' ? 'Published' : 'Draft';
+}
+function typeLabel(type) {
+  return type === 'NON_TKA' ? 'Non-TKA' : 'TKA';
 }
 function truncate(text, max) {
   if (text.length <= max) return text;
@@ -89,13 +97,14 @@ function PaketCard({ item, selected, onSelect }) {
       </div>
       <p className="soal-card__summary">{truncate(item.stimulus, 140)}</p>
       <div className="soal-card__tags">
+        <span className="badge badge--info">{typeLabel(item.type)}</span>
         <span className={'badge ' + hotsBadgeClass(item.hotsLevel)}>{item.hotsLevel}</span>
       </div>
     </article>
   );
 }
 
-function PreviewPanel({ item, onClose, onDeleteRequest }) {
+function PreviewPanel({ item, onClose }) {
   if (!item) {
     return (
       <div className="empty-state">
@@ -106,6 +115,7 @@ function PreviewPanel({ item, onClose, onDeleteRequest }) {
     );
   }
 
+  const isTka = item.type !== 'NON_TKA';
   const wordwallConnected = Boolean(item.wordwallUrl);
 
   return (
@@ -116,29 +126,24 @@ function PreviewPanel({ item, onClose, onDeleteRequest }) {
       <span className="soal-preview__eyebrow">{item.subject} &middot; {item.grade}</span>
       <h2 className="soal-preview__title">{item.title}</h2>
       <div className="soal-preview__tags">
+        <span className="badge badge--info">{typeLabel(item.type)}</span>
         <span className={'badge ' + hotsBadgeClass(item.hotsLevel)}>{item.hotsLevel}</span>
         <span className={'badge ' + statusBadgeClass(item.status)}>{statusLabel(item.status)}</span>
       </div>
-      <h3 className="soal-preview__section-title">Stimulus Budaya Aceh</h3>
+      <h3 className="soal-preview__section-title">Stimulus</h3>
       <p className="soal-preview__question">{item.stimulus}</p>
-      <h3 className="soal-preview__section-title">Aktivitas Wordwall</h3>
-      <p className={'soal-preview__wordwall-indicator ' + (wordwallConnected ? 'is-connected' : 'is-disconnected')}>
-        {wordwallConnected ? <LinkIcon size={16} /> : <Unlink size={16} />} {wordwallConnected ? 'Sudah Terhubung' : 'Belum Terhubung'}
-      </p>
+      {isTka && (
+        <>
+          <h3 className="soal-preview__section-title">Aktivitas Wordwall</h3>
+          <p className={'soal-preview__wordwall-indicator ' + (wordwallConnected ? 'is-connected' : 'is-disconnected')}>
+            {wordwallConnected ? <LinkIcon size={16} /> : <Unlink size={16} />} {wordwallConnected ? 'Sudah Terhubung' : 'Belum Terhubung'}
+          </p>
+        </>
+      )}
       <div className="soal-preview__action">
-        <Link to={`/bank-soal/${item.id}/edit`} className="btn btn-secondary"><Pencil size={16} /> Edit</Link>
         {item.status === 'published' && (
           <Link to={`/smart-diagnostic?paket=${item.id}`} className="btn btn-primary"><PlayCircle size={16} /> Smart Diagnostic</Link>
         )}
-        <button
-          type="button"
-          className="btn-icon btn-icon--danger"
-          aria-label="Hapus Paket Soal"
-          title="Hapus Paket Soal"
-          onClick={() => onDeleteRequest(item)}
-        >
-          <Trash2 size={16} />
-        </button>
       </div>
     </>
   );
@@ -147,11 +152,10 @@ function PreviewPanel({ item, onClose, onDeleteRequest }) {
 function BankSoal() {
   const [allPaket, setAllPaket] = useState(null);
   const [query, setQuery] = useState('');
-  const [filters, setFilters] = useState({ status: 'semua', hotsLevel: 'semua', subject: 'semua' });
+  const [filters, setFilters] = useState({ type: 'semua', status: 'semua', hotsLevel: 'semua', subject: 'semua' });
   const [sort, setSort] = useState('terbaru');
   const [selectedId, setSelectedId] = useState(null);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState(null);
 
   useDocumentTitle('Bank Soal Berbasis Budaya Aceh - Smart Diagnostic TKA');
 
@@ -161,25 +165,15 @@ function BankSoal() {
 
   useEffect(() => {
     function handleEscape(e) {
-      if (e.key !== 'Escape') return;
-      if (deleteTarget) setDeleteTarget(null);
-      else setMobilePreviewOpen(false);
+      if (e.key === 'Escape') setMobilePreviewOpen(false);
     }
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, [deleteTarget]);
+  }, []);
 
   function selectPaket(id) {
     setSelectedId(id);
     setMobilePreviewOpen(true);
-  }
-
-  async function confirmDelete() {
-    const updated = await deletePaket(deleteTarget.id);
-    setAllPaket(updated);
-    setDeleteTarget(null);
-    setMobilePreviewOpen(false);
-    setSelectedId(null);
   }
 
   let filtered = [];
@@ -187,10 +181,11 @@ function BankSoal() {
     const q = query.trim().toLowerCase();
     filtered = allPaket.filter((item) => {
       const matchesQuery = !q || item.title.toLowerCase().includes(q) || item.stimulus.toLowerCase().includes(q);
+      const matchesType = filters.type === 'semua' || item.type === filters.type;
       const matchesStatus = filters.status === 'semua' || item.status === filters.status;
       const matchesHots = filters.hotsLevel === 'semua' || item.hotsLevel === filters.hotsLevel;
       const matchesSubject = filters.subject === 'semua' || item.subject === filters.subject;
-      return matchesQuery && matchesStatus && matchesHots && matchesSubject;
+      return matchesQuery && matchesType && matchesStatus && matchesHots && matchesSubject;
     });
     filtered = sortPaket(filtered, sort);
   }
@@ -202,10 +197,7 @@ function BankSoal() {
       <div className="page-header">
         <div className="page-header__text">
           <h1 className="page-header__title">Bank Soal Berbasis Budaya Aceh</h1>
-          <p className="page-header__desc">Kelola paket soal berbasis budaya Aceh yang terhubung dengan aktivitas Wordwall untuk digunakan pada Smart Diagnostic.</p>
-        </div>
-        <div className="page-header__actions">
-          <Link to="/bank-soal/baru" className="btn btn-primary"><PlusCircle size={18} /> Tambah Paket Soal</Link>
+          <p className="page-header__desc">Jelajahi paket soal budaya Aceh (TKA lewat Wordwall, Non-TKA lewat game interaktif) untuk digunakan pada Smart Diagnostic.</p>
         </div>
       </div>
 
@@ -310,23 +302,10 @@ function BankSoal() {
         </div>
 
         <aside className={'soal-preview preview-panel card-light' + (mobilePreviewOpen ? ' is-open' : '')} aria-label="Pratinjau Paket Soal">
-          <PreviewPanel item={selectedItem} onClose={() => setMobilePreviewOpen(false)} onDeleteRequest={setDeleteTarget} />
+          <PreviewPanel item={selectedItem} onClose={() => setMobilePreviewOpen(false)} />
         </aside>
       </div>
       <div className={'preview-panel-backdrop' + (mobilePreviewOpen ? ' is-open' : '')} onClick={() => setMobilePreviewOpen(false)} />
-
-      <div className={'confirm-modal-backdrop' + (deleteTarget ? ' is-open' : '')} onClick={(e) => { if (e.target === e.currentTarget) setDeleteTarget(null); }}>
-        <div className="confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
-          <h2 className="confirm-modal__title" id="deleteConfirmTitle">Hapus Paket Soal?</h2>
-          <p className="confirm-modal__desc">
-            {deleteTarget ? `Paket soal "${deleteTarget.title}" akan dihapus secara permanen dan tidak dapat dikembalikan.` : ''}
-          </p>
-          <div className="confirm-modal__actions">
-            <button type="button" className="btn btn-secondary" onClick={() => setDeleteTarget(null)}>Batal</button>
-            <button type="button" className="btn btn-danger" onClick={confirmDelete}>Ya, Hapus</button>
-          </div>
-        </div>
-      </div>
     </Layout>
   );
 }

@@ -4,7 +4,6 @@ import Dashboard from './pages/Dashboard';
 import Materi from './pages/Materi';
 import DetailMateri from './pages/DetailMateri';
 import BankSoal from './pages/BankSoal';
-import DetailSoal from './pages/DetailSoal';
 import SmartDiagnostic from './pages/SmartDiagnostic';
 import HasilDiagnostik from './pages/HasilDiagnostik';
 import Profil from './pages/Profil';
@@ -26,11 +25,6 @@ function DetailMateriRoute() {
   return <DetailMateri key={id} />;
 }
 
-function DetailSoalEditRoute() {
-  const { id } = useParams();
-  return <DetailSoal key={id} />;
-}
-
 function App() {
   return (
     <BrowserRouter>
@@ -41,8 +35,6 @@ function App() {
         <Route path="/materi" element={protect(<Materi />)} />
         <Route path="/materi/:id" element={protect(<DetailMateriRoute />)} />
         <Route path="/bank-soal" element={protect(<BankSoal />)} />
-        <Route path="/bank-soal/baru" element={protect(<DetailSoal />)} />
-        <Route path="/bank-soal/:id/edit" element={protect(<DetailSoalEditRoute />)} />
         <Route path="/smart-diagnostic" element={protect(<SmartDiagnostic />)} />
         <Route path="/hasil-diagnostik" element={protect(<HasilDiagnostik />)} />
         <Route path="/profil" element={protect(<Profil />)} />

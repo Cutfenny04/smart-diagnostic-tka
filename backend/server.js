@@ -5,6 +5,8 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth.routes');
 const materiRoutes = require('./routes/materi.routes');
 const paketSoalRoutes = require('./routes/paketSoal.routes');
+const soalRoutes = require('./routes/soal.routes');
+const hasilDiagnostikRoutes = require('./routes/hasilDiagnostik.routes');
 
 const app = express();
 
@@ -22,6 +24,12 @@ app.use('/api/materi', materiRoutes);
 
 // Semua route paket soal (Bank Soal) ada di prefix /api/paket-soal
 app.use('/api/paket-soal', paketSoalRoutes);
+
+// Butir soal (dipakai game Non-TKA) ada di prefix /api/soal
+app.use('/api/soal', soalRoutes);
+
+// Hasil diagnostik (riwayat latihan guru) ada di prefix /api/hasil-diagnostik
+app.use('/api/hasil-diagnostik', hasilDiagnostikRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

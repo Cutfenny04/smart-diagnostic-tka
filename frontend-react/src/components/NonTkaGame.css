@@ -1,0 +1,245 @@
+/* ==========================================================================
+   NON-TKA GAME — pilihan ganda interaktif berbasis stimulus + ilustrasi.
+   Pakai token dari style.css, tidak ada warna/shadow/radius baru.
+   ========================================================================== */
+
+.game-panel {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+}
+
+/* --- Identitas visual Aceh (motif "pucuk rebung") --- */
+.aceh-motif-divider {
+    width: 100%;
+    height: 10px;
+    display: block;
+}
+
+.game-panel__motif {
+    color: var(--color-moss);
+    margin-bottom: calc(var(--space-2) * -1);
+}
+
+.game-result__motif {
+    color: var(--color-rosy-deep);
+    margin-bottom: var(--space-2);
+}
+
+.game-panel__aceh-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    align-self: flex-start;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    background: rgba(131, 153, 88, 0.14);
+    color: #5C6B3A;
+    font-size: var(--text-micro);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+}
+
+.game-panel__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+}
+
+.game-panel__progress-label {
+    font-size: var(--text-small);
+    font-weight: 600;
+    color: var(--text-muted-on-light);
+}
+
+.game-panel__stimulus {
+    background: var(--surface-card-tint);
+    border-left: 3px solid var(--color-rosy-deep);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    font-size: var(--text-body);
+    color: var(--text-on-light);
+    line-height: 1.6;
+}
+
+.game-panel__image {
+    width: 100%;
+    max-height: 320px;
+    object-fit: contain;
+    border-radius: var(--radius-lg);
+    background: var(--surface-card-tint);
+    border: 1px solid var(--border-on-light);
+}
+
+.game-panel__question {
+    font-family: var(--font-headings);
+    font-size: var(--text-h3);
+    color: var(--text-on-light);
+    line-height: 1.4;
+}
+
+.game-options {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.game-option {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    text-align: left;
+    padding: var(--space-4);
+    border-radius: var(--radius-md);
+    border: 1.5px solid var(--border-on-light);
+    background: var(--surface-card);
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.game-option--idle:hover {
+    border-color: var(--color-rosy-deep);
+    box-shadow: var(--shadow-sm);
+    transform: translateY(-1px);
+}
+
+.game-option__key {
+    flex-shrink: 0;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: var(--text-small);
+    background: var(--surface-card-tint);
+    color: var(--text-on-light);
+}
+
+.game-option__text {
+    flex: 1;
+    font-size: var(--text-body);
+    color: var(--text-on-light);
+}
+
+.game-option__icon {
+    flex-shrink: 0;
+}
+
+.game-option--disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.game-option--correct {
+    border-color: var(--color-moss);
+    background: rgba(131, 153, 88, 0.12);
+    cursor: default;
+}
+
+.game-option--correct .game-option__key {
+    background: var(--color-moss);
+    color: var(--color-white);
+}
+
+.game-option--correct .game-option__icon {
+    color: #5C6B3A;
+}
+
+.game-option--incorrect {
+    border-color: var(--color-danger);
+    background: rgba(255, 82, 82, 0.10);
+    cursor: default;
+}
+
+.game-option--incorrect .game-option__key {
+    background: var(--color-danger);
+    color: var(--color-white);
+}
+
+.game-option--incorrect .game-option__icon {
+    color: var(--color-danger);
+}
+
+.game-feedback {
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    align-items: flex-start;
+}
+
+.game-feedback.is-correct {
+    background: rgba(131, 153, 88, 0.12);
+}
+
+.game-feedback.is-incorrect {
+    background: rgba(255, 82, 82, 0.10);
+}
+
+.game-feedback__title {
+    font-weight: 700;
+    color: var(--text-on-light);
+}
+
+.game-feedback__explanation {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    line-height: 1.6;
+}
+
+/* --- Hasil akhir --- */
+.game-result {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: var(--space-2);
+    padding: var(--space-8) var(--space-5);
+}
+
+.game-result__icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: var(--gradient-rosy);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: var(--space-2);
+}
+
+.game-result__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h2);
+    color: var(--text-on-light);
+}
+
+.game-result__score {
+    font-family: var(--font-headings);
+    font-size: var(--text-display);
+    color: var(--color-primary-dark);
+}
+
+.game-result__percent {
+    font-size: var(--text-body-lg);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-2);
+}
+
+.game-result__note {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    max-width: 40ch;
+    margin-bottom: var(--space-2);
+}
+
+.game-result__actions {
+    display: flex;
+    gap: var(--space-3);
+}

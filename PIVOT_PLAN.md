@@ -1,315 +1,279 @@
-# Smart Diagnostic TKA — Requirement Pivot: Analysis & Implementation Plan (REVISI 7)
+# Smart Diagnostic TKA — Requirement Pivot: Analysis & Implementation Plan (REVISI 8)
 
-Status: **Phase 1 selesai & diverifikasi.** Revisi 7 memperkaya detail Phase 2 (belum dimulai) berdasarkan 5 catatan pra-Phase-2 Anda: View tetap Preview Panel (tidak ada halaman baru), Delete pakai confirmation modal, Create/Edit satu file dua mode, status default Draft saat Create, dan aturan validasi Wordwall wajib diisi kalau status Published. Lihat "Detail Phase 2" di §10.
-
----
-
-## Prinsip Implementasi (berlaku untuk seluruh dokumen ini)
-
-- Jangan menambahkan fitur yang tidak ada di proposal.
-- Gunakan kembali halaman yang sudah ada sebisa mungkin.
-- Website ini **bukan** Learning Management System (LMS) dan **bukan** aplikasi pembuat soal.
-- Website hanya berfungsi sebagai media pengelolaan materi, bank soal berbasis budaya Aceh (paket soal terhubung Wordwall), Smart Diagnostic yang mengarahkan ke Wordwall, serta dashboard hasil berbasis data prototype.
-- Utamakan implementasi yang sederhana, konsisten dengan proposal, dan mudah dipresentasikan kepada dosen.
+Status: **Revisi 8 — pivot besar, tahap perencanaan & migrasi skema.** Revisi 7 (di Lampiran, §1–§13) menyatakan proyek "final prototype" dengan guru sebagai pembuat paket soal (CRUD penuh) dan satu jenis soal (Wordwall). Revisi 8 mengubah dua asumsi dasar itu: guru menjadi **pengguna/konsumen** bank soal (bukan penulisnya), dan bank soal terbagi jadi dua jalur — **TKA** (Wordwall, seperti sekarang) dan **Non-TKA** (game interaktif React, baru). Lihat §B untuk detail arah baru, §C untuk urutan pengerjaan.
 
 ---
 
-## Ringkasan Perubahan dari Revisi 5
+## Prinsip Implementasi (tetap berlaku, dari Revisi 1–7)
 
-| # | Koreksi Anda | Perbaikan di Revisi 6 |
+- Jangan menambahkan fitur yang tidak ada di proposal/konsep yang disepakati.
+- Gunakan kembali halaman/komponen yang sudah ada sebisa mungkin.
+- Website ini **bukan** Learning Management System (LMS) penuh.
+- Utamakan implementasi yang sederhana, konsisten, dan mudah dipresentasikan ke dosen/klien.
+
+---
+
+## Ringkasan Perubahan Revisi 7 → Revisi 8
+
+| # | Revisi 7 (lama) | Revisi 8 (baru) |
 |---|---|---|
-| 1 | "Tambah Paket Soal / Edit Paket Soal" jangan terkesan dua halaman | Ditegaskan: **satu file** `detail-soal.html`, dua **mode** (Create/Edit) — lihat §7 |
-| 2 | Status Draft/Published perlu aturan eksplisit | Ditambahkan §5, aturan jelas kapan status berubah dan artinya |
-| 3 | Smart Diagnostic harus eksplisit hanya baca Published | Kalimat eksplisit ditambahkan di §6 |
-| 4 | Phase 2 harus sebut Delete & View Detail juga, konsisten dengan DoD | Phase 2 di §9 diperbarui, 4 aksi CRUD lengkap disebut |
-| 5 | Preview Panel perlu didefinisikan isinya | Ditambahkan §4, daftar isi eksplisit |
-| 6 | Hapus field `wordwallName`, cukup `wordwallUrl` | Field dihapus dari §3, nama aktivitas ditampilkan dari `title` atau label generik "Aktivitas Wordwall" |
-| 7 | Dashboard Hasil perlu kalimat pengaman tambahan | Ditambahkan di §6 |
-| — | Perlu bagian "Batasan Sistem" sebelum Phase Implementation | **Ditambahkan §8**, persis 5 poin yang Anda tulis |
+| 1 | Guru CRUD penuh atas paket soal (Tambah/Edit/Hapus) | Guru **hanya membaca** bank soal (browse + detail + mulai diagnostik). Tim pengembang yang input soal ke database. |
+| 2 | Satu jenis soal: link Wordwall per paket | Dua jenis: **TKA** (Wordwall, seperti sekarang) dan **Non-TKA** (game React interaktif, baru) |
+| 3 | `paket_soal` dimiliki per-guru (`guru_id`, difilter per akun) | `paket_soal` jadi **bank bersama** — semua guru melihat paket yang sama; `guru_id` lama berubah makna jadi audit "siapa yang input", bukan kepemilikan/filter |
+| 4 | Tidak ada tabel butir soal individual | Tabel baru `soal` (butir soal per paket, dipakai game Non-TKA; `game_type` menentukan bentuk interaksi) |
+| 5 | Dashboard Hasil = data prototype statis (`hasilData.js`, tidak tersambung DB) | Tabel baru `hasil_diagnostik` — jadi tujuan akhir (belum tentu diisi otomatis di Revisi 8 tahap ini, lihat §C) |
+| 6 | Modul Panduan Guru belum ada | Modul Panduan Guru (PDF, BAB 1–8) — deliverable terpisah, tidak bergantung kode, lihat §B5 |
 
 ---
 
-## 1. Bank Soal Berbasis Budaya Aceh — Definisi & Fungsi
+## A. Kondisi Saat Ini (state proyek per 2026-08-10, sebelum Revisi 8 dikerjakan)
+
+Ringkasan konkret apa yang sudah dibangun, supaya jelas titik berangkatnya.
+
+### Backend (`backend/`, Express + PostgreSQL/Supabase)
+
+- **Auth** (`routes/auth.routes.js`, `controllers/auth.controller.js`): register, login (JWT 7 hari, bcrypt), ubah password. Hanya untuk akun `guru`, tidak ada akun siswa/admin terpisah.
+- **Materi** (`routes/materi.routes.js`, `controllers/materi.controller.js`): list materi + progress per guru (`progress_materi`), detail materi, update progress (0–100).
+- **Paket Soal / Bank Soal** (`routes/paketSoal.routes.js`, `controllers/paketSoal.controller.js`): CRUD lengkap (list, getById, create, update, remove) — **tapi semuanya difilter `WHERE guru_id = req.guru.id`**, artinya tiap guru hanya melihat & mengelola paketnya sendiri. Validasi: judul/bidang/jenjang/HOTS/stimulus wajib; link Wordwall wajib kalau status di-set Published.
+- **Skema DB** (`backend/sql/supabase_schema.sql`): 4 tabel — `guru`, `materi`, `paket_soal` (satu jenis, Wordwall-only, draft/published, milik guru_id), `progress_materi`. **Belum ada** tabel `soal` (butir soal) atau `hasil_diagnostik`.
+- **Seed data** (`backend/sql/supabase_seed_data.sql`): 1 guru (Budi Santoso), 3 materi, 3 paket_soal (1 published dengan link Wordwall "Kopi Gayo", 2 draft tanpa link).
+
+### Frontend (`frontend-react/`, React + Vite)
+
+- **Halaman**: Login, Dashboard, Materi + DetailMateri, BankSoal + DetailSoal (form Create/Edit satu file dua mode, sesuai Revisi 7 §7), SmartDiagnostic, HasilDiagnostik, Profil + UbahPassword.
+- **BankSoal + DetailSoal**: guru bisa Tambah/Edit/Hapus paket (modal konfirmasi hapus), lihat lewat Preview Panel — persis sesuai desain CRUD Revisi 7.
+- **SmartDiagnostic** (`pages/SmartDiagnostic.jsx`): 3 view dalam satu halaman — daftar paket **Published** → Stimulus Budaya Aceh (halaman pembuka) → embed iframe Wordwall (atau empty state kalau link kosong). Tidak ada timer/skor/penyimpanan jawaban.
+- **HasilDiagnostik** (`pages/HasilDiagnostik.jsx` + `data/hasilData.js`): **100% data prototype statis di frontend** (12 baris dummy, delay 700ms simulasi fetch) — tidak tersambung ke backend sama sekali, karena tabel `hasil_diagnostik` memang belum ada.
+- **Design System**: `DESIGN_SYSTEM.md` — token warna/tipografi/komponen dipakai konsisten di semua halaman.
+- **Deploy**: frontend → Vercel (Root Directory `frontend-react`), backend → Railway (terpisah).
+
+### Batasan sistem yang sudah berlaku (dan sebagian masih relevan di Revisi 8)
+
+Website tidak membuat soal butir-per-butir, tidak mengoreksi jawaban, tidak menyimpan hasil pengerjaan Wordwall, tidak ada integrasi API dengan Wordwall — hanya kelola metadata paket + tampilkan iframe.
+
+---
+
+## B. Arah Baru (Revisi 8)
+
+### B1. Peran Guru Berubah — dari Pembuat jadi Pengguna
+
+Guru **tidak lagi** melakukan Tambah/Edit/Hapus paket soal. Tim pengembang menerima soal dari klien/pengabdian, menyusun paket (termasuk membuat aktivitas Wordwall untuk TKA atau game React untuk Non-TKA), lalu memasukkannya langsung ke database. Guru hanya: login → browse Bank Soal → lihat detail paket (read-only) → mulai Smart Diagnostic → lihat hasil.
+
+**Dampak konkret ke kode yang sudah ada** (dikerjakan di fase selanjutnya, §C, bukan sekarang):
+- `DetailSoal.jsx` (mode Create/Edit) dan tombol Tambah/Edit/Hapus di `BankSoal.jsx` akan dinonaktifkan/dihapus dari sisi guru.
+- Endpoint `create`/`update`/`remove` di `paketSoal.controller.js` berhenti dipakai guru (disimpan untuk kebutuhan admin nanti, atau dipagari di belakang autentikasi tambahan — belum diputuskan, lihat pertanyaan terbuka di §D).
+- Filter `WHERE guru_id = $1` di `list`/`getById` dihapus — Bank Soal jadi bacaan bersama untuk semua guru, bukan privat per akun.
+
+### B2. Bank Soal: Split TKA / Non-TKA
+
+```
+BANK SOAL
+│
+├── TKA       → embed/link Wordwall (mekanisme yang sudah ada, dipertahankan)
+│
+└── NON-TKA   → game interaktif React, dibangun tim dev dari soal client (Word/PDF)
+                nuansa budaya Aceh sebagai KONTEKS soal (bukan cuma dekorasi):
+                visual (ornamen, motif, ilustrasi lokal), konteks (kopi Gayo,
+                pesisir, pertanian, hutan, dst), dan bentuk interaksi.
+```
+
+Jenis game Non-TKA pertama yang dibangun: **pilihan jawaban interaktif** (stimulus + ilustrasi + pertanyaan + 4 opsi). Jenis lain (drag & drop, matching, puzzle, identifikasi gambar, pengurutan) menyusul setelah mekanisme pertama stabil — **tidak dikerjakan sekaligus**.
+
+Smart Diagnostic jadi router sederhana:
+```
+type === 'TKA'      → alur Wordwall yang sudah ada (stimulus → embed iframe)
+type === 'NON_TKA'  → alur game React (stimulus → game component sesuai game_type)
+```
+
+### B3. Data Model v2 (Supabase) — lihat draft SQL terpisah
+
+Perubahan pada `paket_soal` (bukan tabel baru — di-ALTER dari yang sudah ada):
+- tambah `type` (`TKA` / `NON_TKA`)
+- `guru_id` lama berubah makna jadi `created_by_guru_id` (audit, nullable) — bukan lagi dasar filter kepemilikan
+
+Tabel baru:
+- **`soal`** — butir soal per paket (dipakai Non-TKA): `question`, `stimulus`, `image`, `options` (JSON), `correct_answer`, `game_type`, `order_number`.
+- **`hasil_diagnostik`** — hasil pengerjaan: `paket_id`, siapa yang menjalankan sesi, skor, jumlah benar/salah, waktu mulai/selesai.
+
+Draft lengkap ada di `backend/sql/supabase_migration_v2_pivot.sql` (belum dijalankan ke Supabase — lihat catatan di file itu).
+
+### B4. Modul Panduan Guru (PDF)
+
+Deliverable terpisah, tidak bergantung pada kode: panduan langkah-demi-langkah (BAB 1–8, sesuai struktur di konsep awal) untuk guru yang belum pernah pakai platform. Bisa dikerjakan kapan saja secara paralel dengan pivot teknis di atas.
+
+### B5. Batasan Sistem (update dari Revisi 7 §8)
+
+- Website tidak membuat soal dari nol di sisi guru — soal disiapkan tim dev dari materi klien.
+- Website tidak mengoreksi jawaban Wordwall (TKA) — itu domain Wordwall sepenuhnya.
+- Untuk Non-TKA, website **menghitung skor sendiri** (karena game-nya dibangun in-house) — beda dari TKA.
+- Belum ada akun siswa terpisah — siapa yang "menjalankan" sesi diagnostik masih terikat akun guru yang login (pertanyaan terbuka soal `hasil_diagnostik`, lihat §D).
+
+---
+
+## C. Rencana Fase Revisi 8 (urutan pengerjaan)
+
+```
+Fase 1 (dokumen ini + draft schema)     ✔ sedang dikerjakan
+  - Revisi 8 tertulis (dokumen ini)
+  - Draft migrasi SQL (belum dijalankan ke Supabase)
+
+Fase 2 — Migrasi skema live                                    ✔ selesai (2026-08-11)
+  - Migration dijalankan ke Supabase, termasuk 3 perbaikan tak terduga (PK,
+    identity, DEFAULT NOW() yang hilang di tabel live) dan kolom tambahan
+    `soal.explanation`
+  - Input soal: dipakai jalur Node script langsung ke DB (bukan Table Editor
+    manual) -- `backend/scripts/import_soal_non_tka.js`, 90 soal Non-TKA
+    (Fisika/Biologi/Kimia) sudah masuk berstatus draft
+
+Fase 3 — Frontend: guru jadi read-only                          ✔ selesai (2026-08-11)
+  - BankSoal.jsx: tombol Tambah/Edit/Hapus dihapus, filter Tipe (TKA/Non-TKA)
+    ditambahkan, Preview Panel menyembunyikan bagian Wordwall untuk paket
+    Non-TKA
+  - DetailSoal.jsx dihapus total (bukan dibuat read-only) -- Preview Panel di
+    BankSoal.jsx sudah menjadi satu-satunya tampilan detail, sesuai prinsip
+    "View = Preview Panel" yang sudah dipakai sejak Revisi 7
+  - Backend: paketSoal.controller.js -- filter `WHERE guru_id` dihapus dari
+    list/getById; endpoint create/update/remove **sengaja belum diubah**
+    (bukan bug -- lihat §D, keputusan lock-down belum diambil)
+
+Fase 4 — Smart Diagnostic router                                ✔ selesai (2026-08-11)
+  - Percabangan type TKA/NON_TKA ditambahkan di SmartDiagnostic.jsx: setelah
+    view Stimulus, `onStart` merutekan ke view `embed` (TKA, alur existing
+    dipakai ulang) atau `game` (NON_TKA, placeholder "segera hadir")
+  - DiagnosticCard di daftar paket dikasih badge Tipe (TKA/Non-TKA) supaya
+    daftar campuran kedua tipe tetap jelas
+  - Diuji end-to-end di browser dengan data sementara (1 paket TKA + Fisika
+    NON_TKA di-publish sebentar): kedua jalur dikonfirmasi merutekan dengan
+    benar, lalu data uji dihapus/dikembalikan ke draft
+
+Fase 5 — Game Non-TKA pertama                                   ✔ selesai (2026-08-11), sebagian
+  - Backend baru: GET /api/soal?paketId=X (soal.controller.js/soal.routes.js)
+    -- belum ada sebelumnya, migration cuma bikin tabelnya
+  - Komponen React `NonTkaGame.jsx`: stimulus + gambar (kalau ada) + 4 kartu
+    pilihan jawaban interaktif, feedback benar/salah + penjelasan langsung
+    setelah memilih, progress "Soal X dari N", skor & hasil akhir di layar
+    terakhir
+  - Diuji end-to-end di browser (30 soal Fisika penuh, termasuk soal
+    bergambar no.3), jawaban benar/salah/progress/hasil akhir semua benar
+  - **Belum selesai**: nuansa budaya Aceh pada game masih terbatas pakai
+    palet warna & tipografi Design System yang sudah Aceh-flavored;
+    ilustrasi/motif Aceh khusus untuk game belum dibuat (soal-soal impor
+    juga sebagian besar belum bernuansa Aceh secara konten, lihat catatan
+    di §A soal Non-TKA)
+
+Fase 6 — Dashboard Hasil nyata                                  ✔ selesai (2026-08-11)
+  - Backend baru: POST + GET /api/hasil-diagnostik (hasilDiagnostik.controller.js/
+    routes.js) -- GET difilter per guru_id yang login (beda dari paket_soal/soal
+    yang bacaan bersama; hasil diagnostik itu aktivitas pribadi tiap guru)
+  - NonTkaGame.jsx: begitu soal terakhir dijawab, hitung skor lalu POST ke
+    hasil-diagnostik sebelum menampilkan layar hasil; layar hasil kini
+    menunjukkan status simpan sungguhan (berhasil/gagal), bukan lagi catatan
+    "belum tersimpan"
+  - HasilDiagnostik.jsx dirombak total dari data dummy (hasilData.js) ke
+    GET /api/hasil-diagnostik sungguhan -- kartu ringkasan (Total Latihan,
+    Rata-rata Nilai, Nilai Latihan Terakhir, Tuntas), grafik Tuntas vs Belum
+    Tuntas, dan tabel Riwayat Latihan (Paket/Tipe/Benar/Nilai/Tanggal/Status).
+    Status Tuntas pakai ambang KKM_THRESHOLD = 70 (belum ada arahan resmi
+    dari klien, didokumentasikan sebagai asumsi di kode)
+  - Diuji end-to-end di browser: 2 kali main penuh (10 dan 87), dikonfirmasi
+    tersimpan lewat POST 201, muncul benar di Dashboard Hasil (rata-rata,
+    status Tuntas/Belum Tuntas, urutan terbaru dulu), lalu semua data uji
+    dihapus/dikembalikan
+
+Fase 7 — Perapian sebelum nambah jenis game baru               ✔ selesai (2026-08-11)
+  - `PASSING_SCORE` dipindah ke satu tempat (`frontend-react/src/utils/scoring.js`),
+    dipakai bareng oleh NonTkaGame.jsx (badge Tuntas/Belum Tuntas di layar
+    hasil) dan HasilDiagnostik.jsx -- masih nilai 70 (asumsi KKM umum,
+    BUKAN aturan final), tinggal ubah satu angka itu saja kalau klien kasih
+    angka resmi
+  - Nuansa Aceh pertama masuk ke game: motif dekoratif "pucuk rebung"
+    (AcehMotifDivider.jsx, SVG, warna dari token yang sudah ada) tampil
+    permanen sebagai identitas visual game -- tidak tergantung isi soal.
+    Badge "Konteks Budaya Aceh" muncul HANYA kalau teks soal/stimulus
+    memang menyebut sesuatu yang Aceh-spesifik (dicek lewat daftar kata
+    kunci) -- diuji benar cuma muncul di 2 dari 30 soal Fisika (no.14 Pak
+    Budi Banda Aceh-Sigli, no.15 kuah beulangong), tidak muncul di soal lain
+  - Audit 90 soal Non-TKA terhadap Game 1-4: **kesimpulannya semua 90 soal
+    memang murni pilihan ganda tunggal, cocok untuk Game 1 saja.** Tidak ada
+    yang siap pakai untuk Matching/Drag&Drop/Gambar tanpa ditulis ulang.
+    4 kandidat ditandai untuk KALAU nanti ada soal baru yang memang dibuat
+    untuk format itu: pasangan besaran-satuan SI (Fisika #2, cocok
+    Matching), skalar vs vektor (Fisika #5, cocok Drag&Drop -- sortir ke 2
+    kelompok), diagram sel tumbuhan berlabel (Biologi #3, sudah ada gambar
+    berlabel, cocok Gambar/identifikasi), peran organisme rantai makanan
+    (Biologi #17 & #22, cocok Matching, bentuknya mirip contoh yang
+    diberikan user). **Keputusan: Game 2-4 TIDAK dikerjakan sekarang** --
+    tunggu ada soal yang memang dibuat untuk format itu, jangan
+    dipaksakan dari 90 soal MC yang sudah ada.
+
+(Paralel, tidak blocking apa pun di atas)
+Modul Panduan Guru (PDF)                                         🟡 belum dikerjakan
+```
+
+---
+
+## D. Pertanyaan Terbuka (perlu keputusan sebelum Fase 2 dijalankan ke Supabase live)
+
+| Area | Pertanyaan |
+|---|---|
+| Input soal | Tim dev input lewat Supabase Table Editor/SQL manual dulu, atau perlu panel admin terpisah dari awal? |
+| Endpoint create/update/remove lama | Dihapus total, atau dipagari untuk kebutuhan admin di masa depan (butuh role baru)? |
+| `hasil_diagnostik` kepemilikan sesi | Karena belum ada akun siswa — sesi diagnostik dicatat atas nama guru yang login (kelasnya), dengan `student_name` bebas teks seperti data dummy sekarang? Atau ditunda sampai ada akun siswa? |
+| Migrasi data lama | 3 paket_soal seed yang ada sekarang (`kopi-gayo`, `tes`, `tes lagi`) semuanya diberi `type = 'TKA'` default saat migrasi (karena semua masih pola Wordwall) — sudah benar? |
+
+---
+
+## Lampiran — Riwayat Desain Revisi 1–7
+
+*(Dipertahankan sebagai catatan sejarah. Sebagian besar sudah digantikan oleh Revisi 8 di atas — terutama soal kepemilikan paket oleh guru dan single-type Wordwall-only. Baca §B di atas sebagai rujukan utama, bukan bagian ini.)*
+
+### 1. Bank Soal Berbasis Budaya Aceh — Definisi & Fungsi (Revisi 7)
 
 > Bank Soal Berbasis Budaya Aceh merupakan halaman untuk **mengelola paket soal** yang terhubung dengan aktivitas Wordwall. Setiap paket memuat informasi materi, stimulus budaya Aceh, dan tautan aktivitas Wordwall yang digunakan pada Smart Diagnostic.
 
-Guru dapat **menambah, mengubah, menghapus, dan melihat** paket soal. Yang dikelola adalah unit **paket soal**, bukan butir soal individual — struktur data tetap seperti §3, tidak ada field pertanyaan/opsi/jawaban.
+Guru dapat **menambah, mengubah, menghapus, dan melihat** paket soal — **superseded oleh B1 di atas: guru sekarang read-only.**
 
----
-
-## 2. Hubungan Antar Halaman: Materi ↔ Bank Soal ↔ Smart Diagnostic
-
-- **Materi & Modul Pelatihan** — konten pelatihan HOTS untuk pengembangan kompetensi guru sendiri. Guru belajar mandiri di sini.
-- **Bank Soal Berbasis Budaya Aceh** — guru mengelola paket soal (terhubung Wordwall) yang topiknya relevan dengan materi yang baru dipelajari.
-- **Smart Diagnostic** — paket soal terpilih dipakai untuk asesmen siswa, lewat halaman pembuka stimulus lalu embed Wordwall.
-
-```
-Materi & Modul Pelatihan
-    ↓ (guru mempelajari topik, mis. Fotosintesis)
-Guru memilih/membuat paket soal yang sesuai topik tersebut
-    ↓
-Bank Soal Berbasis Budaya Aceh
-    ↓ (guru memilih paket soal yang sesuai materi)
-Smart Diagnostic
-    ↓
-Website membuka stimulus budaya Aceh (halaman pembuka)
-    ↓
-Embed Wordwall
-```
-
----
-
-## 3. Struktur Data — Paket Soal
-
-### `Paket` (di `assets/data/bank-soal.js`)
+### 2. Struktur Data — Paket Soal (Revisi 7, superseded oleh B3)
 
 ```js
 {
   id: 'paket-01',
-  title: 'Fermentasi Kopi Gayo',        // Judul Materi — juga dipakai sebagai label aktivitas Wordwall
-  subject: 'Kimia',                      // Bidang IPA
-  grade: 'SMP',                          // Jenjang
-  hotsLevel: 'C4',                       // Level HOTS
-  stimulus: 'Kopi Gayo yang tumbuh di dataran tinggi Aceh Tengah melalui proses fermentasi biji sebelum disangrai...',
-  wordwallUrl: 'https://wordwall.net/resource/xxxxx',  // opsional — satu-satunya field Wordwall
-  status: 'draft',                        // 'draft' | 'published'
+  title: 'Fermentasi Kopi Gayo',
+  subject: 'Kimia',
+  grade: 'SMP',
+  hotsLevel: 'C4',
+  stimulus: 'Kopi Gayo yang tumbuh di dataran tinggi Aceh Tengah...',
+  wordwallUrl: 'https://wordwall.net/resource/xxxxx',
+  status: 'draft',
   createdAt: '2026-07-01'
 }
 ```
 
-**Perubahan dari Revisi 5:** field `wordwallName` dihapus. Nama aktivitas ditampilkan memakai `title` paket, atau label generik "Aktivitas Wordwall" di tombol/link — tidak perlu field terpisah.
-
-6 informasi inti per paket: Judul Materi, Bidang IPA, Jenjang, Level HOTS, Stimulus Budaya Aceh, Link Wordwall — plus Status.
-
-### `HasilPengerjaan` (di `assets/data/hasil.js`, tidak berubah)
-
-```js
-{
-  id: 'hasil-01',
-  studentName: 'Ahmad Fauzan',
-  materi: 'Fermentasi Kopi Gayo',
-  date: '2026-07-20',
-  score: 85,
-  status: 'Tuntas'
-}
-```
-
----
-
-## 4. Isi Halaman Bank Soal — Card & Preview Panel
-
-**Card di daftar paket** menampilkan: Judul, Bidang, Jenjang, Badge HOTS, Status, ringkasan singkat Stimulus.
-
-**Preview Panel** (saat 1 paket dipilih) menampilkan:
-- Judul
-- Bidang
-- Jenjang
-- HOTS
-- Stimulus
-- Status
-- Tombol **Smart Diagnostic** (buka paket ini langsung di Smart Diagnostic — hanya aktif/muncul kalau status Published)
-- Tombol **Edit** (buka `detail-soal.html` dalam mode Edit untuk paket ini)
-
-Ini yang jadi acuan tetap saat implementasi, supaya isi Preview Panel tidak berubah-ubah di tengah jalan.
-
----
-
-## 5. Aturan Status Draft / Published
+### 3. Aturan Status Draft / Published (masih berlaku, tidak berubah di Revisi 8)
 
 | Status | Arti | Perilaku |
 |---|---|---|
-| **Draft** | Paket belum siap digunakan (mis. link Wordwall belum diisi, atau guru masih menyiapkan) | Muncul di Bank Soal, **tidak muncul** sebagai pilihan di Smart Diagnostic |
-| **Published** | Paket siap digunakan pada Smart Diagnostic | Muncul di Bank Soal **dan** jadi pilihan aktif di Smart Diagnostic |
+| **Draft** | Paket belum siap digunakan | Muncul di Bank Soal, **tidak muncul** di Smart Diagnostic |
+| **Published** | Paket siap digunakan | Muncul di Bank Soal **dan** jadi pilihan aktif di Smart Diagnostic |
 
-**Published hanya muncul di Smart Diagnostic.** Ini aturan filtering utama — Smart Diagnostic tidak pernah menampilkan paket berstatus Draft ke pengguna.
-
----
-
-## 6. Wordwall & Smart Diagnostic — Satu Prinsip
-
-**Website menyimpan link aktivitas Wordwall dan menampilkannya melalui embed iframe saat guru membuka Smart Diagnostic.**
-
-1. Guru mengisi informasi paket soal di web (judul, stimulus budaya Aceh, bidang, jenjang, HOTS).
-2. Guru mendigitalisasi soal HOTS langsung di Wordwall, memakai stimulus sebagai acuan.
-3. Guru tempel link Wordwall ke paket, ubah status jadi Published.
-4. **Smart Diagnostic hanya menampilkan paket soal dengan status Published** — membaca paket tsb, tampilkan Wordwall-nya lewat embed iframe.
-
-**Dashboard Hasil hanya berfungsi sebagai visualisasi contoh hasil diagnostik pada tahap prototype.**
-
----
-
-## 7. Refactor Bank Stimulus → Bank Soal Berbasis Budaya Aceh (tidak berubah)
-
-Satu evolusi, bukan halaman lama ditinggal + halaman baru dibuat terpisah:
-- Konten budaya Aceh dari Bank Stimulus (15 deskripsi, 5 kategori) diserap jadi isi Stimulus Budaya Aceh per paket.
-- Struktur halaman (card, search, filter, Preview Panel) dipakai ulang.
-- Menu sidebar "Bank Stimulus" hilang karena sudah **menjadi** "Bank Soal Berbasis Budaya Aceh".
-
-**Halaman Create/Edit menggunakan satu file, dua mode:**
-
-```
-Mode:
-- Tambah Paket Soal
-- Edit Paket Soal
-
-File:
-detail-soal.html   (satu file untuk kedua mode — bukan dua halaman terpisah)
-```
-
----
-
-## 8. Batasan Sistem
-
-- Website tidak membuat soal.
-- Website tidak mengoreksi jawaban siswa.
-- Website tidak menyimpan hasil pengerjaan Wordwall.
-- Website tidak memiliki integrasi API dengan Wordwall.
-- Website hanya mengelola paket soal dan menampilkan aktivitas Wordwall melalui iframe.
-
----
-
-## 9. Daftar Halaman Final (8 halaman)
+### 4. Daftar Halaman (Revisi 7, 8 halaman — tetap dipertahankan strukturnya di Revisi 8, hanya perilaku CRUD yang berubah)
 
 | # | Halaman | File |
 |---|---|---|
-| 1 | Login | `login.html` |
-| 2 | Dashboard | `dashboard.html` |
-| 3 | Materi & Modul Pelatihan | `materi.html` |
-| 4 | Bank Soal Berbasis Budaya Aceh | `bank-soal.html` |
-| 5 | Detail Paket Soal — mode Tambah / Edit (satu file, dua mode) | `detail-soal.html` |
-| 6 | Smart Diagnostic (termasuk halaman pembuka stimulus budaya Aceh) | `smart-diagnostic.html` |
-| 7 | Dashboard Hasil | `hasil-diagnostik.html` |
-| 8 | Profil | `profil.html` |
+| 1 | Login | `Login.jsx` |
+| 2 | Dashboard | `Dashboard.jsx` |
+| 3 | Materi & Modul Pelatihan | `Materi.jsx` + `DetailMateri.jsx` |
+| 4 | Bank Soal Berbasis Budaya Aceh | `BankSoal.jsx` |
+| 5 | Detail Paket Soal | `DetailSoal.jsx` (Revisi 7: mode Tambah/Edit → Revisi 8: read-only) |
+| 6 | Smart Diagnostic | `SmartDiagnostic.jsx` |
+| 7 | Dashboard Hasil | `HasilDiagnostik.jsx` |
+| 8 | Profil | `Profil.jsx` + `UbahPassword.jsx` |
 
----
-
-## 10. Rencana Implementasi (urutan prioritas)
+### 5. Definition of Done — Revisi 7 (tercapai, ditutup)
 
 ```
-Phase 1
-✔ Refactor Sidebar
-✔ Refactor Dashboard
-✔ Refactor Bank Soal
-
-Phase 2
-✔ Tambah Paket Soal (Create)
-✔ Edit Paket Soal (Update)
-✔ Hapus Paket Soal (Delete)
-✔ Lihat Detail Paket Soal (View, lewat Preview Panel)
-
-Phase 3
-✔ Smart Diagnostic
-
-Phase 4
-✔ Dashboard Hasil
-
-Phase 5
-✔ Polish UI
-✔ Responsive
-✔ Testing
+Phase 1 ✔  Phase 2 ✔  Phase 3 ✔  Phase 4 ✔  Phase 5 ✔
+Project Status (Revisi 7): FINAL PROTOTYPE — READY FOR DEMONSTRATION
 ```
 
-**Detail Phase 1:**
-- Sidebar: satu entri "Bank Soal Berbasis Budaya Aceh".
-- Dashboard: quick-access disesuaikan, hapus Recommendation dari Materi.
-- Refactor Bank Soal:
-  1. Refactor struktur Bank Stimulus menjadi Bank Soal Berbasis Budaya Aceh.
-  2. Menggunakan kembali seluruh data stimulus budaya Aceh yang sudah dibuat.
-  3. Menyesuaikan struktur data menjadi informasi paket soal (§3).
-  4. Menyesuaikan tampilan card, filter, preview panel (§4), dan pencarian.
-
-**Detail Phase 2 (diperbarui dengan catatan pra-Phase 2 Anda):**
-
-- **View = Preview Panel, titik.** Tidak ada halaman/file terpisah untuk melihat detail (tidak ada `view-soal.html`). Card → klik → Preview Panel → tombol Edit / Smart Diagnostic. Ini sudah berjalan sejak Phase 1, dipertahankan.
-- **Create & Edit = satu file, dua mode** — `detail-soal.html`:
-  - `detail-soal.html` (tanpa query param) → mode Create, header "Tambah Paket Soal".
-  - `detail-soal.html?id=paket-03` → mode Edit, header "Edit Paket Soal", form terisi otomatis dari paket terkait.
-  - Tidak ada file kedua yang di-copy.
-- **Status default saat Create = Draft.** Guru baru bisa ubah ke Published setelah link Wordwall ditempel — konsisten dengan aturan status di §5.
-- **Validasi form (sederhana):**
-  - Wajib diisi: Judul, Bidang, Jenjang, Level HOTS, Stimulus.
-  - Link Wordwall: boleh kosong jika status Draft.
-  - **Kalau status diubah ke Published, Link Wordwall wajib diisi** — validasi ini yang paling penting, langsung mencerminkan alur proposal (Published berarti siap dipakai Smart Diagnostic, yang butuh link Wordwall).
-- **Delete = confirmation modal**, bukan langsung hapus saat tombol diklik:
-  ```
-  Hapus Paket?
-  [ Batal ]  [ Ya, Hapus ]
-  ```
-  Sesederhana mungkin — reuse tombol `.btn-secondary` (Batal) dan `.btn-primary`/varian danger (Ya, Hapus) yang sudah ada di Design System. Modal ini komponen baru kecil (belum ada di Design System sebelumnya) — akan didokumentasikan sebagai `.confirm-modal` begitu dibangun, dari token yang sudah ada saja (tidak ada warna/shadow/radius baru).
-
-**Target akhir Phase 2** — hanya 2 file halaman total, sesuai Revisi 6:
-
-```
-Bank Soal (bank-soal.html)
-    │
-    ├── Tambah Paket → detail-soal.html (mode create)
-    │
-    ├── Card
-    │      └── Preview Panel
-    │              ├── Edit → detail-soal.html?id=... (mode edit)
-    │              └── Smart Diagnostic (hanya jika Published)
-    │
-    └── Delete → confirmation modal → hapus dari data in-memory
-```
-
-Setelah Phase 2 selesai, guru bisa melakukan seluruh CRUD paket soal (Create/Read/Update/Delete) tanpa halaman tambahan selain `bank-soal.html` dan `detail-soal.html`.
-
-**Detail Phase 3:**
-- Bangun `smart-diagnostic.html`: pilih paket **Published saja** (§5) → stimulus budaya Aceh (halaman pembuka) → tombol "Mulai Diagnostik" → embed iframe Wordwall.
-
-**Detail Phase 4:**
-- Bangun `hasil-diagnostik.html` + `assets/data/hasil.js`: jumlah siswa, rata-rata nilai, tuntas/belum tuntas, satu grafik sederhana, tabel hasil. Visualisasi contoh hasil pada tahap prototype (§6).
-
-**Detail Phase 5:**
-- Polish UI seluruh halaman baru/diubah agar konsisten dengan Design System.
-- Uji responsive desktop & tablet.
-- Testing menyeluruh: tidak ada broken link, tidak ada halaman lama yang masih muncul di navigasi.
-
----
-
-## 11. Definition of Done
-
-Implementasi dianggap selesai apabila:
-- Semua halaman sesuai proposal.
-- Tidak ada fitur AI.
-- Tidak ada editor soal di website.
-- Bank Stimulus sudah direfactor menjadi Bank Soal Berbasis Budaya Aceh.
-- Guru dapat menambah, mengubah, menghapus, dan melihat paket soal.
-- Smart Diagnostic dapat membuka aktivitas Wordwall melalui iframe.
-- Dashboard Hasil menampilkan prototype hasil diagnostik.
-- Seluruh halaman menggunakan design system yang sama.
-- Responsive desktop dan tablet.
-- Tidak ada broken link atau halaman lama yang masih muncul di navigasi.
-
----
-
-## 12. Risiko & Pertanyaan Terbuka
-
-| Area | Catatan |
-|---|---|
-| Guru membuat soal di web? | Tetap tidak diasumsikan ada fitur susun pertanyaan/opsi/jawaban — "mengelola paket soal" berarti CRUD atas paket, bukan CRUD atas butir soal |
-| Bentuk stimulus/halaman pembuka di Smart Diagnostic | Belum ada arahan detail visual — dibangun sesederhana mungkin dulu |
-
----
-
-## 13. Status Implementasi Final
-
-```
-Phase 1 ✔
-Phase 2 ✔
-Phase 3 ✔
-Phase 4 ✔
-Phase 5 ✔
-
-Project Status:
-FINAL PROTOTYPE
-READY FOR DEMONSTRATION
-```
-
-Seluruh 8 halaman final (Login, Dashboard, Materi & Modul Pelatihan, Bank Soal Berbasis Budaya Aceh, Detail Paket Soal, Smart Diagnostic, Dashboard Hasil, Profil) sudah dibangun dan diuji. Phase 5 menambahkan: halaman Profil (sebelumnya kosong, kini menampilkan data prototype guru), perbaikan cross-page (`.kpi-grid`/`.dashboard-section` yang sebelumnya hanya berlaku di Dashboard kini dipromosikan ke `style.css` sehingga Bank Soal/Materi/Bank Stimulus ikut mendapat spacing yang konsisten), aksesibilitas keyboard pada kartu Bank Soal, dan cleanup CSS/JS (komponen `.dropdown-menu`/`.card-glass-dark`/`.skeleton--card` yang sudah tidak terpakai dihapus, `console.log` yang membocorkan password di `login.js` dihapus).
-
-**Addendum pasca-pivot (backend nyata & dua halaman scaffold dibangun):** setelah Revisi 7 di atas ditulis, proyek ini bertambah sebuah backend nyata (`backend/`, Express + MySQL, lihat `backend/README.md`) — Login/Register dan CRUD Bank Soal sekarang memanggil API sungguhan (bukan lagi localStorage/dummy data), lewat `frontend/assets/js/login.js` dan `frontend/assets/data/bank-soal.js`. Dua dari tiga file scaffold kosong yang disebut sebagai known gap di revisi sebelumnya sudah dibangun karena keduanya memang direferensikan oleh link aktif di aplikasi:
-- `detail-materi.html` — halaman detail/overview modul materi (read-only: judul, progress, daftar topik), dituju oleh tombol "Mulai Belajar"/"Lanjutkan Belajar" di `materi.html`.
-- `ubah-password.html` — form ganti password, dituju oleh menu profil di topbar. Terhubung ke endpoint backend baru `PUT /api/auth/password`.
-
-**`detail-stimulus.html` (dan `bank-stimulus.html`) sengaja dibiarkan kosong/tidak disentuh** — sudah digantikan total oleh Bank Soal Berbasis Budaya Aceh sejak §7, dan tidak ada satu link pun di aplikasi yang mengarah ke halaman ini (bukan gap yang mempengaruhi pengguna, murni file mati).
+Addendum pasca-Revisi-7: backend nyata (Express + Supabase/PostgreSQL) dibangun menggantikan localStorage/dummy data untuk Login/Register dan CRUD Bank Soal. `detail-materi.html`/`DetailMateri.jsx` dan `ubah-password.html`/`UbahPassword.jsx` dibangun karena direferensikan oleh link aktif. `bank-stimulus`/`detail-stimulus` sengaja dibiarkan mati (sudah digantikan Bank Soal sejak awal, tidak ada link yang mengarah ke sana).

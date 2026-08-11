@@ -2,21 +2,30 @@ import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { FlaskConical, GraduationCap, PlayCircle, Inbox, ArrowLeft, Link2Off } from 'lucide-react';
 import Layout from '../components/Layout';
+import NonTkaGame from '../components/NonTkaGame';
 import { fetchPaketSoal } from '../data/bankSoalData';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './SmartDiagnostic.css';
 
-/* Scope (Requirement Pivot Revisi 7): halaman ini hanya membaca paket
-   dengan status === 'published' dan membuka paket.wordwallUrl lewat
-   iframe. Tidak ada timer, skor, penyimpanan jawaban, integrasi API
-   Wordwall, atau AI. Tiga view, satu halaman, tanpa routing per-view
-   (sama seperti smart-diagnostic.js vanilla):
-     1. list     — Daftar Paket Published
-     2. stimulus — Stimulus Budaya Aceh (pengantar sebelum Wordwall)
-     3. embed    — Embed Wordwall (iframe), atau Empty State kalau link kosong */
+/* Scope (Revisi 8, lihat PIVOT_PLAN.md §B/§C): halaman ini hanya membaca
+   paket dengan status === 'published', lalu merutekan berdasarkan
+   paket.type setelah Stimulus:
+     - TKA     -> embed iframe Wordwall (paket.wordwallUrl)
+     - NON_TKA -> NonTkaGame (game pilihan ganda, lihat components/NonTkaGame.jsx
+       -- Fase 5 di PIVOT_PLAN.md §C)
+   Tidak ada timer, integrasi API Wordwall, atau AI untuk jalur TKA. Empat
+   view, satu halaman, tanpa routing per-view:
+     1. list     — Daftar Paket Published (TKA & Non-TKA campur)
+     2. stimulus — Stimulus (pengantar sebelum Wordwall/game)
+     3. embed    — Embed Wordwall (iframe), atau Empty State kalau link kosong
+     4. game     — NonTkaGame (skor dihitung di browser, belum disimpan --
+        penyimpanan hasil adalah Fase 6, lihat PIVOT_PLAN.md §C) */
 
 function hotsBadgeClass(level) {
   return { C4: 'badge--c4', C5: 'badge--c5', C6: 'badge--c6' }[level] || 'badge--c4';
+}
+function typeLabel(type) {
+  return type === 'NON_TKA' ? 'Non-TKA' : 'TKA';
 }
 function truncate(text, max) {
   if (text.length <= max) return text;
@@ -35,6 +44,9 @@ function DiagnosticCard({ item, onOpen }) {
         <span><GraduationCap size={14} /> {item.grade}</span>
       </div>
       <p className="diagnostic-card__summary">{truncate(item.stimulus, 120)}</p>
+      <div className="diagnostic-card__tags">
+        <span className="badge badge--info">{typeLabel(item.type)}</span>
+      </div>
       <div className="diagnostic-card__action">
         <button type="button" className="btn btn-primary"><PlayCircle size={16} /> Mulai</button>
       </div>
@@ -150,7 +162,7 @@ function SmartDiagnostic() {
       <div className="page-header">
         <div className="page-header__text">
           <h1 className="page-header__title">Smart Diagnostic</h1>
-          <p className="page-header__desc">Pilih paket soal budaya Aceh yang sudah dipublikasikan, lalu mulai aktivitas diagnostik melalui Wordwall.</p>
+          <p className="page-header__desc">Pilih paket soal budaya Aceh yang sudah dipublikasikan, lalu mulai aktivitas diagnostik melalui Wordwall (TKA) atau game interaktif (Non-TKA).</p>
         </div>
       </div>
 
@@ -174,12 +186,16 @@ function SmartDiagnostic() {
         <StimulusView
           item={selectedPaket}
           onBack={() => setView('list')}
-          onStart={() => setView('embed')}
+          onStart={() => setView(selectedPaket.type === 'NON_TKA' ? 'game' : 'embed')}
         />
       )}
 
       {view === 'embed' && selectedPaket && (
         <EmbedView item={selectedPaket} onBack={(hasUrl) => setView(hasUrl ? 'stimulus' : 'list')} />
+      )}
+
+      {view === 'game' && selectedPaket && (
+        <NonTkaGame paket={selectedPaket} onExit={() => setView('stimulus')} />
       )}
     </Layout>
   );

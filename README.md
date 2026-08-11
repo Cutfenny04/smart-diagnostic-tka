@@ -1,7 +1,11 @@
 # smart-diagnostic-tka
 Platform Pelatihan Penyusunan Instrumen HOTS IPA Berbasis Smart Diagnostic TKA Terintegrasi Game Digital Budaya Aceh.
 
-Prototipe untuk Pengabdian Masyarakat, terdiri dari frontend (React + Vite) di `frontend-react/` dan backend nyata (Express + Supabase/PostgreSQL) di `backend/`. Login/Register, Bank Soal Berbasis Budaya Aceh, Smart Diagnostic, Dashboard Hasil, Profil, dan Ubah Password sudah terhubung ke backend sungguhan; lihat `PIVOT_PLAN.md` untuk arsitektur asli dan status tiap fase, `DESIGN_SYSTEM.md` untuk seluruh token dan komponen UI, dan `backend/README.md` untuk setup database serta daftar endpoint API.
+Prototipe untuk Pengabdian Masyarakat, terdiri dari frontend (React + Vite) di `frontend-react/` dan backend nyata (Express + Supabase/PostgreSQL) di `backend/`. Login/Register, Bank Soal Berbasis Budaya Aceh, Smart Diagnostic, Dashboard Hasil, Profil, dan Ubah Password sudah terhubung ke backend sungguhan.
+
+**`PIVOT_PLAN.md` (Revisi 8) adalah sumber kebenaran utama untuk arsitektur dan status tiap fase saat ini** — dokumen ini (README) hanya ringkasan menjalankan/deploy, jangan dianggap otoritatif soal fitur apa yang ada. Lihat juga `DESIGN_SYSTEM.md` untuk seluruh token dan komponen UI, dan `backend/README.md` untuk setup database serta daftar endpoint API (catatan: `backend/README.md` juga masih mendokumentasikan API lama sebelum Revisi 8 — cek `PIVOT_PLAN.md` §B/§C untuk state terkini).
+
+Sejak Revisi 8: Bank Soal adalah bacaan bersama, bukan lagi milik per-guru — guru tidak lagi membuat/mengedit/menghapus paket soal dari UI (endpoint backend-nya masih ada tapi sudah tidak dipanggil dari frontend). Paket soal terbagi dua tipe: **TKA** (link Wordwall yang diinput guru) dan **Non-TKA** (soal pilihan ganda buatan tim dev, dimainkan lewat game React bawaan situs).
 
 ## Menjalankan secara lokal
 
@@ -16,4 +20,4 @@ Frontend di-deploy ke Vercel dengan Root Directory `frontend-react` (Framework P
 
 ## Halaman
 
-Login &middot; Dashboard &middot; Materi & Modul Pelatihan (+ Detail Materi) &middot; Bank Soal Berbasis Budaya Aceh &middot; Detail Paket Soal (create/edit) &middot; Smart Diagnostic &middot; Dashboard Hasil &middot; Profil (+ Ubah Password).
+Login &middot; Dashboard &middot; Materi & Modul Pelatihan (+ Detail Materi) &middot; Bank Soal Berbasis Budaya Aceh (read-only, tanpa halaman create/edit) &middot; Smart Diagnostic (router TKA/Non-TKA, termasuk game Non-TKA) &middot; Dashboard Hasil &middot; Profil (+ Ubah Password).
