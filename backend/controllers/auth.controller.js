@@ -70,6 +70,25 @@ async function login(req, res) {
   }
 }
 
+// PROFIL - data guru yang sedang login sungguhan, dipakai Profil.jsx
+// (sebelumnya halaman ini pakai data dummy statis, lihat PIVOT_PLAN.md).
+async function me(req, res) {
+  try {
+    const { rows } = await pool.query(
+      'SELECT id, nama, email, created_at FROM guru WHERE id = $1',
+      [req.guru.id]
+    );
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Akun guru tidak ditemukan' });
+    }
+    const guru = rows[0];
+    return res.json({ id: guru.id, nama: guru.nama, email: guru.email, createdAt: guru.created_at });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+}
+
 // UBAH PASSWORD - guru yang sudah login mengganti password sendiri
 async function changePassword(req, res) {
   try {
@@ -103,4 +122,4 @@ async function changePassword(req, res) {
   }
 }
 
-module.exports = { register, login, changePassword };
+module.exports = { register, login, me, changePassword };

@@ -5,15 +5,18 @@ import { getIcon } from '../utils/icon';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Profil.css';
 
-/* View-only: menampilkan info guru yang sedang login, tidak ada form edit. */
+/* View-only: menampilkan info guru yang sedang login sungguhan (dari
+   GET /api/auth/me -- lihat data/profilData.js), tidak ada form edit.
+   Tabel `guru` cuma punya nama/email/tanggal daftar, jadi field yang
+   dulu ditampilkan di sini (sekolah, mata pelajaran, jenjang) dihapus
+   karena memang tidak ada sumber data aslinya -- bukan diisi dummy baru. */
 
 function initial(name) {
   return name.trim().charAt(0).toUpperCase();
 }
 
 function formatDate(iso) {
-  const d = new Date(iso + 'T00:00:00');
-  return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
+  return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 function InfoRow({ icon, label, value }) {
@@ -50,18 +53,15 @@ function Profil() {
         {profil ? (
           <>
             <div className="profil-card__head">
-              <span className="profil-avatar" aria-hidden="true">{initial(profil.name)}</span>
+              <span className="profil-avatar" aria-hidden="true">{initial(profil.nama)}</span>
               <div>
-                <h2 className="profil-card__name">{profil.name}</h2>
-                <span className="badge badge--info">{profil.role}</span>
+                <h2 className="profil-card__name">{profil.nama}</h2>
+                <span className="badge badge--info">Guru IPA</span>
               </div>
             </div>
             <div className="profil-info-list">
               <InfoRow icon="mail" label="Email" value={profil.email} />
-              <InfoRow icon="school" label="Sekolah" value={profil.school} />
-              <InfoRow icon="flask-conical" label="Mata Pelajaran" value={profil.subject} />
-              <InfoRow icon="graduation-cap" label="Jenjang Diampu" value={profil.grade} />
-              <InfoRow icon="calendar" label="Bergabung Sejak" value={formatDate(profil.joinDate)} />
+              <InfoRow icon="calendar" label="Bergabung Sejak" value={formatDate(profil.createdAt)} />
             </div>
           </>
         ) : (

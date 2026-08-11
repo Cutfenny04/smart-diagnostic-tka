@@ -285,6 +285,24 @@ Fase 7E — Wordwall embed sungguhan + cek embeddability                       �
     daripada fetch ke Wordwall setiap kali dibuka. Belum jadi masalah nyata
     sekarang, jadi belum dikerjakan.
 
+Fase 7F — Profil pakai data asli, bukan dummy lagi                          ✔ selesai (2026-08-11)
+  - `Profil.jsx` sebelumnya 100% data prototype statis ("Cut Meutia, S.Pd."
+    dari `data/profilData.js`) -- tidak terhubung sama sekali ke akun yang
+    sedang login. Sekarang pakai `GET /api/auth/me` (baru,
+    `auth.controller.js`/`auth.routes.js`) yang mengembalikan nama/email/
+    tanggal daftar guru yang sungguhan sedang login.
+  - Field "Sekolah", "Mata Pelajaran", "Jenjang Diampu" yang dulu tampil di
+    halaman ini **dihapus**, bukan diganti placeholder -- tabel `guru`
+    memang cuma punya nama/email/tanggal daftar, tidak ada kolom untuk itu.
+    Label "Guru IPA" tetap ada sebagai teks statis (bukan data personal
+    yang dipalsukan, cuma penanda peran platform, konsisten dengan yang
+    sudah dipakai di Topbar.jsx sejak awal).
+  - `UbahPassword.jsx` sudah pakai API sungguhan sejak awal (`PUT
+    /api/auth/password`), tidak ada yang perlu diubah di situ.
+  - Diuji di browser: login sungguhan, buka Profil, nama & email yang
+    tampil cocok dengan akun yang login (bukan "Cut Meutia" lagi), tanggal
+    bergabung terbaca benar. Tidak ada error console. Data uji dihapus.
+
 (Paralel, tidak blocking apa pun di atas)
 Modul Panduan Guru (PDF)                                         🟡 belum dikerjakan
 ```

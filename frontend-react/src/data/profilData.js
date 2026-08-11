@@ -1,24 +1,9 @@
-/* ==========================================================================
-   PROFIL — Data prototype (sama persis isinya dengan
-   frontend/assets/data/profil.js versi lama). View-only, tidak ada alur edit.
+import { API_BASE_URL, authHeaders, handleAuthResponse } from '../services/api';
 
-   Future backend: ganti body fetchProfil() dengan
-     return fetch(`${API_BASE_URL}/api/profil`, { headers: authHeaders() }).then(handleAuthResponse);
-   Caller sudah menganggap ini sebagai sumber async, jadi tidak ada file lain yang perlu berubah.
-   ========================================================================== */
-
-const profilData = {
-  name: 'Cut Meutia, S.Pd.',
-  role: 'Guru IPA',
-  email: 'cut.meutia@smpn1acehbesar.sch.id',
-  school: 'SMP Negeri 1 Aceh Besar',
-  subject: 'Ilmu Pengetahuan Alam (IPA)',
-  grade: 'Kelas VII - IX',
-  joinDate: '2023-07-01',
-};
-
+/* Data guru yang sedang login sungguhan, dari GET /api/auth/me -- bukan
+   lagi data prototype statis. Tabel `guru` cuma punya nama/email/tanggal
+   daftar (lihat backend/sql), jadi field seperti sekolah/mata pelajaran
+   yang dulu ditampilkan di sini dihapus, bukan diisi placeholder baru. */
 export function fetchProfil() {
-  return new Promise((resolve) => {
-    window.setTimeout(() => resolve(profilData), 500);
-  });
+  return fetch(`${API_BASE_URL}/api/auth/me`, { headers: authHeaders() }).then(handleAuthResponse);
 }
