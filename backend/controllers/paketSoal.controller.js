@@ -85,9 +85,14 @@ async function getById(req, res) {
   }
 }
 
-// CREATE - dipakai detail-soal.html mode Tambah. created_by_guru_id dicatat
-// untuk audit saja, bukan kepemilikan (paket yang sudah dibuat tetap
-// terlihat/terkelola oleh semua guru).
+// CREATE - Revisi 8 Fase 7A (PIVOT_PLAN.md §A/§B): guru CUMA boleh membuat
+// paket TKA (aktivitas Wordwall yang mereka buat sendiri, lalu didaftarkan
+// ke sini). Non-TKA tetap eksklusif milik tim dev lewat
+// scripts/import_soal_non_tka.js -- `type` di sini SENGAJA di-hardcode
+// 'TKA', bukan diambil dari req.body, supaya guru tidak bisa membuat paket
+// Non-TKA lewat request yang dimanipulasi. created_by_guru_id dicatat untuk
+// audit saja, bukan kepemilikan (paket yang sudah dibuat tetap
+// terlihat/terkelola oleh semua guru, konsisten dengan bank soal bersama).
 async function create(req, res) {
   try {
     const errorMessage = validatePaket(req.body);
@@ -97,8 +102,8 @@ async function create(req, res) {
 
     const { title, subject, grade, hotsLevel, stimulus, wordwallUrl, status } = req.body;
     const { rows } = await pool.query(
-      `INSERT INTO paket_soal (created_by_guru_id, title, subject, grade, hots_level, stimulus, wordwall_url, status)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO paket_soal (created_by_guru_id, title, type, subject, grade, hots_level, stimulus, wordwall_url, status)
+       VALUES ($1, $2, 'TKA', $3, $4, $5, $6, $7, $8)
        RETURNING *`,
       [req.guru.id, title, subject, grade, hotsLevel, stimulus, wordwallUrl || null, status || 'draft']
     );
@@ -110,7 +115,9 @@ async function create(req, res) {
   }
 }
 
-// UPDATE - dipakai detail-soal.html mode Edit
+// UPDATE - hanya boleh untuk paket bertipe TKA. Dicek di server (bukan cuma
+// disembunyikan di UI) supaya guru tidak bisa mengubah paket Non-TKA lewat
+// request API yang dimanipulasi langsung -- lihat PIVOT_PLAN.md §B1.
 async function update(req, res) {
   try {
     const errorMessage = validatePaket(req.body);
@@ -119,11 +126,14 @@ async function update(req, res) {
     }
 
     const { rows: existing } = await pool.query(
-      'SELECT id FROM paket_soal WHERE id = $1',
+      'SELECT id, type FROM paket_soal WHERE id = $1',
       [req.params.id]
     );
     if (existing.length === 0) {
       return res.status(404).json({ message: 'Paket soal tidak ditemukan' });
+    }
+    if (existing[0].type !== 'TKA') {
+      return res.status(403).json({ message: 'Paket Non-TKA tidak bisa diubah lewat sini' });
     }
 
     const { title, subject, grade, hotsLevel, stimulus, wordwallUrl, status } = req.body;
@@ -142,16 +152,21 @@ async function update(req, res) {
   }
 }
 
-// DELETE - dipakai confirm modal "Hapus Paket Soal?" di bank-soal.html
+// DELETE - sama seperti update, cuma boleh untuk paket bertipe TKA.
 async function remove(req, res) {
   try {
-    const result = await pool.query(
-      'DELETE FROM paket_soal WHERE id = $1',
+    const { rows: existing } = await pool.query(
+      'SELECT id, type FROM paket_soal WHERE id = $1',
       [req.params.id]
     );
-    if (result.rowCount === 0) {
+    if (existing.length === 0) {
       return res.status(404).json({ message: 'Paket soal tidak ditemukan' });
     }
+    if (existing[0].type !== 'TKA') {
+      return res.status(403).json({ message: 'Paket Non-TKA tidak bisa dihapus lewat sini' });
+    }
+
+    await pool.query('DELETE FROM paket_soal WHERE id = $1', [req.params.id]);
     return res.json({ message: 'Paket soal berhasil dihapus' });
   } catch (err) {
     console.error(err);

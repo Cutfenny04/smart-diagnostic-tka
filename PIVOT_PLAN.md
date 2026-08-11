@@ -55,14 +55,17 @@ Website tidak membuat soal butir-per-butir, tidak mengoreksi jawaban, tidak meny
 
 ## B. Arah Baru (Revisi 8)
 
-### B1. Peran Guru Berubah — dari Pembuat jadi Pengguna
+### B1. Peran Guru Berubah — dibedakan per tipe paket (dikoreksi Fase 7D)
 
-Guru **tidak lagi** melakukan Tambah/Edit/Hapus paket soal. Tim pengembang menerima soal dari klien/pengabdian, menyusun paket (termasuk membuat aktivitas Wordwall untuk TKA atau game React untuk Non-TKA), lalu memasukkannya langsung ke database. Guru hanya: login → browse Bank Soal → lihat detail paket (read-only) → mulai Smart Diagnostic → lihat hasil.
+> **Revisi 2026-08-11 (Fase 7D):** paragraf ini awalnya bilang guru read-only untuk SEMUA paket. Itu keliru — yang benar dibedakan per tipe:
 
-**Dampak konkret ke kode yang sudah ada** (dikerjakan di fase selanjutnya, §C, bukan sekarang):
-- `DetailSoal.jsx` (mode Create/Edit) dan tombol Tambah/Edit/Hapus di `BankSoal.jsx` akan dinonaktifkan/dihapus dari sisi guru.
-- Endpoint `create`/`update`/`remove` di `paketSoal.controller.js` berhenti dipakai guru (disimpan untuk kebutuhan admin nanti, atau dipagari di belakang autentikasi tambahan — belum diputuskan, lihat pertanyaan terbuka di §D).
-- Filter `WHERE guru_id = $1` di `list`/`getById` dihapus — Bank Soal jadi bacaan bersama untuk semua guru, bukan privat per akun.
+- **TKA**: guru tetap Tambah/Edit/Hapus, karena merekalah yang membuat aktivitas Wordwall-nya sendiri lalu mendaftarkan link-nya ke Bank Soal. Ini bukan "guru menulis soal di website" — cuma mendaftarkan aktivitas yang sudah jadi.
+- **Non-TKA**: guru read-only sepenuhnya. Tim pengembang menerima soal dari klien/pengabdian, menyusun jadi paket + game React, lalu memasukkannya langsung ke database. Guru hanya: login → browse Bank Soal → lihat detail paket (read-only) → mulai Smart Diagnostic → lihat hasil.
+
+**Implementasi konkret** (lihat Fase 7D di §C untuk detail lengkap & bukti pengujian):
+- `DetailSoal.jsx` dibangun ulang, khusus untuk TKA (rute `/bank-soal/tka/baru` dan `/bank-soal/tka/:id/edit`).
+- Endpoint `create`/`update`/`delete` di `paketSoal.controller.js` menolak (403) kalau target paket bertipe NON_TKA — divalidasi di server, bukan cuma disembunyikan di UI.
+- Filter `WHERE guru_id = $1` di `list`/`getById` tetap dihapus — Bank Soal jadi bacaan bersama untuk semua guru (siapa pun bisa lihat paket siapa pun), tapi Tambah/Edit/Hapus tetap dibatasi per tipe seperti di atas.
 
 ### B2. Bank Soal: Split TKA / Non-TKA
 
@@ -125,7 +128,8 @@ Fase 2 — Migrasi skema live                                    ✔ selesai (20
     manual) -- `backend/scripts/import_soal_non_tka.js`, 90 soal Non-TKA
     (Fisika/Biologi/Kimia) sudah masuk berstatus draft
 
-Fase 3 — Frontend: guru jadi read-only                          ✔ selesai (2026-08-11)
+Fase 3 — Frontend: guru jadi read-only                          ✔ selesai (2026-08-11),
+                                                                   ✏️ dikoreksi Fase 7D
   - BankSoal.jsx: tombol Tambah/Edit/Hapus dihapus, filter Tipe (TKA/Non-TKA)
     ditambahkan, Preview Panel menyembunyikan bagian Wordwall untuk paket
     Non-TKA
@@ -135,6 +139,12 @@ Fase 3 — Frontend: guru jadi read-only                          ✔ selesai (2
   - Backend: paketSoal.controller.js -- filter `WHERE guru_id` dihapus dari
     list/getById; endpoint create/update/remove **sengaja belum diubah**
     (bukan bug -- lihat §D, keputusan lock-down belum diambil)
+  - **KELIRU, dikoreksi di Fase 7D (2026-08-11)**: read-only diterapkan ke
+    SELURUH Bank Soal (TKA dan Non-TKA sekaligus), padahal konsepnya
+    harusnya dibedakan per tipe -- guru tetap perlu CRUD untuk TKA (mereka
+    yang membuat aktivitas Wordwall dan mendaftarkan link-nya), hanya
+    Non-TKA yang murni repository tim dev. Lihat Fase 7D di bawah untuk
+    perbaikannya.
 
 Fase 4 — Smart Diagnostic router                                ✔ selesai (2026-08-11)
   - Percabangan type TKA/NON_TKA ditambahkan di SmartDiagnostic.jsx: setelah
@@ -206,6 +216,36 @@ Fase 7 — Perapian sebelum nambah jenis game baru               ✔ selesai (20
     tunggu ada soal yang memang dibuat untuk format itu, jangan
     dipaksakan dari 90 soal MC yang sudah ada.
 
+Fase 7D — Koreksi konsep Bank Soal: TKA boleh CRUD, Non-TKA tetap read-only  ✔ selesai (2026-08-11)
+  - Ralat atas Fase 3: read-only yang diterapkan kemarin ternyata terlalu
+    luas -- seharusnya cuma Non-TKA (soal disiapkan tim dev) yang read-only.
+    TKA tetap perlu CRUD dari guru, karena guru sendiri yang membuat
+    aktivitas Wordwall lalu mendaftarkan link-nya ke Bank Soal (bukan
+    menulis soal di website -- dua hal berbeda).
+  - Backend (`paketSoal.controller.js`): create/update/delete kini menolak
+    (403) kalau target paket bertipe NON_TKA; `create` memaksa `type =
+    'TKA'` di query SQL-nya sendiri (bukan dari `req.body.type`) sehingga
+    guru tidak bisa membuat paket Non-TKA lewat request yang dimanipulasi.
+    Aturan ini divalidasi di server, bukan cuma disembunyikan di UI --
+    dites langsung lewat curl (PUT/DELETE ke paket Non-TKA -> 403; POST
+    dengan `type: NON_TKA` disisipkan -> tetap tersimpan sebagai TKA).
+  - Frontend: `DetailSoal.jsx` dibuat ulang (bukan dipulihkan dari histori
+    git apa adanya) khusus untuk TKA -- judul "Tambah/Edit Paket TKA", tidak
+    ada pilihan tipe (implisit selalu TKA). Rute baru `/bank-soal/tka/baru`
+    dan `/bank-soal/tka/:id/edit` (sengaja diberi awalan `/tka/`, bukan
+    dipakai bareng Non-TKA). `bankSoalData.js` dapat lagi `fetchPaketById`/
+    `savePaket`/`deletePaket`. `BankSoal.jsx`: tombol "+ Tambah Paket TKA"
+    di header, Preview Panel menampilkan Edit + Hapus **hanya kalau
+    `item.type === 'TKA'`** (dicek `isTka`, sama seperti bagian Wordwall
+    yang sudah ada sebelumnya) -- paket Non-TKA tetap cuma punya tombol
+    Smart Diagnostic, tanpa Edit/Hapus.
+  - Diuji end-to-end di browser (bukan cuma backend): login sungguhan,
+    Tambah Paket TKA -> muncul di daftar dengan badge TKA -> Edit -> ubah
+    judul tersimpan -> Hapus (via confirm modal "Hapus Paket TKA?") ->
+    hilang dari daftar. Paket Non-TKA dicek tidak punya Edit/Hapus sama
+    sekali di Preview Panel. Tidak ada error console. Data uji dihapus
+    setelahnya.
+
 (Paralel, tidak blocking apa pun di atas)
 Modul Panduan Guru (PDF)                                         🟡 belum dikerjakan
 ```
@@ -221,15 +261,17 @@ Modul Panduan Guru (PDF)                                         🟡 belum dike
 | `hasil_diagnostik` kepemilikan sesi | Karena belum ada akun siswa — sesi diagnostik dicatat atas nama guru yang login (kelasnya), dengan `student_name` bebas teks seperti data dummy sekarang? Atau ditunda sampai ada akun siswa? |
 | Migrasi data lama | 3 paket_soal seed yang ada sekarang (`kopi-gayo`, `tes`, `tes lagi`) semuanya diberi `type = 'TKA'` default saat migrasi (karena semua masih pola Wordwall) — sudah benar? |
 
-### D1. Gap ditemukan 2026-08-11: tidak ada mekanisme publish
+### D1. Gap ditemukan 2026-08-11: tidak ada mekanisme publish (sebagian sudah beres di Fase 7D)
 
-Setelah Bank Soal jadi read-only (Fase 3), **tidak ada satu pun tempat di aplikasi** yang bisa mengubah status paket dari `draft` ke `published` — tombolnya sengaja dihapus dari sisi guru, dan belum ada panel admin pengganti. Satu-satunya cara sampai saat ini adalah UPDATE langsung ke Supabase (lewat script Node atau SQL Editor).
+Ceritanya: setelah Bank Soal jadi read-only total di Fase 3, tidak ada satu pun tempat di aplikasi yang bisa mengubah status paket dari `draft` ke `published`. Dampaknya sempat nyata — ketiga paket Non-TKA (Fisika/Biologi/Kimia) tertinggal berstatus `draft` di production setelah sesi testing, Smart Diagnostic tampak kosong. Sudah di-publish manual sekali (2026-08-11) supaya bisa langsung dipakai.
 
-Dampaknya sempat nyata: ketiga paket Non-TKA (Fisika/Biologi/Kimia) tertinggal berstatus `draft` di production setelah sesi testing, sehingga Smart Diagnostic tampak kosong bagi pengguna sungguhan. Sudah di-publish manual (2026-08-11) supaya bisa langsung dipakai, tapi **ini bukan solusi permanen** — kalau ada paket baru di masa depan, publish-nya masih harus manual lewat DB sampai salah satu dari dua hal ini diputuskan/dibangun:
-- Panel admin minimal (form sederhana untuk toggle status paket), atau
-- Guru tertentu (role baru) diberi akses terbatas untuk publish tanpa full CRUD.
+**Sudah beres untuk TKA** sejak Fase 7D: form `DetailSoal.jsx` (khusus TKA) punya field status Draft/Published, jadi guru bisa publish paket TKA mereka sendiri kapan pun tanpa bantuan dev.
 
-Belum diprioritaskan karena belum ada permintaan eksplisit dari klien.
+**Masih jadi gap untuk Non-TKA** — repository itu murni dikelola tim dev, jadi publish-nya tetap harus manual lewat Supabase (script Node atau SQL Editor) sampai salah satu dari dua hal ini dibangun:
+- Panel admin minimal (form sederhana untuk toggle status paket Non-TKA), atau
+- Endpoint khusus tim dev untuk publish tanpa perlu masuk ke SQL Editor tiap kali.
+
+Belum diprioritaskan karena belum ada permintaan eksplisit dari klien, dan frekuensinya rendah (soal baru datang dalam batch besar dari klien, bukan satu-satu).
 
 ---
 

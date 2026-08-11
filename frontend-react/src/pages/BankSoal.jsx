@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  Search, SearchX, FlaskConical, GraduationCap,
-  MousePointerClick, PlayCircle, X, Link as LinkIcon, Unlink,
+  PlusCircle, Search, SearchX, FlaskConical, GraduationCap,
+  MousePointerClick, Pencil, PlayCircle, Trash2, X, Link as LinkIcon, Unlink,
 } from 'lucide-react';
 import Layout from '../components/Layout';
-import { fetchPaketSoal } from '../data/bankSoalData';
+import { fetchPaketSoal, deletePaket } from '../data/bankSoalData';
 import { getIcon } from '../utils/icon';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './BankSoal.css';
@@ -104,7 +104,7 @@ function PaketCard({ item, selected, onSelect }) {
   );
 }
 
-function PreviewPanel({ item, onClose }) {
+function PreviewPanel({ item, onClose, onDeleteRequest }) {
   if (!item) {
     return (
       <div className="empty-state">
@@ -141,8 +141,20 @@ function PreviewPanel({ item, onClose }) {
         </>
       )}
       <div className="soal-preview__action">
+        {isTka && <Link to={`/bank-soal/tka/${item.id}/edit`} className="btn btn-secondary"><Pencil size={16} /> Edit</Link>}
         {item.status === 'published' && (
           <Link to={`/smart-diagnostic?paket=${item.id}`} className="btn btn-primary"><PlayCircle size={16} /> Smart Diagnostic</Link>
+        )}
+        {isTka && (
+          <button
+            type="button"
+            className="btn-icon btn-icon--danger"
+            aria-label="Hapus Paket TKA"
+            title="Hapus Paket TKA"
+            onClick={() => onDeleteRequest(item)}
+          >
+            <Trash2 size={16} />
+          </button>
         )}
       </div>
     </>
@@ -156,6 +168,7 @@ function BankSoal() {
   const [sort, setSort] = useState('terbaru');
   const [selectedId, setSelectedId] = useState(null);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState(null);
 
   useDocumentTitle('Bank Soal Berbasis Budaya Aceh - Smart Diagnostic TKA');
 
@@ -165,15 +178,25 @@ function BankSoal() {
 
   useEffect(() => {
     function handleEscape(e) {
-      if (e.key === 'Escape') setMobilePreviewOpen(false);
+      if (e.key !== 'Escape') return;
+      if (deleteTarget) setDeleteTarget(null);
+      else setMobilePreviewOpen(false);
     }
     document.addEventListener('keydown', handleEscape);
     return () => document.removeEventListener('keydown', handleEscape);
-  }, []);
+  }, [deleteTarget]);
 
   function selectPaket(id) {
     setSelectedId(id);
     setMobilePreviewOpen(true);
+  }
+
+  async function confirmDelete() {
+    const updated = await deletePaket(deleteTarget.id);
+    setAllPaket(updated);
+    setDeleteTarget(null);
+    setMobilePreviewOpen(false);
+    setSelectedId(null);
   }
 
   let filtered = [];
@@ -198,6 +221,9 @@ function BankSoal() {
         <div className="page-header__text">
           <h1 className="page-header__title">Bank Soal Berbasis Budaya Aceh</h1>
           <p className="page-header__desc">Jelajahi paket soal budaya Aceh (TKA lewat Wordwall, Non-TKA lewat game interaktif) untuk digunakan pada Smart Diagnostic.</p>
+        </div>
+        <div className="page-header__actions">
+          <Link to="/bank-soal/tka/baru" className="btn btn-primary"><PlusCircle size={18} /> Tambah Paket TKA</Link>
         </div>
       </div>
 
@@ -302,10 +328,23 @@ function BankSoal() {
         </div>
 
         <aside className={'soal-preview preview-panel card-light' + (mobilePreviewOpen ? ' is-open' : '')} aria-label="Pratinjau Paket Soal">
-          <PreviewPanel item={selectedItem} onClose={() => setMobilePreviewOpen(false)} />
+          <PreviewPanel item={selectedItem} onClose={() => setMobilePreviewOpen(false)} onDeleteRequest={setDeleteTarget} />
         </aside>
       </div>
       <div className={'preview-panel-backdrop' + (mobilePreviewOpen ? ' is-open' : '')} onClick={() => setMobilePreviewOpen(false)} />
+
+      <div className={'confirm-modal-backdrop' + (deleteTarget ? ' is-open' : '')} onClick={(e) => { if (e.target === e.currentTarget) setDeleteTarget(null); }}>
+        <div className="confirm-modal" role="alertdialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
+          <h2 className="confirm-modal__title" id="deleteConfirmTitle">Hapus Paket TKA?</h2>
+          <p className="confirm-modal__desc">
+            {deleteTarget ? `Paket "${deleteTarget.title}" akan dihapus secara permanen dan tidak dapat dikembalikan.` : ''}
+          </p>
+          <div className="confirm-modal__actions">
+            <button type="button" className="btn btn-secondary" onClick={() => setDeleteTarget(null)}>Batal</button>
+            <button type="button" className="btn btn-danger" onClick={confirmDelete}>Ya, Hapus</button>
+          </div>
+        </div>
+      </div>
     </Layout>
   );
 }
