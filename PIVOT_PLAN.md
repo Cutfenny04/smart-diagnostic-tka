@@ -221,6 +221,16 @@ Modul Panduan Guru (PDF)                                         🟡 belum dike
 | `hasil_diagnostik` kepemilikan sesi | Karena belum ada akun siswa — sesi diagnostik dicatat atas nama guru yang login (kelasnya), dengan `student_name` bebas teks seperti data dummy sekarang? Atau ditunda sampai ada akun siswa? |
 | Migrasi data lama | 3 paket_soal seed yang ada sekarang (`kopi-gayo`, `tes`, `tes lagi`) semuanya diberi `type = 'TKA'` default saat migrasi (karena semua masih pola Wordwall) — sudah benar? |
 
+### D1. Gap ditemukan 2026-08-11: tidak ada mekanisme publish
+
+Setelah Bank Soal jadi read-only (Fase 3), **tidak ada satu pun tempat di aplikasi** yang bisa mengubah status paket dari `draft` ke `published` — tombolnya sengaja dihapus dari sisi guru, dan belum ada panel admin pengganti. Satu-satunya cara sampai saat ini adalah UPDATE langsung ke Supabase (lewat script Node atau SQL Editor).
+
+Dampaknya sempat nyata: ketiga paket Non-TKA (Fisika/Biologi/Kimia) tertinggal berstatus `draft` di production setelah sesi testing, sehingga Smart Diagnostic tampak kosong bagi pengguna sungguhan. Sudah di-publish manual (2026-08-11) supaya bisa langsung dipakai, tapi **ini bukan solusi permanen** — kalau ada paket baru di masa depan, publish-nya masih harus manual lewat DB sampai salah satu dari dua hal ini diputuskan/dibangun:
+- Panel admin minimal (form sederhana untuk toggle status paket), atau
+- Guru tertentu (role baru) diberi akses terbatas untuk publish tanpa full CRUD.
+
+Belum diprioritaskan karena belum ada permintaan eksplisit dari klien.
+
 ---
 
 ## Lampiran — Riwayat Desain Revisi 1–7
