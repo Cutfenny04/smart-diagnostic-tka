@@ -304,7 +304,47 @@ Fase 7F — Profil pakai data asli, bukan dummy lagi                          �
     bergabung terbaca benar. Tidak ada error console. Data uji dihapus.
 
 (Paralel, tidak blocking apa pun di atas)
-Modul Panduan Guru (PDF)                                         🟡 belum dikerjakan
+Modul Panduan Guru (PDF)                                         ✔ tahap 1 selesai (2026-08-12)
+  - PDF pertama yang diembed: "Modul Tutorial Pembuatan Game Edukasi
+    Interaktif Menggunakan Wordwall" (dari user, 15 halaman) -- disimpan di
+    `frontend-react/public/assets/modul/modul-tutorial-wordwall.pdf` (static
+    asset, sama pola dengan gambar soal Non-TKA, tidak perlu Supabase
+    Storage/backend endpoint apa pun).
+  - Ditambahkan section "Modul Panduan Guru" di `Materi.jsx` (di atas
+    "Progress Belajar Anda", statis -- bukan bagian dari daftar materi yang
+    di-fetch dari `/api/materi`, karena PDF ini bukan modul berjenjang
+    dengan progress): judul + deskripsi + tombol "Unduh PDF" (`<a download>`)
+    + iframe embed PDF langsung di halaman (`.guide-module-card` di
+    `Materi.css`).
+  - Diuji end-to-end di browser dengan akun QA sementara (register lewat
+    fetch ke endpoint yang sudah ada, tidak ada halaman register di
+    frontend): dikonfirmasi iframe memuat PDF (network request 200,
+    content-type application/pdf, ukuran file cocok) dan link download
+    mengarah ke file yang benar dengan atribut `download`. Akun QA dihapus
+    langsung dari DB setelahnya (tidak ada endpoint hapus akun sendiri,
+    dipakai query DELETE manual seperti sesi-sesi sebelumnya).
+  - **Bug tak terkait ditemukan saat pengujian, langsung diperbaiki juga
+    (2026-08-12, atas permintaan user)**: `GET /api/materi` 500 ("operator
+    does not exist: text = bigint" di `materi.controller.js:8`/
+    `getAllMateri`). Root cause: tabel `progress_materi` di production
+    ternyata dibuat dengan SEMUA kolom bertipe `text` (bukan
+    SERIAL/INT/INT/INT/TIMESTAMP sesuai `supabase_schema.sql`) -- drift yang
+    sama kelasnya dengan `paket_soal` yang ditemukan saat migrasi Revisi 8.
+    Sekaligus ditemukan `materi.id` juga tidak punya PRIMARY KEY sama
+    sekali. Fix ada di `backend/sql/fix_progress_materi_types.sql` (idempotent,
+    guard block, sudah dijalankan langsung ke Supabase live -- tabel masih 0
+    baris saat itu jadi tidak ada risiko cast data): `materi` dapat PK,
+    `progress_materi.guru_id`/`materi_id` jadi BIGINT + FK ke
+    `guru`/`materi`, `progress` jadi INTEGER, `last_opened` jadi
+    TIMESTAMPTZ, plus UNIQUE(guru_id, materi_id). Diverifikasi dengan akun
+    QA baru: `GET /api/materi` sekarang 200 dan mengembalikan ketiga materi
+    (HOTS, Budaya Aceh x2). Akun QA dihapus lagi setelahnya.
+  - **Belum selesai**: ini baru PDF pertama/contoh. "Modul Panduan Guru"
+    sesuai konsep awal (§B4) seharusnya panduan BAB 1-8 cara memakai
+    platform Smart Diagnostic TKA sendiri (Login, Dashboard, dst) -- PDF
+    yang baru diembed ini isinya tutorial Wordwall (cara guru bikin game),
+    bukan itu. Perlu diklarifikasi ke user: apakah PDF Wordwall ini sudah
+    cukup, atau masih perlu PDF panduan platform terpisah menyusul.
 ```
 
 ---

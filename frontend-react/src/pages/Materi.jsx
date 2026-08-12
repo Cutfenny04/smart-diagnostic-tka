@@ -1,12 +1,14 @@
 import { createElement, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Clock, Layers, PlayCircle, SearchX } from 'lucide-react';
+import { Search, Clock, Layers, PlayCircle, SearchX, FileText, Download } from 'lucide-react';
 import Layout from '../components/Layout';
 import { fetchMateri, materiCategoryMeta as CATEGORY_META, materiCategoryOrder as CATEGORY_ORDER, materiOverallProgress as OVERALL_PROGRESS } from '../data/materiData';
 import { getIcon } from '../utils/icon';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Materi.css';
+
+const GURU_GUIDE_PDF = '/assets/modul/modul-tutorial-wordwall.pdf';
 
 const FILTERS = [
   { value: 'semua', label: 'Semua' },
@@ -98,6 +100,22 @@ function Materi() {
           <p className="page-header__desc">Pelajari seluruh materi penyusunan soal HOTS IPA berbasis budaya Aceh secara bertahap.</p>
         </div>
       </div>
+
+      <section className="dashboard-section card-light guide-module-card" aria-label="Modul Panduan Guru">
+        <div className="guide-module-card__header">
+          <div className="guide-module-card__icon" aria-hidden="true"><FileText size={24} /></div>
+          <div className="guide-module-card__text">
+            <h2 className="section-heading__title">Modul Panduan Guru</h2>
+            <p className="guide-module-card__desc">Modul Tutorial Pembuatan Game Edukasi Interaktif Menggunakan Wordwall — panduan langkah demi langkah bagi Bapak/Ibu guru untuk membuat dan memainkan game edukasi di kelas.</p>
+          </div>
+          <a href={GURU_GUIDE_PDF} download className="btn btn-primary guide-module-card__download">
+            <Download size={16} /> Unduh PDF
+          </a>
+        </div>
+        <div className="guide-module-card__viewer">
+          <iframe src={GURU_GUIDE_PDF} title="Modul Panduan Guru - Tutorial Wordwall" />
+        </div>
+      </section>
 
       <section className="dashboard-section card-light" aria-label="Progress Belajar Keseluruhan">
         <div className="learning-overview">
