@@ -1,12 +1,52 @@
 /* ==========================================================================
-   NON-TKA GAME — pilihan ganda interaktif berbasis stimulus + ilustrasi.
-   Pakai token dari style.css, tidak ada warna/shadow/radius baru.
+   NON-TKA GAME — "Ekspedisi Sains Aceh" (redesign 2026-08-15).
+   Pakai token dari style.css, kecuali --color-gold(-deep) yang didefinisikan
+   di bawah, DI-SCOPE ke .game-scene (bukan :root) supaya tidak "menular" ke
+   halaman lain -- lihat DESIGN_SYSTEM.md §1.1: "No gold/yellow anywhere, on
+   any page" terkunci untuk seluruh produk, tapi khusus halaman game ini
+   pengecualian sudah disetujui pengguna (2026-08-15) demi nuansa
+   "eksplorasi" ala referensi Figma. Jangan copy token ini ke file CSS lain.
    ========================================================================== */
 
-.game-panel {
+.game-scene {
+    --color-gold: #C9A15C;
+    --color-gold-deep: #A8823F;
+
+    position: relative;
+    border-radius: var(--radius-2xl);
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: var(--space-5);
     display: flex;
     flex-direction: column;
-    gap: var(--space-4);
+    gap: var(--space-5);
+    box-shadow: var(--shadow-premium);
+}
+
+.game-scene__overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(6, 36, 24, 0.35) 0%, rgba(6, 36, 24, 0.55) 45%, rgba(6, 36, 24, 0.85) 100%);
+}
+
+.game-scene__content {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.game-scene--result .game-scene__overlay {
+    background: linear-gradient(180deg, rgba(6, 36, 24, 0.2) 0%, rgba(6, 36, 24, 0.5) 100%);
+}
+
+.game-scene--result .game-scene__content {
+    align-items: center;
+    justify-content: center;
+    min-height: 420px;
 }
 
 /* --- Identitas visual Aceh (motif "pucuk rebung") --- */
@@ -16,13 +56,12 @@
     display: block;
 }
 
-.game-panel__motif {
-    color: var(--color-moss);
-    margin-bottom: calc(var(--space-2) * -1);
+.question-board__motif {
+    color: var(--color-gold);
 }
 
 .game-result__motif {
-    color: var(--color-rosy-deep);
+    color: var(--color-gold-deep);
     margin-bottom: var(--space-2);
 }
 
@@ -41,172 +80,546 @@
     letter-spacing: 0.02em;
 }
 
-.game-panel__head {
+/* ==========================================================================
+   GAME HUD
+   ========================================================================== */
+.game-hud {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+    background: rgba(255, 255, 255, 0.94);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3) var(--space-4);
+    box-shadow: var(--shadow-md);
+}
+
+.game-hud__back {
+    flex-shrink: 0;
+}
+
+.game-hud__identity {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+}
+
+.game-hud__avatar {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--gradient-rosy);
+    color: var(--color-white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-headings);
+    font-weight: 700;
+    font-size: var(--text-body);
+    border: 2px solid var(--color-gold);
+}
+
+.game-hud__identity-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+}
+
+.game-hud__paket-title {
+    font-family: var(--font-headings);
+    font-size: var(--text-small);
+    font-weight: 700;
+    color: var(--text-on-light);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 220px;
+}
+
+.game-hud__progress {
+    flex: 1 1 220px;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+}
+
+.game-hud__progress-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: var(--space-2);
+}
+
+.game-hud__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-micro);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--color-gold-deep);
+}
+
+.game-hud__count {
+    font-size: var(--text-small);
+    font-weight: 700;
+    color: var(--text-on-light);
+}
+
+.game-hud__stars {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--text-small);
+    font-weight: 700;
+    color: var(--color-gold-deep);
+}
+
+.game-hud__bar .progress-bar__fill {
+    background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-deep) 100%);
+}
+
+.game-hud__dots {
+    display: flex;
+    gap: 4px;
+    margin-top: 2px;
+    flex-wrap: wrap;
+}
+
+.game-hud__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border-on-light);
+    transition: var(--transition-fast);
+}
+
+.game-hud__dot.is-done {
+    background: var(--color-moss);
+}
+
+.game-hud__dot.is-current {
+    background: var(--color-gold);
+    transform: scale(1.3);
+}
+
+/* ==========================================================================
+   QUESTION BOARD
+   ========================================================================== */
+.question-board {
+    position: relative;
+    background: var(--surface-card);
+    border: 1px solid var(--border-on-light);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    padding: var(--space-6);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
+
+.question-board__header {
+    display: flex;
+    flex-direction: column;
     gap: var(--space-3);
 }
 
-.game-panel__progress-label {
-    font-size: var(--text-small);
-    font-weight: 600;
-    color: var(--text-muted-on-light);
-}
-
-.game-panel__stimulus {
-    background: var(--surface-card-tint);
-    border-left: 3px solid var(--color-rosy-deep);
-    border-radius: var(--radius-md);
-    padding: var(--space-4);
-    font-size: var(--text-body);
-    color: var(--text-on-light);
-    line-height: 1.6;
-}
-
-.game-panel__image {
-    width: 100%;
-    max-height: 320px;
-    object-fit: contain;
-    border-radius: var(--radius-lg);
-    background: var(--surface-card-tint);
-    border: 1px solid var(--border-on-light);
-}
-
-.game-panel__question {
+.question-board__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
     font-family: var(--font-headings);
     font-size: var(--text-h3);
+    font-weight: 500;
     color: var(--text-on-light);
-    line-height: 1.4;
 }
 
+.question-board__eyebrow::before {
+    content: '';
+    width: 4px;
+    height: 20px;
+    border-radius: var(--radius-pill);
+    background: linear-gradient(180deg, var(--color-gold) 0%, var(--color-gold-deep) 100%);
+}
+
+.question-board__badges {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.question-board__stimulus-col,
+.question-board__question-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    min-width: 0;
+}
+
+/* Layout 2 kolom desktop HANYA kalau soal punya gambar (lihat §16 brief) --
+   di bawah 1024px atau tanpa gambar, tetap 1 kolom lewat flex-column di atas. */
+@media (min-width: 1024px) {
+    .question-board--split {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+        grid-template-areas:
+            "motif motif"
+            "header header"
+            "stimulus question";
+        column-gap: var(--space-6);
+        row-gap: var(--space-5);
+    }
+
+    .question-board--split .question-board__motif { grid-area: motif; }
+    .question-board--split .question-board__header { grid-area: header; }
+    .question-board--split .question-board__stimulus-col { grid-area: stimulus; }
+    .question-board--split .question-board__question-col { grid-area: question; }
+}
+
+/* --- Stimulus: prosa vs. pseudo-tabel (lihat komentar di NonTkaGame.jsx
+   StimulusBlock -- tidak ada field tabel terstruktur di data soal) --- */
+.game-stimulus {
+    margin: 0;
+}
+
+.game-stimulus--prose {
+    font-style: normal;
+    font-size: var(--text-body);
+    color: var(--text-on-light);
+    line-height: 1.7;
+    background: var(--surface-card-tint);
+    border-left: 3px solid var(--color-gold);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+}
+
+.game-stimulus--table {
+    background: var(--surface-card-tint);
+    border: 1px solid var(--border-on-light);
+    border-left: 3px solid var(--color-gold);
+    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+}
+
+.game-stimulus__caption {
+    font-weight: 700;
+    font-size: var(--text-small);
+    color: var(--text-on-light);
+    margin-bottom: var(--space-2);
+}
+
+.game-stimulus__table-scroll {
+    overflow-x: auto;
+}
+
+.game-stimulus__list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2);
+    padding-left: var(--space-5);
+    font-size: var(--text-body);
+    color: var(--text-on-light);
+    min-width: 260px;
+}
+
+.game-stimulus__list li {
+    padding-bottom: var(--space-2);
+    border-bottom: 1px dashed var(--border-on-light);
+}
+
+.game-stimulus__list li:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+/* --- Gambar soal + lightbox --- */
+.game-image {
+    position: relative;
+    display: block;
+    width: 100%;
+    padding: 0;
+    border: 1px solid var(--border-on-light);
+    background: var(--surface-card-tint);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    cursor: zoom-in;
+    transition: var(--transition-fast);
+}
+
+.game-image:hover {
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+    border-color: var(--color-gold);
+}
+
+.game-image__img {
+    display: block;
+    width: 100%;
+    max-height: 360px;
+    object-fit: contain;
+    background: var(--surface-card-tint);
+}
+
+.game-image__zoom-hint {
+    position: absolute;
+    right: var(--space-3);
+    bottom: var(--space-3);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: var(--space-1) var(--space-3);
+    border-radius: var(--radius-pill);
+    background: rgba(10, 51, 35, 0.72);
+    color: var(--color-beige);
+    font-size: var(--text-micro);
+    font-weight: 700;
+}
+
+.game-image-lightbox {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 36, 24, 0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-6);
+    z-index: 200;
+    cursor: zoom-out;
+}
+
+.game-image-lightbox__img {
+    max-width: min(90vw, 900px);
+    max-height: 85vh;
+    object-fit: contain;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-premium);
+    cursor: default;
+}
+
+.game-image-lightbox__close {
+    position: absolute;
+    top: var(--space-5);
+    right: var(--space-5);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    color: var(--color-beige);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.game-image-lightbox__close:hover {
+    background: rgba(255, 255, 255, 0.22);
+}
+
+/* --- Pertanyaan: font body, TIDAK dekoratif (lihat §8 brief) --- */
+.question-board__question {
+    font-family: var(--font-body);
+    font-weight: 700;
+    font-size: var(--text-h3);
+    color: var(--text-on-light);
+    line-height: 1.5;
+}
+
+/* --- Kartu jawaban --- */
 .game-options {
     display: grid;
     gap: var(--space-3);
 }
 
-.game-option {
+.answer-card {
     display: flex;
     align-items: center;
     gap: var(--space-3);
     width: 100%;
     text-align: left;
-    padding: var(--space-4);
-    border-radius: var(--radius-md);
+    padding: var(--space-4) var(--space-5);
+    border-radius: var(--radius-lg);
     border: 1.5px solid var(--border-on-light);
     background: var(--surface-card);
     cursor: pointer;
     transition: var(--transition-fast);
 }
 
-.game-option--idle:hover {
-    border-color: var(--color-rosy-deep);
-    box-shadow: var(--shadow-sm);
-    transform: translateY(-1px);
+.answer-card--idle:hover {
+    border-color: var(--color-gold);
+    box-shadow: var(--shadow-glow);
+    transform: translateY(-2px);
 }
 
-.game-option__key {
+.answer-card__key {
     flex-shrink: 0;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 700;
-    font-size: var(--text-small);
+    font-size: var(--text-body);
     background: var(--surface-card-tint);
     color: var(--text-on-light);
+    border: 1.5px solid var(--border-on-light);
+    transition: var(--transition-fast);
 }
 
-.game-option__text {
+.answer-card__text {
     flex: 1;
     font-size: var(--text-body);
     color: var(--text-on-light);
+    line-height: 1.5;
 }
 
-.game-option__icon {
+.answer-card__icon {
     flex-shrink: 0;
 }
 
-.game-option--disabled {
+.answer-card--disabled {
     opacity: 0.5;
     cursor: default;
 }
 
-.game-option--correct {
+.answer-card--correct {
     border-color: var(--color-moss);
     background: rgba(131, 153, 88, 0.12);
     cursor: default;
 }
 
-.game-option--correct .game-option__key {
+.answer-card--correct .answer-card__key {
     background: var(--color-moss);
     color: var(--color-white);
+    border-color: var(--color-moss);
 }
 
-.game-option--correct .game-option__icon {
+.answer-card--correct .answer-card__icon {
     color: #5C6B3A;
 }
 
-.game-option--incorrect {
+.answer-card--incorrect {
     border-color: var(--color-danger);
     background: rgba(255, 82, 82, 0.10);
     cursor: default;
 }
 
-.game-option--incorrect .game-option__key {
+.answer-card--incorrect .answer-card__key {
     background: var(--color-danger);
     color: var(--color-white);
+    border-color: var(--color-danger);
 }
 
-.game-option--incorrect .game-option__icon {
+.answer-card--incorrect .answer-card__icon {
     color: var(--color-danger);
 }
 
-.game-feedback {
-    border-radius: var(--radius-md);
-    padding: var(--space-4);
+/* --- Feedback + Pembahasan --- */
+.feedback-panel {
+    border-radius: var(--radius-lg);
+    padding: var(--space-5);
     display: flex;
     flex-direction: column;
-    gap: var(--space-2);
+    gap: var(--space-3);
     align-items: flex-start;
 }
 
-.game-feedback.is-correct {
+.feedback-panel.is-correct {
     background: rgba(131, 153, 88, 0.12);
+    border: 1px solid rgba(131, 153, 88, 0.3);
 }
 
-.game-feedback.is-incorrect {
+.feedback-panel.is-incorrect {
     background: rgba(255, 82, 82, 0.10);
+    border: 1px solid rgba(255, 82, 82, 0.25);
 }
 
-.game-feedback__title {
+.feedback-panel__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.feedback-panel.is-correct .feedback-panel__head {
+    color: #5C6B3A;
+}
+
+.feedback-panel.is-incorrect .feedback-panel__head {
+    color: var(--color-danger);
+}
+
+.feedback-panel__title {
     font-weight: 700;
+    color: var(--text-on-light);
+    font-size: var(--text-body);
+}
+
+.feedback-panel__correction {
+    font-size: var(--text-body);
     color: var(--text-on-light);
 }
 
-.game-feedback__explanation {
-    font-size: var(--text-small);
-    color: var(--text-muted-on-light);
-    line-height: 1.6;
+.feedback-panel__next {
+    margin-top: var(--space-2);
 }
 
-/* --- Hasil akhir --- */
+.pembahasan-card {
+    width: 100%;
+    background: var(--surface-card-tint);
+    border: 1px solid var(--border-on-light);
+    border-left: 3px solid var(--color-gold);
+    border-radius: var(--radius-md);
+    padding: var(--space-4);
+}
+
+.pembahasan-card__head {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-weight: 700;
+    font-size: var(--text-small);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--color-gold-deep);
+    margin-bottom: var(--space-2);
+}
+
+.pembahasan-card__text {
+    font-size: var(--text-body);
+    color: var(--text-muted-on-light);
+    line-height: 1.7;
+}
+
+/* ==========================================================================
+   HASIL AKHIR
+   ========================================================================== */
 .game-result {
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: center;
     gap: var(--space-2);
-    padding: var(--space-8) var(--space-5);
+    padding: var(--space-8) var(--space-6);
+    background: rgba(255, 255, 255, 0.96);
+    border-radius: var(--radius-2xl);
+    box-shadow: var(--shadow-lg);
+    max-width: 480px;
+    width: 100%;
 }
 
 .game-result__icon {
     width: 64px;
     height: 64px;
     border-radius: 50%;
-    background: var(--gradient-rosy);
+    background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-deep) 100%);
     color: var(--color-white);
     display: flex;
     align-items: center;
@@ -214,10 +627,19 @@
     margin-bottom: var(--space-2);
 }
 
+.game-result__eyebrow {
+    font-size: var(--text-micro);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-gold-deep);
+}
+
 .game-result__title {
     font-family: var(--font-headings);
-    font-size: var(--text-h2);
+    font-size: var(--text-h1);
     color: var(--text-on-light);
+    margin-bottom: var(--space-2);
 }
 
 .game-result__score {
@@ -242,4 +664,41 @@
 .game-result__actions {
     display: flex;
     gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+/* ==========================================================================
+   RESPONSIVE
+   ========================================================================== */
+@media (max-width: 768px) {
+    .game-scene {
+        padding: var(--space-4);
+        border-radius: var(--radius-lg);
+    }
+
+    .game-hud {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .game-hud__paket-title {
+        max-width: none;
+    }
+
+    .question-board {
+        padding: var(--space-5);
+    }
+
+    .game-image__img {
+        max-height: 240px;
+    }
+
+    .game-result {
+        padding: var(--space-6) var(--space-5);
+    }
+
+    .game-result__actions {
+        flex-direction: column;
+        width: 100%;
+    }
 }

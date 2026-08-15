@@ -18,6 +18,26 @@
     gap: var(--space-3);
 }
 
+/* --- Identitas "Game Interaktif" untuk paket Non-TKA (motif pucuk rebung
+   dari NonTkaGame.css, dipakai lagi di sini supaya identitasnya menyatu dari
+   kartu -> stimulus -> game) --- */
+.diagnostic-card--game {
+    padding-top: var(--space-4);
+}
+
+.diagnostic-card__motif {
+    color: var(--color-moss);
+    margin-bottom: var(--space-1);
+}
+
+.diagnostic-card__type-badge--game {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    background: rgba(131, 153, 88, 0.14);
+    color: #5C6B3A;
+}
+
 .diagnostic-card__head {
     display: flex;
     align-items: flex-start;
@@ -75,6 +95,11 @@
 .diagnostic-stimulus {
     max-width: 720px;
     margin: 0 auto;
+}
+
+.diagnostic-stimulus__motif {
+    color: var(--color-moss);
+    margin-bottom: var(--space-4);
 }
 
 .diagnostic-stimulus__title {

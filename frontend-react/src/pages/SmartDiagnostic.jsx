@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { FlaskConical, GraduationCap, PlayCircle, Inbox, ArrowLeft, Link2Off, ExternalLink } from 'lucide-react';
+import { FlaskConical, GraduationCap, PlayCircle, Gamepad2, Inbox, ArrowLeft, Link2Off, ExternalLink } from 'lucide-react';
 import Layout from '../components/Layout';
 import NonTkaGame from '../components/NonTkaGame';
+import AcehMotifDivider from '../components/AcehMotifDivider';
 import { fetchPaketSoal } from '../data/bankSoalData';
 import { checkWordwallEmbeddable } from '../data/wordwallData';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -34,8 +35,10 @@ function truncate(text, max) {
 }
 
 function DiagnosticCard({ item, onOpen }) {
+  const isGame = item.type === 'NON_TKA';
   return (
-    <article className="diagnostic-card card-light" onClick={() => onOpen(item.id)}>
+    <article className={'diagnostic-card card-light' + (isGame ? ' diagnostic-card--game' : '')} onClick={() => onOpen(item.id)}>
+      {isGame && <AcehMotifDivider className="diagnostic-card__motif" />}
       <div className="diagnostic-card__head">
         <h3 className="diagnostic-card__title">{item.title}</h3>
         <span className={'badge ' + hotsBadgeClass(item.hotsLevel)}>{item.hotsLevel}</span>
@@ -46,10 +49,14 @@ function DiagnosticCard({ item, onOpen }) {
       </div>
       <p className="diagnostic-card__summary">{truncate(item.stimulus, 120)}</p>
       <div className="diagnostic-card__tags">
-        <span className="badge badge--info">{typeLabel(item.type)}</span>
+        {isGame
+          ? <span className="badge diagnostic-card__type-badge--game"><Gamepad2 size={13} /> Game Interaktif</span>
+          : <span className="badge badge--info">{typeLabel(item.type)}</span>}
       </div>
       <div className="diagnostic-card__action">
-        <button type="button" className="btn btn-primary"><PlayCircle size={16} /> Mulai</button>
+        {isGame
+          ? <button type="button" className="btn btn-primary"><Gamepad2 size={16} /> Main Sekarang</button>
+          : <button type="button" className="btn btn-primary"><PlayCircle size={16} /> Mulai</button>}
       </div>
     </article>
   );
@@ -78,19 +85,24 @@ function ListView({ publishedPaket, onOpen }) {
 }
 
 function StimulusView({ item, onBack, onStart }) {
+  const isGame = item.type === 'NON_TKA';
   return (
-    <div className="card-light diagnostic-stimulus">
+    <div className={'card-light diagnostic-stimulus' + (isGame ? ' diagnostic-stimulus--game' : '')}>
+      {isGame && <AcehMotifDivider className="diagnostic-stimulus__motif" />}
       <h2 className="diagnostic-stimulus__title">{item.title}</h2>
       <div className="diagnostic-stimulus__tags">
         <span className="badge badge--info">{item.subject}</span>
         <span className="badge badge--info">{item.grade}</span>
         <span className={'badge ' + hotsBadgeClass(item.hotsLevel)}>{item.hotsLevel}</span>
+        {isGame && <span className="badge diagnostic-card__type-badge--game"><Gamepad2 size={13} /> Game Interaktif</span>}
       </div>
       <h3 className="diagnostic-stimulus__section-title">Stimulus Budaya Aceh</h3>
       <p className="diagnostic-stimulus__text">{item.stimulus}</p>
       <div className="diagnostic-stimulus__actions">
         <button type="button" className="btn btn-secondary" onClick={onBack}><ArrowLeft size={16} /> Kembali</button>
-        <button type="button" className="btn btn-primary" onClick={onStart}><PlayCircle size={16} /> Mulai Diagnostik</button>
+        {isGame
+          ? <button type="button" className="btn btn-primary" onClick={onStart}><Gamepad2 size={16} /> Mulai Game</button>
+          : <button type="button" className="btn btn-primary" onClick={onStart}><PlayCircle size={16} /> Mulai Diagnostik</button>}
       </div>
     </div>
   );
