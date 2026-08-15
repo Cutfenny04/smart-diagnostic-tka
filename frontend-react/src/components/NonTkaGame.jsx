@@ -1,12 +1,13 @@
 import { useEffect, useState } from 'react';
 import {
   ArrowLeft, ArrowRight, CheckCircle2, XCircle, RotateCcw, Trophy, Inbox,
-  Leaf, Compass, Star, Lightbulb, Maximize, X,
+  Leaf, Compass, Star, Lightbulb, Maximize, X, Volume2, VolumeX,
 } from 'lucide-react';
 import { fetchSoalByPaket } from '../data/soalData';
 import { saveHasil } from '../data/hasilData';
 import { isTuntas } from '../utils/scoring';
 import { useAuth } from '../context/AuthContext';
+import { useGameSounds } from '../hooks/useGameSounds';
 import AcehMotifDivider from './AcehMotifDivider';
 import './NonTkaGame.css';
 
@@ -54,6 +55,15 @@ function hotsBadgeClass(level) {
    nama file valid sebagai URL. */
 const BG_GAME = encodeURI('/assets/assets bank soal non tka/TV - 2.png');
 const BG_RESULT = encodeURI('/assets/assets bank soal non tka/desa.png.png');
+
+/* Ilustrasi flat Rumoh Aceh -- diekstrak dari salah satu SVG di folder yang
+   sama (bukan file utuh: SVG aslinya adalah kumpulan 10+ elemen Canva yang
+   dijadikan satu file 15MB, sebagian besarnya maskot kartun generik yang
+   TIDAK dipakai karena bertentangan dengan arahan brand "elegant, bukan
+   kekanak-kanakan"). Cuma potongan Rumoh Aceh ini yang relevan & senada
+   dengan gaya flat aplikasi -- dipakai sebagai aksen dekoratif kecil di
+   pojok scene, bukan pengganti background foto. */
+const LANDMARK = encodeURI('/assets/assets bank soal non tka/rumoh-aceh-ilustrasi.png');
 
 function optionState(optionKey, selectedKey, correctAnswer) {
   if (!selectedKey) return 'idle';
@@ -122,7 +132,7 @@ function GameImage({ src, alt }) {
   );
 }
 
-function GameHud({ paket, currentNumber, total, progressPercent, correctSoFar, onExit }) {
+function GameHud({ paket, currentNumber, total, progressPercent, correctSoFar, onExit, muted, onToggleMuted }) {
   const { profile } = useAuth();
   const profileName = profile?.nama || 'Guru';
   const profileInitial = profileName.charAt(0).toUpperCase();
@@ -132,6 +142,16 @@ function GameHud({ paket, currentNumber, total, progressPercent, correctSoFar, o
     <div className="game-hud">
       <button type="button" className="btn btn-secondary game-hud__back" onClick={onExit}>
         <ArrowLeft size={16} /> Kembali
+      </button>
+
+      <button
+        type="button"
+        className="btn-icon game-hud__mute-btn"
+        onClick={onToggleMuted}
+        aria-label={muted ? 'Aktifkan suara' : 'Matikan suara'}
+        title={muted ? 'Aktifkan suara' : 'Matikan suara'}
+      >
+        {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
       </button>
 
       <div className="game-hud__identity">
@@ -170,6 +190,7 @@ function GameScene({ background, className, children }) {
   return (
     <div className={'game-scene' + (className ? ' ' + className : '')} style={{ backgroundImage: `url("${background}")` }}>
       <div className="game-scene__overlay" aria-hidden="true" />
+      <img className="game-scene__landmark" src={LANDMARK} alt="" aria-hidden="true" />
       <div className="game-scene__content">{children}</div>
     </div>
   );
@@ -253,6 +274,7 @@ function NonTkaGame({ paket, onExit }) {
   const [finished, setFinished] = useState(false);
   const [startedAt, setStartedAt] = useState(() => new Date().toISOString());
   const [saveStatus, setSaveStatus] = useState('saving');
+  const { muted, toggleMuted, playClick, playCorrect, playIncorrect, playComplete } = useGameSounds();
 
   useEffect(() => {
     fetchSoalByPaket(paket.id).then(setSoalList);
@@ -273,12 +295,15 @@ function NonTkaGame({ paket, onExit }) {
   function selectAnswer(key) {
     if (selectedKey) return;
     const current = soalList[currentIndex];
+    const isCorrect = key === current.correctAnswer;
     setSelectedKey(key);
-    setAnswers((prev) => [...prev, { soalId: current.id, selectedKey: key, isCorrect: key === current.correctAnswer }]);
+    setAnswers((prev) => [...prev, { soalId: current.id, selectedKey: key, isCorrect }]);
+    if (isCorrect) playCorrect(); else playIncorrect();
   }
 
   function finishGame(finalAnswers) {
     setFinished(true);
+    playComplete();
     const total = soalList.length;
     const correctCount = finalAnswers.filter((a) => a.isCorrect).length;
     const score = total === 0 ? 0 : Math.round((correctCount / total) * 100);
@@ -298,6 +323,7 @@ function NonTkaGame({ paket, onExit }) {
   }
 
   function goNext() {
+    playClick();
     if (currentIndex + 1 >= soalList.length) {
       finishGame(answers);
       return;
@@ -353,6 +379,8 @@ function NonTkaGame({ paket, onExit }) {
         progressPercent={progressPercent}
         correctSoFar={correctSoFar}
         onExit={onExit}
+        muted={muted}
+        onToggleMuted={toggleMuted}
       />
 
       <div className={'question-board' + (hasImage ? ' question-board--split' : '')}>

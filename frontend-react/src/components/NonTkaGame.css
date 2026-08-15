@@ -39,6 +39,26 @@
     gap: var(--space-5);
 }
 
+/* Aksen ilustrasi Rumoh Aceh, "mengintip" di pojok scene -- dekoratif murni
+   (alt=""), tidak boleh menghalangi/menutupi panel konten di atasnya. */
+.game-scene__landmark {
+    position: absolute;
+    right: -18px;
+    bottom: -18px;
+    width: clamp(96px, 14vw, 168px);
+    height: auto;
+    opacity: 0.9;
+    filter: drop-shadow(0 8px 16px rgba(6, 36, 24, 0.45));
+    pointer-events: none;
+    z-index: 0;
+}
+
+.game-scene--result .game-scene__landmark {
+    right: auto;
+    left: -12px;
+    bottom: -12px;
+}
+
 .game-scene--result .game-scene__overlay {
     background: linear-gradient(180deg, rgba(6, 36, 24, 0.2) 0%, rgba(6, 36, 24, 0.5) 100%);
 }
@@ -95,6 +115,10 @@
 }
 
 .game-hud__back {
+    flex-shrink: 0;
+}
+
+.game-hud__mute-btn {
     flex-shrink: 0;
 }
 
