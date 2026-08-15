@@ -3,7 +3,7 @@ const pool = require('../config/db');
 // GET /api/materi - ambil semua materi + progress guru yang login
 async function getAllMateri(req, res) {
   try {
-    const guruId = req.guru.id; // didapat dari token (via verifyToken middleware)
+    const guruId = req.user.id; // didapat dari token Supabase (via supabaseAuth.middleware)
 
     const { rows } = await pool.query(
       `SELECT
@@ -33,7 +33,7 @@ async function getAllMateri(req, res) {
 // GET /api/materi/:id - ambil 1 materi detail
 async function getMateriById(req, res) {
   try {
-    const guruId = req.guru.id;
+    const guruId = req.user.id;
     const { id } = req.params;
 
     const { rows } = await pool.query(
@@ -67,7 +67,7 @@ async function getMateriById(req, res) {
 // POST /api/materi/:id/progress - update progress belajar guru untuk materi ini
 async function updateProgress(req, res) {
   try {
-    const guruId = req.guru.id;
+    const guruId = req.user.id;
     const { id } = req.params;
     const { progress } = req.body;
 

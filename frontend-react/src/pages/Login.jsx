@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { login } from '../services/api';
+import { supabase } from '../services/supabaseClient';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Login.css';
 
@@ -263,15 +263,27 @@ function Login() {
     if (!isValid) return;
 
     setIsSubmitting(true);
-    try {
-      const data = await login(emailValue, passwordValue);
-      window.localStorage.setItem('token', data.token);
-      window.localStorage.setItem('guru', JSON.stringify(data.guru));
-      navigate('/dashboard');
-    } catch (err) {
-      setPasswordError(err.message || 'Email atau password salah.');
+
+    // signInWithPassword() tidak throw untuk kredensial salah -- errornya
+    // dikembalikan lewat field `error`, bukan exception (beda dari fetch()
+    // ke /api/auth/login yang lama). Lihat catatan migrasi Auth: NIP dipakai
+    // sebagai password di Supabase Auth, email tetap jadi username.
+    const { error } = await supabase.auth.signInWithPassword({
+      email: emailValue,
+      password: passwordValue,
+    });
+
+    if (error) {
+      setPasswordError('Email atau password salah.');
       setIsSubmitting(false);
+      return;
     }
+
+    // Sesi disimpan & dikelola supabase-js sendiri (lihat AuthContext, Fase
+    // 5) -- tidak perlu lagi menulis token manual ke localStorage di sini.
+    // 'guru' (nama utk sapaan Topbar/Dashboard) juga belum diisi di sini --
+    // itu baru datang dari tabel profiles di Fase 6 (Migrasikan Profile).
+    navigate('/dashboard');
   }
 
   return (

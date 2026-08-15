@@ -11,8 +11,9 @@ export const materiCategoryOrder = ['hots', 'budaya', 'soal'];
 // Prototype: belum dihitung dari data asli, lihat PIVOT_PLAN.md §Batasan Sistem.
 export const materiOverallProgress = { completed: 12, total: 18, percent: 67 };
 
-export function fetchMateri() {
-  return fetch(`${API_BASE_URL}/api/materi`, { headers: authHeaders() }).then(handleAuthResponse);
+export async function fetchMateri() {
+  const headers = await authHeaders();
+  return fetch(`${API_BASE_URL}/api/materi`, { headers }).then(handleAuthResponse);
 }
 
 export function fetchMateriById(id) {

@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, Bell, BellOff, ChevronDown, User, Lock, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 function Topbar({ onOpenDrawer }) {
   const [notifOpen, setNotifOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const wrapperRef = useRef(null);
   const navigate = useNavigate();
+  const { signOut, profile } = useAuth();
 
-  const guru = JSON.parse(window.localStorage.getItem('guru') || 'null');
-  const profileName = guru?.nama || 'Guru';
+  const profileName = profile?.nama || 'Guru';
   const profileAvatar = profileName.charAt(0).toUpperCase();
 
   // Tutup dropdown yang lagi terbuka kalau user klik di luar area topbar, atau tekan Escape.
@@ -34,9 +35,8 @@ function Topbar({ onOpenDrawer }) {
     };
   }, []);
 
-  function handleLogout() {
-    window.localStorage.removeItem('token');
-    window.localStorage.removeItem('guru');
+  async function handleLogout() {
+    await signOut();
     navigate('/login');
   }
 

@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { PlayCircle, Activity } from 'lucide-react';
 import Layout from '../components/Layout';
 import { fetchDashboardData } from '../data/dashboardData';
+import { useAuth } from '../context/AuthContext';
 import { getIcon } from '../utils/icon';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -82,19 +83,19 @@ function LearningProgressItem({ item }) {
 
 function Dashboard() {
   const [data, setData] = useState(null);
+  const { profile } = useAuth();
 
   useEffect(() => {
     let cancelled = false;
     fetchDashboardData().then((result) => {
       if (cancelled) return;
-      const guru = JSON.parse(window.localStorage.getItem('guru') || 'null');
-      if (guru) result.greeting.name = guru.nama;
+      if (profile) result.greeting.name = profile.nama;
       setData(result);
     });
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [profile]);
 
   useProgressBarAnimation(Boolean(data));
   useDocumentTitle('Dashboard - Smart Diagnostic TKA');

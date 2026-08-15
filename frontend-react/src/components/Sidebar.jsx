@@ -1,4 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
+import { useAuth } from '../context/AuthContext';
 import {
   LayoutDashboard,
   BookOpen,
@@ -23,10 +24,10 @@ const NAV_ITEMS = [
 
 function Sidebar({ collapsed, onToggleCollapse }) {
   const navigate = useNavigate();
+  const { signOut } = useAuth();
 
-  function handleLogout() {
-    window.localStorage.removeItem('token');
-    window.localStorage.removeItem('guru');
+  async function handleLogout() {
+    await signOut();
     navigate('/login');
   }
 

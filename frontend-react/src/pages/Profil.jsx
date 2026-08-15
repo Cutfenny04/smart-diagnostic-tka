@@ -1,15 +1,15 @@
-import { createElement, useEffect, useState } from 'react';
+import { createElement } from 'react';
 import Layout from '../components/Layout';
-import { fetchProfil } from '../data/profilData';
+import { useAuth } from '../context/AuthContext';
 import { getIcon } from '../utils/icon';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Profil.css';
 
-/* View-only: menampilkan info guru yang sedang login sungguhan (dari
-   GET /api/auth/me -- lihat data/profilData.js), tidak ada form edit.
-   Tabel `guru` cuma punya nama/email/tanggal daftar, jadi field yang
-   dulu ditampilkan di sini (sekolah, mata pelajaran, jenjang) dihapus
-   karena memang tidak ada sumber data aslinya -- bukan diisi dummy baru. */
+/* View-only: menampilkan info guru yang sedang login sungguhan, dari tabel
+   profiles (Fase 6 migrasi Auth) lewat AuthContext -- bukan lagi
+   /api/auth/me. Tidak ada form edit. NIP ditampilkan kalau ada; dua guru
+   (Siti Suyata, Nurliana) belum punya NIP sampai data itu diberikan, jadi
+   barisnya disembunyikan untuk mereka, bukan diisi placeholder. */
 
 function initial(name) {
   return name.trim().charAt(0).toUpperCase();
@@ -32,13 +32,9 @@ function InfoRow({ icon, label, value }) {
 }
 
 function Profil() {
-  const [profil, setProfil] = useState(null);
+  const { profile } = useAuth();
 
   useDocumentTitle('Profil - Smart Diagnostic TKA');
-
-  useEffect(() => {
-    fetchProfil().then(setProfil);
-  }, []);
 
   return (
     <Layout breadcrumb="Profil">
@@ -50,18 +46,19 @@ function Profil() {
       </div>
 
       <div className="card-light profil-card">
-        {profil ? (
+        {profile ? (
           <>
             <div className="profil-card__head">
-              <span className="profil-avatar" aria-hidden="true">{initial(profil.nama)}</span>
+              <span className="profil-avatar" aria-hidden="true">{initial(profile.nama)}</span>
               <div>
-                <h2 className="profil-card__name">{profil.nama}</h2>
+                <h2 className="profil-card__name">{profile.nama}</h2>
                 <span className="badge badge--info">Guru IPA</span>
               </div>
             </div>
             <div className="profil-info-list">
-              <InfoRow icon="mail" label="Email" value={profil.email} />
-              <InfoRow icon="calendar" label="Bergabung Sejak" value={formatDate(profil.createdAt)} />
+              <InfoRow icon="mail" label="Email" value={profile.email} />
+              {profile.nip && <InfoRow icon="id-card" label="NIP" value={profile.nip} />}
+              <InfoRow icon="calendar" label="Bergabung Sejak" value={formatDate(profile.created_at)} />
             </div>
           </>
         ) : (

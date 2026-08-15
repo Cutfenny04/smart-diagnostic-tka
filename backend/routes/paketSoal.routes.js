@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const verifyToken = require('../middleware/auth.middleware');
+const verifyToken = require('../middleware/supabaseAuth.middleware');
 const { list, getById, create, update, remove } = require('../controllers/paketSoal.controller');
 
 // Semua route paket soal butuh login (guru hanya boleh kelola paketnya sendiri)

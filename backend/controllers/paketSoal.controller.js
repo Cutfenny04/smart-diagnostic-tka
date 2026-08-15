@@ -105,7 +105,7 @@ async function create(req, res) {
       `INSERT INTO paket_soal (created_by_guru_id, title, type, subject, grade, hots_level, stimulus, wordwall_url, status)
        VALUES ($1, $2, 'TKA', $3, $4, $5, $6, $7, $8)
        RETURNING *`,
-      [req.guru.id, title, subject, grade, hotsLevel, stimulus, wordwallUrl || null, status || 'draft']
+      [req.user.id, title, subject, grade, hotsLevel, stimulus, wordwallUrl || null, status || 'draft']
     );
 
     return res.status(201).json(toApiShape(rows[0]));

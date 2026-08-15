@@ -38,7 +38,7 @@ async function create(req, res) {
        RETURNING *`,
       [
         paketId,
-        req.guru.id,
+        req.user.id,
         score,
         correctCount,
         wrongCount ?? Math.max(totalQuestions - correctCount, 0),
@@ -66,7 +66,7 @@ async function list(req, res) {
        LEFT JOIN paket_soal p ON p.id = h.paket_id
        WHERE h.guru_id = $1
        ORDER BY h.created_at DESC`,
-      [req.guru.id]
+      [req.user.id]
     );
     return res.json(rows.map(toApiShape));
   } catch (err) {

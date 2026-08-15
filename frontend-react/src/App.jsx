@@ -11,6 +11,7 @@ import Profil from './pages/Profil';
 import UbahPassword from './pages/UbahPassword';
 import NotFound from './pages/NotFound';
 import ProtectedRoute from './components/ProtectedRoute';
+import { AuthProvider } from './context/AuthContext';
 import './styles/style.css';
 
 function protect(element) {
@@ -34,21 +35,23 @@ function DetailSoalEditRoute() {
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/dashboard" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/dashboard" element={protect(<Dashboard />)} />
-        <Route path="/materi" element={protect(<Materi />)} />
-        <Route path="/materi/:id" element={protect(<DetailMateriRoute />)} />
-        <Route path="/bank-soal" element={protect(<BankSoal />)} />
-        <Route path="/bank-soal/tka/baru" element={protect(<DetailSoal />)} />
-        <Route path="/bank-soal/tka/:id/edit" element={protect(<DetailSoalEditRoute />)} />
-        <Route path="/smart-diagnostic" element={protect(<SmartDiagnostic />)} />
-        <Route path="/hasil-diagnostik" element={protect(<HasilDiagnostik />)} />
-        <Route path="/profil" element={protect(<Profil />)} />
-        <Route path="/ubah-password" element={protect(<UbahPassword />)} />
-        <Route path="*" element={protect(<NotFound />)} />
-      </Routes>
+      <AuthProvider>
+        <Routes>
+          <Route path="/" element={<Navigate to="/dashboard" replace />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/dashboard" element={protect(<Dashboard />)} />
+          <Route path="/materi" element={protect(<Materi />)} />
+          <Route path="/materi/:id" element={protect(<DetailMateriRoute />)} />
+          <Route path="/bank-soal" element={protect(<BankSoal />)} />
+          <Route path="/bank-soal/tka/baru" element={protect(<DetailSoal />)} />
+          <Route path="/bank-soal/tka/:id/edit" element={protect(<DetailSoalEditRoute />)} />
+          <Route path="/smart-diagnostic" element={protect(<SmartDiagnostic />)} />
+          <Route path="/hasil-diagnostik" element={protect(<HasilDiagnostik />)} />
+          <Route path="/profil" element={protect(<Profil />)} />
+          <Route path="/ubah-password" element={protect(<UbahPassword />)} />
+          <Route path="*" element={protect(<NotFound />)} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }

@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Lock, CheckCircle2 } from 'lucide-react';
 import Layout from '../components/Layout';
 import { changePassword } from '../data/authData';
+import { supabase } from '../services/supabaseClient';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './UbahPassword.css';
 
@@ -60,9 +61,11 @@ function UbahPassword() {
     try {
       await changePassword(form.oldPassword, form.newPassword);
       setSuccess(true);
+      // Sign-out eksplisit supaya guru wajib masuk lagi pakai password baru
+      // (konfirmasi implisit bahwa password barunya benar-benar tersimpan),
+      // bukan cuma dilempar ke /login dengan sesi lama yang masih hidup.
+      await supabase.auth.signOut();
       window.setTimeout(() => {
-        window.localStorage.removeItem('token');
-        window.localStorage.removeItem('guru');
         navigate('/login', { replace: true });
       }, 1800);
     } catch (err) {
@@ -76,7 +79,10 @@ function UbahPassword() {
       <div className="page-header">
         <div className="page-header__text">
           <h1 className="page-header__title">Ubah Password</h1>
-          <p className="page-header__desc">Perbarui password akun Anda secara berkala untuk menjaga keamanan.</p>
+          <p className="page-header__desc">
+            Perbarui password akun Anda secara berkala untuk menjaga keamanan. Disarankan mengganti
+            password setelah login pertama, terutama jika masih menggunakan NIP sebagai password.
+          </p>
         </div>
       </div>
 
