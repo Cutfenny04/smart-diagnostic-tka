@@ -89,6 +89,14 @@ function StimulusView({ item, onBack, onStart }) {
   return (
     <div className={'card-light diagnostic-stimulus' + (isGame ? ' diagnostic-stimulus--game' : '')}>
       {isGame && <AcehMotifDivider className="diagnostic-stimulus__motif" />}
+      {isGame && (
+        <img
+          className="diagnostic-stimulus__mascot"
+          src={encodeURI('/assets/assets bank soal non tka/mascot-anak-aceh.png')}
+          alt=""
+          aria-hidden="true"
+        />
+      )}
       <h2 className="diagnostic-stimulus__title">{item.title}</h2>
       <div className="diagnostic-stimulus__tags">
         <span className="badge badge--info">{item.subject}</span>

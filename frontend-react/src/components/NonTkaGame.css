@@ -59,6 +59,52 @@
     bottom: -12px;
 }
 
+/* Maskot pendamping -- sisi berlawanan dari landmark supaya tidak tabrakan
+   (game: landmark kanan / maskot kiri; hasil: landmark kiri / maskot kanan). */
+.game-scene__mascot {
+    position: absolute;
+    left: -8px;
+    bottom: -6px;
+    width: clamp(84px, 11vw, 130px);
+    height: auto;
+    filter: drop-shadow(0 6px 14px rgba(6, 36, 24, 0.4));
+    pointer-events: none;
+    z-index: 0;
+}
+
+.game-scene--result .game-scene__mascot {
+    left: auto;
+    right: -8px;
+}
+
+/* --- Tombol papan kayu (Kembali / Lanjut) --- */
+.sign-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: none;
+    background: none;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: var(--transition-fast);
+}
+
+.sign-btn img {
+    display: block;
+    height: 46px;
+    width: auto;
+}
+
+.sign-btn:hover {
+    transform: translateY(-2px) scale(1.03);
+    filter: drop-shadow(0 6px 10px rgba(6, 36, 24, 0.3));
+}
+
+.sign-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
 .game-scene--result .game-scene__overlay {
     background: linear-gradient(180deg, rgba(6, 36, 24, 0.2) 0%, rgba(6, 36, 24, 0.5) 100%);
 }
@@ -198,10 +244,18 @@
 .game-hud__stars {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: 4px;
+    min-width: 56px;
+    height: 26px;
+    padding: 0 var(--space-3) 0 var(--space-2);
     font-size: var(--text-small);
     font-weight: 700;
-    color: var(--color-gold-deep);
+    color: var(--color-white);
+    text-shadow: 0 1px 2px rgba(6, 36, 24, 0.45);
+    background-image: url("/assets/assets bank soal non tka/glossy-badge.png");
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
 }
 
 .game-hud__bar .progress-bar__fill {
@@ -234,13 +288,26 @@
 
 /* ==========================================================================
    QUESTION BOARD
+   Bingkai luar (.question-board) bertekstur kayu (wood-plank-texture.png,
+   diekstrak dari salah satu aset Canva di folder Non-TKA -- lihat komentar
+   di NonTkaGame.jsx), isi (.question-board__inner) tetap surface krem yang
+   readable. Dipisah jadi 2 layer supaya tekstur foto kayu tidak mengganggu
+   keterbacaan teks di dalamnya.
    ========================================================================== */
 .question-board {
     position: relative;
-    background: var(--surface-card);
-    border: 1px solid var(--border-on-light);
+    background-image: url("/assets/assets bank soal non tka/wood-plank-texture.png");
+    background-size: cover;
+    background-position: center;
     border-radius: var(--radius-xl);
     box-shadow: var(--shadow-lg);
+    padding: 12px;
+}
+
+.question-board__inner {
+    position: relative;
+    background: var(--surface-card);
+    border-radius: calc(var(--radius-xl) - 6px);
     padding: var(--space-6);
     display: flex;
     flex-direction: column;
@@ -250,25 +317,42 @@
 .question-board__header {
     display: flex;
     flex-direction: column;
+    align-items: flex-start;
     gap: var(--space-3);
 }
 
-.question-board__eyebrow {
+/* "Papan nama" kayu gantung di belakang label Tantangan -- object-fit: cover
+   + object-position: bottom memotong bagian tali di atas gambar supaya yang
+   tersisa cuma bagian papannya. */
+.question-board__eyebrow-wrap {
+    position: relative;
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2);
-    font-family: var(--font-headings);
-    font-size: var(--text-h3);
-    font-weight: 500;
-    color: var(--text-on-light);
+    justify-content: center;
+    width: 220px;
+    max-width: 100%;
+    height: 56px;
 }
 
-.question-board__eyebrow::before {
-    content: '';
-    width: 4px;
-    height: 20px;
-    border-radius: var(--radius-pill);
-    background: linear-gradient(180deg, var(--color-gold) 0%, var(--color-gold-deep) 100%);
+.question-board__eyebrow-board {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: bottom;
+    filter: drop-shadow(0 4px 8px rgba(6, 36, 24, 0.25));
+}
+
+.question-board__eyebrow {
+    position: relative;
+    z-index: 1;
+    font-family: var(--font-headings);
+    font-size: var(--text-body-lg);
+    font-weight: 700;
+    color: var(--text-on-light);
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+    padding-bottom: 6px;
 }
 
 .question-board__badges {
@@ -289,7 +373,7 @@
 /* Layout 2 kolom desktop HANYA kalau soal punya gambar (lihat §16 brief) --
    di bawah 1024px atau tanpa gambar, tetap 1 kolom lewat flex-column di atas. */
 @media (min-width: 1024px) {
-    .question-board--split {
+    .question-board__inner--split {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         grid-template-areas:
@@ -300,10 +384,10 @@
         row-gap: var(--space-5);
     }
 
-    .question-board--split .question-board__motif { grid-area: motif; }
-    .question-board--split .question-board__header { grid-area: header; }
-    .question-board--split .question-board__stimulus-col { grid-area: stimulus; }
-    .question-board--split .question-board__question-col { grid-area: question; }
+    .question-board__inner--split .question-board__motif { grid-area: motif; }
+    .question-board__inner--split .question-board__header { grid-area: header; }
+    .question-board__inner--split .question-board__stimulus-col { grid-area: stimulus; }
+    .question-board__inner--split .question-board__question-col { grid-area: question; }
 }
 
 /* --- Stimulus: prosa vs. pseudo-tabel (lihat komentar di NonTkaGame.jsx
@@ -710,7 +794,16 @@
     }
 
     .question-board {
-        padding: var(--space-5);
+        padding: 8px;
+    }
+
+    .question-board__inner {
+        padding: var(--space-4);
+    }
+
+    .question-board__eyebrow-wrap {
+        width: 180px;
+        height: 48px;
     }
 
     .game-image__img {

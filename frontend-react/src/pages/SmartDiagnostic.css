@@ -95,6 +95,28 @@
 .diagnostic-stimulus {
     max-width: 720px;
     margin: 0 auto;
+    position: relative;
+}
+
+/* Maskot pemandu -- cuma dipasang di kartu Stimulus (max-width 720px,
+   terpusat di halaman lebih lebar) yang selalu punya ruang kosong di
+   sisinya, beda dari NonTkaGame.jsx yang sengaja TIDAK memasang maskot di
+   Question Board karena tingginya berubah-ubah tergantung soal. */
+.diagnostic-stimulus__mascot {
+    position: absolute;
+    right: -72px;
+    top: -18px;
+    width: clamp(64px, 9vw, 108px);
+    height: auto;
+    filter: drop-shadow(0 8px 14px rgba(10, 51, 35, 0.25));
+    pointer-events: none;
+    display: none;
+}
+
+@media (min-width: 900px) {
+    .diagnostic-stimulus__mascot {
+        display: block;
+    }
 }
 
 .diagnostic-stimulus__motif {

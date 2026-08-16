@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
-  ArrowLeft, ArrowRight, CheckCircle2, XCircle, RotateCcw, Trophy, Inbox,
+  ArrowLeft, CheckCircle2, XCircle, RotateCcw, Trophy, Inbox,
   Leaf, Compass, Star, Lightbulb, Maximize, X, Volume2, VolumeX,
 } from 'lucide-react';
 import { fetchSoalByPaket } from '../data/soalData';
@@ -48,22 +48,35 @@ function hotsBadgeClass(level) {
   return { C4: 'badge--c4', C5: 'badge--c5', C6: 'badge--c6' }[level] || 'badge--c4';
 }
 
-/* Background "scene" -- satu-satunya aset dari folder yang layak dipakai
-   sebagai gambar utuh (lihat PIVOT_PLAN keputusan redesign 2026-08-15):
-   dua file "Untitled design" di folder yang sama adalah poster Canva
-   15MB/7MB, bukan aset UI, jadi tidak dipakai. encodeURI supaya spasi di
-   nama file valid sebagai URL. */
+/* Background "scene" (foto ilustrasi) + aset "kit kayu" & maskot -- semua
+   diekstrak dari file-file di folder yang sama (lihat PIVOT_PLAN redesign
+   2026-08-15/16). Dua file "Untitled design (2/3).svg" aslinya bukan aset
+   siap-pakai satu gambar utuh, melainkan kumpulan 10-14 elemen Canva
+   terpisah yang digabung jadi satu file 7-15MB -- masing-masing elemen
+   diekstrak sekali lalu disimpan sebagai file PNG bersih di folder yang
+   sama (arahan pengguna 2026-08-16: "pakai semuanya", termasuk kit tombol
+   kayu bergaya kartun & kedua karakter maskot meski gayanya beda dari
+   flat design aplikasi ini). encodeURI supaya spasi di nama file valid
+   sebagai URL. */
 const BG_GAME = encodeURI('/assets/assets bank soal non tka/TV - 2.png');
 const BG_RESULT = encodeURI('/assets/assets bank soal non tka/desa.png.png');
-
-/* Ilustrasi flat Rumoh Aceh -- diekstrak dari salah satu SVG di folder yang
-   sama (bukan file utuh: SVG aslinya adalah kumpulan 10+ elemen Canva yang
-   dijadikan satu file 15MB, sebagian besarnya maskot kartun generik yang
-   TIDAK dipakai karena bertentangan dengan arahan brand "elegant, bukan
-   kekanak-kanakan"). Cuma potongan Rumoh Aceh ini yang relevan & senada
-   dengan gaya flat aplikasi -- dipakai sebagai aksen dekoratif kecil di
-   pojok scene, bukan pengganti background foto. */
 const LANDMARK = encodeURI('/assets/assets bank soal non tka/rumoh-aceh-ilustrasi.png');
+const WOOD_BOARD = encodeURI('/assets/assets bank soal non tka/wood-board-blank.png');
+const SIGN_BACK = encodeURI('/assets/assets bank soal non tka/sign-back.png');
+const SIGN_NEXT = encodeURI('/assets/assets bank soal non tka/sign-next.png');
+const MASCOT_ALT = encodeURI('/assets/assets bank soal non tka/mascot-anak-1.png');
+
+/* Tombol papan kayu gantung (teks "BACK"/"NEXT" sudah baku di dalam
+   gambarnya, tidak bisa diganti per-konteks) -- makna sebenarnya untuk
+   screen reader tetap dikirim lewat aria-label dinamis (mis. "Lihat hasil
+   ekspedisi"), bukan cuma ikut teks visual di gambar. */
+function SignButton({ src, label, onClick, className }) {
+  return (
+    <button type="button" className={'sign-btn' + (className ? ' ' + className : '')} onClick={onClick} aria-label={label}>
+      <img src={src} alt="" aria-hidden="true" />
+    </button>
+  );
+}
 
 function optionState(optionKey, selectedKey, correctAnswer) {
   if (!selectedKey) return 'idle';
@@ -140,9 +153,7 @@ function GameHud({ paket, currentNumber, total, progressPercent, correctSoFar, o
 
   return (
     <div className="game-hud">
-      <button type="button" className="btn btn-secondary game-hud__back" onClick={onExit}>
-        <ArrowLeft size={16} /> Kembali
-      </button>
+      <SignButton src={SIGN_BACK} label="Kembali ke daftar paket soal" onClick={onExit} className="game-hud__back" />
 
       <button
         type="button"
@@ -186,11 +197,18 @@ function GameHud({ paket, currentNumber, total, progressPercent, correctSoFar, o
   );
 }
 
-function GameScene({ background, className, children }) {
+/* landmark/mascot cuma boleh dipasang di scene yang konten utamanya PASTI
+   punya ruang kosong di sekitarnya (kartu terpusat dengan max-width, seperti
+   ResultView) -- lihat catatan penempatan di NonTkaGame.css. Di layar
+   bermain, tinggi Question Board berubah-ubah (tergantung stimulus/gambar),
+   jadi dua elemen dekoratif itu TIDAK dipasang di sana supaya tidak berisiko
+   ketiban/menutupi tombol jawaban atau tombol Lanjut. */
+function GameScene({ background, className, landmark, mascot, children }) {
   return (
     <div className={'game-scene' + (className ? ' ' + className : '')} style={{ backgroundImage: `url("${background}")` }}>
       <div className="game-scene__overlay" aria-hidden="true" />
-      <img className="game-scene__landmark" src={LANDMARK} alt="" aria-hidden="true" />
+      {landmark && <img className="game-scene__landmark" src={landmark} alt="" aria-hidden="true" />}
+      {mascot && <img className="game-scene__mascot" src={mascot} alt="" aria-hidden="true" />}
       <div className="game-scene__content">{children}</div>
     </div>
   );
@@ -228,9 +246,12 @@ function FeedbackPanel({ isCorrect, correctAnswer, explanation, isLast, onNext }
           <p className="pembahasan-card__text">{explanation}</p>
         </div>
       )}
-      <button type="button" className="btn btn-primary feedback-panel__next" onClick={onNext}>
-        {isLast ? 'Lihat Hasil Ekspedisi' : 'Lanjut Tantangan'} <ArrowRight size={16} />
-      </button>
+      <SignButton
+        src={SIGN_NEXT}
+        label={isLast ? 'Lihat hasil ekspedisi' : 'Lanjut ke tantangan berikutnya'}
+        onClick={onNext}
+        className="feedback-panel__next"
+      />
     </div>
   );
 }
@@ -247,7 +268,7 @@ function ResultView({ answers, total, saveStatus, onRestart, onExit }) {
   const tuntas = isTuntas(percent);
 
   return (
-    <GameScene background={BG_RESULT} className="game-scene--result">
+    <GameScene background={BG_RESULT} className="game-scene--result" landmark={LANDMARK} mascot={MASCOT_ALT}>
       <div className="game-result">
         <AcehMotifDivider className="game-result__motif" />
         <div className="game-result__icon"><Trophy size={32} /></div>
@@ -258,7 +279,7 @@ function ResultView({ answers, total, saveStatus, onRestart, onExit }) {
         <span className={'badge ' + (tuntas ? 'badge--selesai' : 'badge--belum')}>{tuntas ? 'Tuntas' : 'Belum Tuntas'}</span>
         <p className="game-result__note">{SAVE_NOTE[saveStatus] || ''}</p>
         <div className="game-result__actions">
-          <button type="button" className="btn btn-secondary" onClick={onExit}><ArrowLeft size={16} /> Kembali</button>
+          <SignButton src={SIGN_BACK} label="Kembali ke daftar paket soal" onClick={onExit} />
           <button type="button" className="btn btn-primary" onClick={onRestart}><RotateCcw size={16} /> Ulangi</button>
         </div>
       </div>
@@ -383,48 +404,53 @@ function NonTkaGame({ paket, onExit }) {
         onToggleMuted={toggleMuted}
       />
 
-      <div className={'question-board' + (hasImage ? ' question-board--split' : '')}>
-        <AcehMotifDivider className="question-board__motif" />
+      <div className="question-board">
+        <div className={'question-board__inner' + (hasImage ? ' question-board__inner--split' : '')}>
+          <AcehMotifDivider className="question-board__motif" />
 
-        <div className="question-board__header">
-          <span className="question-board__eyebrow">Tantangan {String(currentNumber).padStart(2, '0')}</span>
-          <div className="question-board__badges">
-            <span className="badge badge--info">{paket.subject}</span>
-            <span className={'badge ' + hotsBadgeClass(paket.hotsLevel)}>{paket.hotsLevel}</span>
-            {isAcehContext && <span className="game-panel__aceh-badge"><Leaf size={14} /> Konteks Budaya Aceh</span>}
+          <div className="question-board__header">
+            <div className="question-board__eyebrow-wrap">
+              <img className="question-board__eyebrow-board" src={WOOD_BOARD} alt="" aria-hidden="true" />
+              <span className="question-board__eyebrow">Tantangan {String(currentNumber).padStart(2, '0')}</span>
+            </div>
+            <div className="question-board__badges">
+              <span className="badge badge--info">{paket.subject}</span>
+              <span className={'badge ' + hotsBadgeClass(paket.hotsLevel)}>{paket.hotsLevel}</span>
+              {isAcehContext && <span className="game-panel__aceh-badge"><Leaf size={14} /> Konteks Budaya Aceh</span>}
+            </div>
           </div>
-        </div>
 
-        <div className="question-board__stimulus-col">
-          <StimulusBlock stimulus={current.stimulus} />
-          {hasImage && (
-            <GameImage key={current.id} src={current.image} alt={'Ilustrasi Tantangan ' + currentNumber + ' - ' + paket.title} />
-          )}
-        </div>
+          <div className="question-board__stimulus-col">
+            <StimulusBlock stimulus={current.stimulus} />
+            {hasImage && (
+              <GameImage key={current.id} src={current.image} alt={'Ilustrasi Tantangan ' + currentNumber + ' - ' + paket.title} />
+            )}
+          </div>
 
-        <div className="question-board__question-col">
-          <h2 className="question-board__question">{current.question}</h2>
+          <div className="question-board__question-col">
+            <h2 className="question-board__question">{current.question}</h2>
 
-          <div className="game-options">
-            {current.options.map((opt) => (
-              <AnswerCard
-                key={opt.key}
-                option={opt}
-                state={optionState(opt.key, selectedKey, current.correctAnswer)}
-                onSelect={selectAnswer}
+            <div className="game-options">
+              {current.options.map((opt) => (
+                <AnswerCard
+                  key={opt.key}
+                  option={opt}
+                  state={optionState(opt.key, selectedKey, current.correctAnswer)}
+                  onSelect={selectAnswer}
+                />
+              ))}
+            </div>
+
+            {selectedKey && (
+              <FeedbackPanel
+                isCorrect={currentIsCorrect}
+                correctAnswer={current.correctAnswer}
+                explanation={current.explanation}
+                isLast={currentNumber >= soalList.length}
+                onNext={goNext}
               />
-            ))}
+            )}
           </div>
-
-          {selectedKey && (
-            <FeedbackPanel
-              isCorrect={currentIsCorrect}
-              correctAnswer={current.correctAnswer}
-              explanation={current.explanation}
-              isLast={currentNumber >= soalList.length}
-              onNext={goNext}
-            />
-          )}
         </div>
       </div>
     </GameScene>
