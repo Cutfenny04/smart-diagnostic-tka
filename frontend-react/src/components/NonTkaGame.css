@@ -288,15 +288,17 @@
 
 /* ==========================================================================
    QUESTION BOARD
-   Bingkai luar (.question-board) bertekstur kayu (wood-plank-texture.png,
+   Bingkai luar (.question-board) bertekstur kayu (wood-plank-texture.webp,
    diekstrak dari salah satu aset Canva di folder Non-TKA -- lihat komentar
    di NonTkaGame.jsx), isi (.question-board__inner) tetap surface krem yang
    readable. Dipisah jadi 2 layer supaya tekstur foto kayu tidak mengganggu
-   keterbacaan teks di dalamnya.
+   keterbacaan teks di dalamnya. Sumber asli PNG 2550x1766 (7MB) di-resize ke
+   1600px lebar + dikonversi WebP q82 (~300KB, cukup untuk background-size:
+   cover di kartu game) -- tidak perlu alpha channel jadi WebP aman dipakai.
    ========================================================================== */
 .question-board {
     position: relative;
-    background-image: url("/assets/assets bank soal non tka/wood-plank-texture.png");
+    background-image: url("/assets/assets bank soal non tka/wood-plank-texture.webp");
     background-size: cover;
     background-position: center;
     border-radius: var(--radius-xl);
