@@ -2,7 +2,7 @@ import { createElement, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, Clock, Layers, PlayCircle, SearchX, FileText, Download } from 'lucide-react';
 import Layout from '../components/Layout';
-import { fetchMateri, materiCategoryMeta as CATEGORY_META, materiCategoryOrder as CATEGORY_ORDER, materiOverallProgress as OVERALL_PROGRESS } from '../data/materiData';
+import { fetchMateri, materiCategoryMeta as CATEGORY_META, materiCategoryOrder as CATEGORY_ORDER, computeMateriOverallProgress } from '../data/materiData';
 import { getIcon } from '../utils/icon';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -91,6 +91,7 @@ function Materi() {
   }
 
   const continueModule = modules?.find((m) => m.lastOpened);
+  const overallProgress = computeMateriOverallProgress(modules || []);
 
   return (
     <Layout breadcrumb="Materi & Modul Pelatihan">
@@ -121,14 +122,14 @@ function Materi() {
         <div className="learning-overview">
           <div className="learning-overview__text">
             <h2 className="section-heading__title">Progress Belajar Anda</h2>
-            <p className="learning-overview__count">{OVERALL_PROGRESS.completed} dari {OVERALL_PROGRESS.total} materi selesai</p>
+            <p className="learning-overview__count">{overallProgress.completed} dari {overallProgress.total} materi selesai</p>
           </div>
           <div className="learning-overview__figure">
-            <span className="learning-overview__percent">{OVERALL_PROGRESS.percent}%</span>
+            <span className="learning-overview__percent">{overallProgress.percent}%</span>
           </div>
         </div>
-        <div className="progress-bar" role="progressbar" aria-valuenow={OVERALL_PROGRESS.percent} aria-valuemin="0" aria-valuemax="100" aria-label="Progress belajar keseluruhan">
-          <div className="progress-bar__fill" data-progress={OVERALL_PROGRESS.percent} />
+        <div className="progress-bar" role="progressbar" aria-valuenow={overallProgress.percent} aria-valuemin="0" aria-valuemax="100" aria-label="Progress belajar keseluruhan">
+          <div className="progress-bar__fill" data-progress={overallProgress.percent} />
         </div>
       </section>
 

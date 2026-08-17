@@ -12,6 +12,7 @@ const pool = require('../config/db');
 function toApiShape(row) {
   return {
     id: row.id,
+    createdByGuruId: row.created_by_guru_id,
     title: row.title,
     type: row.type,
     subject: row.subject,

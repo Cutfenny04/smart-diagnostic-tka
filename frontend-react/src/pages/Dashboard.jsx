@@ -83,11 +83,13 @@ function LearningProgressItem({ item }) {
 
 function Dashboard() {
   const [data, setData] = useState(null);
-  const { profile } = useAuth();
+  const { user, profile } = useAuth();
+  const userId = user?.id;
 
   useEffect(() => {
+    if (!userId) return;
     let cancelled = false;
-    fetchDashboardData().then((result) => {
+    fetchDashboardData(userId).then((result) => {
       if (cancelled) return;
       if (profile) result.greeting.name = profile.nama;
       setData(result);
@@ -95,7 +97,7 @@ function Dashboard() {
     return () => {
       cancelled = true;
     };
-  }, [profile]);
+  }, [userId, profile]);
 
   useProgressBarAnimation(Boolean(data));
   useDocumentTitle('Dashboard - Smart Diagnostic TKA');

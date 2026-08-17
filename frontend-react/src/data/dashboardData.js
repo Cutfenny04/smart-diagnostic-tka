@@ -1,21 +1,18 @@
 /* ==========================================================================
-   DASHBOARD HOME — Data prototype (sama persis isinya dengan
-   frontend/assets/data/dashboard.js versi lama). Nanti tinggal diganti
-   fetchDashboardData() dengan fetch ke /api/dashboard sungguhan.
+   DASHBOARD HOME — statistik, aktivitas terbaru, dan progress belajar
+   dirakit dari data asli (materi, hasil diagnostik, paket soal), bukan
+   dummy lagi. Satu-satunya yang masih statis (disengaja, per permintaan
+   user): `announcements` -- belum ada sumber data pengumuman asli.
    ========================================================================== */
+import { fetchMateri, computeMateriOverallProgress, computeMateriProgressByCategory } from './materiData';
+import { fetchHasil } from './hasilData';
+import { fetchPaketSoal } from './bankSoalData';
+import { formatRelativeTime } from '../utils/relativeTime';
 
 export const dashboardGreeting = {
-  name: 'Ibu Fenny',
   message:
     'Teruslah mengasah kemampuan berpikir tingkat tinggi (HOTS) peserta didik Anda melalui pembelajaran IPA yang membumi pada kearifan budaya Aceh.',
 };
-
-export const dashboardStats = [
-  { id: 'materi', icon: 'book-open', label: 'Total Materi Dipelajari', value: 18, unit: '/24 Modul' },
-  { id: 'soal', icon: 'landmark', label: 'Paket Soal Dikelola', value: 15, unit: 'Paket' },
-  { id: 'diagnostic', icon: 'activity', label: 'Smart Diagnostic Selesai', value: 5, unit: 'Sesi' },
-  { id: 'progress', icon: 'target', label: 'Progress Pelatihan', value: 72, unit: '%', isProgress: true },
-];
 
 export const quickAccessItems = [
   { href: '/materi', icon: 'book-open', title: 'Materi & Modul', desc: 'Video, PDF, dan artikel pelatihan HOTS IPA.' },
@@ -25,36 +22,77 @@ export const quickAccessItems = [
   { href: '/profil', icon: 'user-circle', title: 'Profil', desc: 'Kelola data diri, sekolah, dan kata sandi.' },
 ];
 
-export const recentActivity = [
-  { icon: 'check-circle', text: 'Menyelesaikan Modul HOTS: Fotosintesis & Ekosistem Hutan Leuser', time: '2 jam yang lalu' },
-  { icon: 'file-plus', text: 'Menambahkan paket soal baru berbasis stimulus Kopi Gayo', time: 'Kemarin, 15.40' },
-  { icon: 'activity', text: 'Menyelesaikan sesi Smart Diagnostic Fisika', time: '2 hari yang lalu' },
-  { icon: 'download', text: 'Mengunduh modul Kimia: Reaksi dalam Kehidupan Sehari-hari', time: '3 hari yang lalu' },
-];
-
+// Belum ada sistem pengumuman asli (butuh backend/CMS tersendiri) --
+// sengaja dibiarkan statis dulu, per instruksi user.
 export const announcements = [
   { status: 'important', badgeLabel: 'Penting', date: '20 Jul 2026', title: 'Jadwal Pelatihan Tahap 2 — Batch Agustus 2026', desc: 'Pendaftaran ulang paling lambat 1 Agustus 2026 melalui koordinator MGMP IPA.' },
   { status: 'new', badgeLabel: 'Baru', date: '15 Jul 2026', title: 'Update Modul Baru: IPA Terpadu — Energi Terbarukan', desc: 'Modul kini tersedia di halaman Materi & Modul Pelatihan.' },
   { status: 'info', badgeLabel: 'Info', date: '10 Jul 2026', title: 'Workshop Mendatang: Menyusun Stimulus Kontekstual Budaya Aceh', desc: 'Sesi daring bersama fasilitator USK, jadwal menyusul.' },
 ];
 
-export const learningProgress = [
-  { label: 'Modul HOTS', percent: 80 },
-  { label: 'Bank Soal Budaya Aceh', percent: 60 },
-  { label: 'Smart Diagnostic', percent: 100 },
-];
+/* `userId` = id guru yang login (auth.users.id / profiles.id), dipakai buat
+   menghitung "paket TKA yang saya buat sendiri" dari created_by_guru_id. */
+export async function fetchDashboardData(userId) {
+  const [modules, hasil, paketSoal] = await Promise.all([
+    fetchMateri(),
+    fetchHasil(),
+    fetchPaketSoal(),
+  ]);
 
-export function fetchDashboardData() {
-  return new Promise((resolve) => {
-    window.setTimeout(() => {
-      resolve({
-        greeting: dashboardGreeting,
-        stats: dashboardStats,
-        quickAccess: quickAccessItems,
-        recentActivity,
-        announcements,
-        learningProgress,
-      });
-    }, 500);
-  });
+  const materiProgress = computeMateriOverallProgress(modules);
+  const paketDikelola = paketSoal.filter((p) => p.createdByGuruId === userId).length;
+
+  // Cuma paket Non-TKA yang otomatis menghasilkan baris hasil_diagnostik
+  // (TKA/Wordwall belum ada integrasi nilai -- lihat PIVOT_PLAN.md §D/Fase
+  // 14), jadi "aktivitas Smart Diagnostic" dihitung dari situ.
+  const publishedNonTka = paketSoal.filter((p) => p.type === 'NON_TKA' && p.status === 'published');
+  const attemptedPaketIds = new Set(hasil.map((h) => h.paketId));
+  const diagnosticPercent = publishedNonTka.length === 0
+    ? 0
+    : Math.round((publishedNonTka.filter((p) => attemptedPaketIds.has(p.id)).length / publishedNonTka.length) * 100);
+
+  // Progress Pelatihan keseluruhan = rata-rata progress belajar materi dan
+  // aktivitas Smart Diagnostic -- dua-duanya sumber data asli yang ada saat
+  // ini (belum ada tracking terpisah untuk "Modul Wordwall").
+  const overallPercent = Math.round((materiProgress.percent + diagnosticPercent) / 2);
+
+  const stats = [
+    { id: 'materi', icon: 'book-open', label: 'Total Materi Dipelajari', value: materiProgress.completed, unit: `/${materiProgress.total} Modul` },
+    { id: 'soal', icon: 'landmark', label: 'Paket TKA Saya Kelola', value: paketDikelola, unit: 'Paket' },
+    { id: 'diagnostic', icon: 'activity', label: 'Smart Diagnostic Selesai', value: hasil.length, unit: 'Sesi' },
+    { id: 'progress', icon: 'target', label: 'Progress Pelatihan', value: overallPercent, unit: '%', isProgress: true },
+  ];
+
+  const materiActivity = modules
+    .filter((m) => m.lastOpened)
+    .map((m) => ({
+      icon: m.progress >= 100 ? 'check-circle' : 'book-open',
+      text: (m.progress >= 100 ? 'Menyelesaikan modul: ' : 'Mempelajari modul: ') + m.title,
+      timestamp: m.lastOpened,
+    }));
+
+  const diagnosticActivity = hasil.map((h) => ({
+    icon: 'activity',
+    text: `Menyelesaikan Smart Diagnostic ${h.paketSubject || h.paketTitle} — nilai ${h.score}`,
+    timestamp: h.completedAt || h.createdAt,
+  }));
+
+  const recentActivity = [...materiActivity, ...diagnosticActivity]
+    .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+    .slice(0, 6)
+    .map((item) => ({ icon: item.icon, text: item.text, time: formatRelativeTime(item.timestamp) }));
+
+  const learningProgress = [
+    ...computeMateriProgressByCategory(modules).map((c) => ({ label: c.label, percent: c.percent })),
+    { label: 'Smart Diagnostic', percent: diagnosticPercent },
+  ];
+
+  return {
+    greeting: dashboardGreeting,
+    stats,
+    quickAccess: quickAccessItems,
+    recentActivity,
+    announcements,
+    learningProgress,
+  };
 }
