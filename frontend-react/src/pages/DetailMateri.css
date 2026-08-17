@@ -46,40 +46,6 @@
     white-space: nowrap;
 }
 
-/* --- Topic list --- */
-.topic-list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    margin: var(--space-4) 0 var(--space-6);
-}
-
-.topic-list__item {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
-    padding: var(--space-3) var(--space-4);
-    border: 1px solid var(--border-on-light);
-    border-radius: var(--radius-md);
-    font-size: var(--text-body);
-    color: var(--text-muted-on-light);
-}
-
-.topic-list__item svg {
-    width: 20px;
-    height: 20px;
-    flex-shrink: 0;
-    color: var(--border-on-light);
-}
-
-.topic-list__item.is-done {
-    color: var(--text-on-light);
-}
-
-.topic-list__item.is-done svg {
-    color: var(--color-moss);
-}
-
 /* ==========================================================================
    RESPONSIVE
    ========================================================================== */

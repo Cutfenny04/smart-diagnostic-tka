@@ -7,6 +7,7 @@ const paketSoalRoutes = require('./routes/paketSoal.routes');
 const soalRoutes = require('./routes/soal.routes');
 const hasilDiagnostikRoutes = require('./routes/hasilDiagnostik.routes');
 const wordwallRoutes = require('./routes/wordwall.routes');
+const dashboardRoutes = require('./routes/dashboard.routes');
 
 const app = express();
 
@@ -31,6 +32,9 @@ app.use('/api/hasil-diagnostik', hasilDiagnostikRoutes);
 
 // Utilitas cek embed Wordwall ada di prefix /api/wordwall
 app.use('/api/wordwall', wordwallRoutes);
+
+// Ringkasan agregat Dashboard Hasil ada di prefix /api/dashboard
+app.use('/api/dashboard', dashboardRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

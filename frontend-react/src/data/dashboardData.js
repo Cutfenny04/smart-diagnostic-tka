@@ -46,10 +46,13 @@ export async function fetchDashboardData(userId) {
   // (TKA/Wordwall belum ada integrasi nilai -- lihat PIVOT_PLAN.md §D/Fase
   // 14), jadi "aktivitas Smart Diagnostic" dihitung dari situ.
   const publishedNonTka = paketSoal.filter((p) => p.type === 'NON_TKA' && p.status === 'published');
-  const attemptedPaketIds = new Set(hasil.map((h) => h.paketId));
+  // String(...) di kedua sisi WAJIB: hasil_diagnostik.paket_id kolomnya INT
+  // (pulang sbg number dari node-pg), sedangkan paket_soal.id BIGINT (pulang
+  // sbg string) -- tanpa ini Set.has() selalu false walau ID-nya sama.
+  const attemptedPaketIds = new Set(hasil.map((h) => String(h.paketId)));
   const diagnosticPercent = publishedNonTka.length === 0
     ? 0
-    : Math.round((publishedNonTka.filter((p) => attemptedPaketIds.has(p.id)).length / publishedNonTka.length) * 100);
+    : Math.round((publishedNonTka.filter((p) => attemptedPaketIds.has(String(p.id))).length / publishedNonTka.length) * 100);
 
   // Progress Pelatihan keseluruhan = rata-rata progress belajar materi dan
   // aktivitas Smart Diagnostic -- dua-duanya sumber data asli yang ada saat
