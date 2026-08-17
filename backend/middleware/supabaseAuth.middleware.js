@@ -1,10 +1,9 @@
 const supabaseAdmin = require('../config/supabaseAdmin');
 
-// Middleware Auth baru (Fase 3 migrasi ke Supabase Auth) -- dipakai semua
-// route fitur (materi, paketSoal, hasilDiagnostik, soal, wordwall).
-// auth.middleware.js lama TIDAK dihapus, masih dipakai auth.routes.js untuk
-// endpoint /me dan /password yang jalan di atas tabel `guru` lama (backup
-// sampai cutover selesai, lihat riwayat migrasi Auth).
+// Middleware Auth (migrasi ke Supabase Auth) -- dipakai semua route fitur
+// (materi, paketSoal, hasilDiagnostik, soal, wordwall). Jalur JWT lama
+// (auth.middleware.js/auth.controller.js/auth.routes.js, atas tabel `guru`)
+// sudah dicabut sepenuhnya -- frontend 100% pakai Supabase Auth sekarang.
 //
 // Verifikasi lewat supabaseAdmin.auth.getUser(token) (bukan jsonwebtoken)
 // supaya tidak perlu urus JWKS/algoritma signing Supabase sendiri -- Supabase

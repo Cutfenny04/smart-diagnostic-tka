@@ -2,7 +2,6 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-const authRoutes = require('./routes/auth.routes');
 const materiRoutes = require('./routes/materi.routes');
 const paketSoalRoutes = require('./routes/paketSoal.routes');
 const soalRoutes = require('./routes/soal.routes');
@@ -19,8 +18,6 @@ app.get('/', (req, res) => {
   res.send('Backend Platform Pelatihan Guru aktif 🚀');
 });
 
-// Semua route auth ada di prefix /api/auth
-app.use('/api/auth', authRoutes);
 app.use('/api/materi', materiRoutes);
 
 // Semua route paket soal (Bank Soal) ada di prefix /api/paket-soal
