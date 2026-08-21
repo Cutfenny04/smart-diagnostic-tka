@@ -1,0 +1,93 @@
+/* ==========================================================================
+   WORDWALL GUIDE — panel "Alur Membuat Aktivitas TKA" di atas form
+   Tambah/Edit Paket TKA.
+   ========================================================================== */
+
+.wordwall-guide {
+    margin-bottom: var(--space-5);
+}
+
+.wordwall-guide__desc {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    max-width: 70ch;
+}
+
+.wordwall-guide__list {
+    list-style: none;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-3);
+    margin: var(--space-4) 0;
+}
+
+.wordwall-guide__step {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    padding: var(--space-2) var(--space-3);
+    border-radius: var(--radius-md);
+    background: var(--surface-card-tint);
+    border: 1px solid var(--border-on-light);
+}
+
+.wordwall-guide__num {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    font-size: var(--text-micro);
+    font-weight: 700;
+    flex-shrink: 0;
+    background: rgba(10, 51, 35, 0.08);
+    color: var(--text-muted-on-light);
+}
+
+.wordwall-guide__step.is-here .wordwall-guide__num {
+    background: rgba(211, 150, 140, 0.2);
+    color: var(--color-rosy-deep);
+}
+
+.wordwall-guide__step.is-external .wordwall-guide__num {
+    background: rgba(16, 86, 102, 0.16);
+    color: var(--color-primary-mid);
+}
+
+.wordwall-guide__step.is-auto .wordwall-guide__num {
+    background: rgba(131, 153, 88, 0.16);
+    color: #5C6B3A;
+}
+
+.wordwall-guide__label {
+    flex: 1;
+    font-size: var(--text-small);
+    color: var(--text-on-light);
+}
+
+.wordwall-guide__where {
+    font-size: var(--text-micro);
+    font-weight: 600;
+    color: var(--text-muted-on-light);
+    white-space: nowrap;
+}
+
+.wordwall-guide__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-4);
+}
+
+.wordwall-guide__link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-1);
+    font-size: var(--text-small);
+    font-weight: 600;
+    color: var(--color-rosy-deep);
+}
+
+.wordwall-guide__link:hover {
+    color: var(--color-rosy);
+}

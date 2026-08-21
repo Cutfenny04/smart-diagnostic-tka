@@ -15,7 +15,9 @@ async function getAllMateri(req, res) {
          m.materi_count AS "materiCount",
          m.created_at AS "dateAdded",
          COALESCE(p.progress, 0) AS progress,
-         p.last_opened AS "lastOpened"
+         p.last_opened AS "lastOpened",
+         p.started_at AS "startedAt",
+         p.completed_at AS "completedAt"
        FROM materi m
        LEFT JOIN progress_materi p
          ON p.materi_id = m.id AND p.guru_id = $1
@@ -45,7 +47,9 @@ async function getMateriById(req, res) {
          m.duration,
          m.materi_count AS "materiCount",
          m.konten_url AS "kontenUrl",
-         COALESCE(p.progress, 0) AS progress
+         COALESCE(p.progress, 0) AS progress,
+         p.started_at AS "startedAt",
+         p.completed_at AS "completedAt"
        FROM materi m
        LEFT JOIN progress_materi p
          ON p.materi_id = m.id AND p.guru_id = $1
@@ -76,11 +80,21 @@ async function updateProgress(req, res) {
     }
 
     // INSERT ... ON CONFLICT: kalau belum ada baris progress, buat baru;
-    // kalau sudah ada, update aja (karena guru_id + materi_id itu unik)
+    // kalau sudah ada, update aja (karena guru_id + materi_id itu unik).
+    // started_at/completed_at SENGAJA cuma diisi sekali (COALESCE dengan
+    // nilai lama di sisi UPDATE) -- last_opened boleh berubah tiap sentuhan,
+    // tapi "kapan pertama mulai" dan "kapan pertama selesai" tidak boleh
+    // tertimpa cuma karena guru membuka ulang materinya (roadmap item #4,
+    // 2026-08-22: "tanggal_mulai"/"tanggal_selesai" harus tanggal asli
+    // pertama kali, bukan tanggal sentuhan terakhir).
     await pool.query(
-      `INSERT INTO progress_materi (guru_id, materi_id, progress, last_opened)
-       VALUES ($1, $2, $3, NOW())
-       ON CONFLICT (guru_id, materi_id) DO UPDATE SET progress = $3, last_opened = NOW()`,
+      `INSERT INTO progress_materi (guru_id, materi_id, progress, last_opened, started_at, completed_at)
+       VALUES ($1, $2, $3, NOW(), CASE WHEN $3 > 0 THEN NOW() END, CASE WHEN $3 >= 100 THEN NOW() END)
+       ON CONFLICT (guru_id, materi_id) DO UPDATE SET
+         progress = $3,
+         last_opened = NOW(),
+         started_at = COALESCE(progress_materi.started_at, CASE WHEN $3 > 0 THEN NOW() END),
+         completed_at = COALESCE(progress_materi.completed_at, CASE WHEN $3 >= 100 THEN NOW() END)`,
       [guruId, id, progress]
     );
 

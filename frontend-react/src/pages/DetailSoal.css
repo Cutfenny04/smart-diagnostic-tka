@@ -7,3 +7,26 @@
     max-width: 720px;
     padding: var(--space-6);
 }
+
+.wordwall-url-check {
+    display: block;
+    font-size: var(--text-small);
+    margin-top: var(--space-1);
+}
+
+.wordwall-url-check.is-checking {
+    color: var(--text-muted-on-light);
+}
+
+.wordwall-url-check.is-valid {
+    color: #5C6B3A;
+}
+
+.wordwall-url-check.is-uncertain,
+.wordwall-url-check.is-fallback {
+    color: var(--color-rosy-deep);
+}
+
+.wordwall-url-check.is-invalid {
+    color: var(--color-danger);
+}

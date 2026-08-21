@@ -5,6 +5,7 @@ import Layout from '../components/Layout';
 import { fetchMateriById, updateMateriProgress, materiCategoryMeta as CATEGORY_META } from '../data/materiData';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
+import { formatDate } from '../utils/formatDate';
 import './DetailMateri.css';
 
 // Belum dibuka sama sekali = 0. Baru dibuka pertama kali = 25 (otomatis,
@@ -45,7 +46,7 @@ function DetailMateri() {
     if (!modul || modul.progress > 0 || autoStartedRef.current) return;
     autoStartedRef.current = true;
     updateMateriProgress(modul.id, STARTED_PROGRESS).then(() => {
-      setModul((prev) => (prev ? { ...prev, progress: STARTED_PROGRESS } : prev));
+      setModul((prev) => (prev ? { ...prev, progress: STARTED_PROGRESS, startedAt: prev.startedAt || new Date().toISOString() } : prev));
     });
   }, [modul]);
 
@@ -53,7 +54,7 @@ function DetailMateri() {
     setSaving(true);
     try {
       await updateMateriProgress(modul.id, 100);
-      setModul((prev) => (prev ? { ...prev, progress: 100 } : prev));
+      setModul((prev) => (prev ? { ...prev, progress: 100, completedAt: prev.completedAt || new Date().toISOString() } : prev));
     } finally {
       setSaving(false);
     }
@@ -124,6 +125,13 @@ function DetailMateri() {
           </div>
           <span className="detail-materi-progress__label">{modul.progress}% selesai</span>
         </div>
+
+        {modul.startedAt && (
+          <p className="detail-materi-dates">
+            Mulai dipelajari: {formatDate(modul.startedAt)}
+            {modul.completedAt && <> &middot; Selesai: {formatDate(modul.completedAt)}</>}
+          </p>
+        )}
 
         <div className="form-actions">
           <Link to="/materi" className="btn btn-secondary">Kembali ke Materi</Link>

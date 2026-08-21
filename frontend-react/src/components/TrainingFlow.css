@@ -1,0 +1,138 @@
+/* ==========================================================================
+   TRAINING FLOW — stepper "Alur Pelatihan Anda" di Dashboard utama.
+   Reuse token & pola visual .timeline (style.css) supaya konsisten dengan
+   Aktivitas Terbaru, tapi berdiri sendiri karena butuh sub-langkah + status
+   badge per tahap.
+   ========================================================================== */
+
+.training-flow__desc {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    max-width: 70ch;
+}
+
+.training-flow__list {
+    list-style: none;
+}
+
+.training-flow__item {
+    display: flex;
+    gap: var(--space-4);
+    position: relative;
+    padding-bottom: var(--space-6);
+}
+
+.training-flow__item:last-child {
+    padding-bottom: 0;
+}
+
+.training-flow__item:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 19px;
+    top: 40px;
+    bottom: 0;
+    width: 1px;
+    background: var(--border-on-light);
+}
+
+.training-flow__marker {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: rgba(10, 51, 35, 0.06);
+    color: var(--text-muted-on-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+    font-family: var(--font-headings);
+    font-size: var(--text-body);
+}
+
+.training-flow__item.is-selesai .training-flow__marker {
+    background: rgba(131, 153, 88, 0.16);
+    color: #5C6B3A;
+}
+
+.training-flow__item.is-sedang .training-flow__marker,
+.training-flow__item.is-current .training-flow__marker {
+    background: var(--gradient-rosy);
+    color: var(--color-white);
+}
+
+.training-flow__body {
+    flex: 1;
+    min-width: 0;
+}
+
+.training-flow__head {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+    margin-bottom: var(--space-1);
+}
+
+.training-flow__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h3);
+    font-weight: 400;
+    color: var(--text-on-light);
+}
+
+.training-flow__note {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-2);
+}
+
+.training-flow__substeps {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    margin-bottom: var(--space-3);
+}
+
+.training-flow__substep {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+}
+
+.training-flow__substep.is-done {
+    color: var(--text-on-light);
+}
+
+.training-flow__substep-icon {
+    width: 16px;
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.training-flow__substep.is-done .training-flow__substep-icon {
+    color: var(--color-moss);
+}
+
+.training-flow__substep.is-external .training-flow__substep-icon {
+    color: var(--color-primary-mid);
+}
+
+.training-flow__link {
+    display: inline-flex;
+    font-size: var(--text-small);
+    font-weight: 600;
+    color: var(--color-rosy-deep);
+}
+
+.training-flow__link:hover {
+    color: var(--color-rosy);
+}
+
+.training-flow__item.is-current .training-flow__title {
+    color: var(--color-rosy-deep);
+}

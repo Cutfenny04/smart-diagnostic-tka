@@ -4,6 +4,7 @@ import Layout from '../components/Layout';
 import { fetchDashboardHasil } from '../data/dashboardHasilData';
 import { getIcon } from '../utils/icon';
 import { isTuntas } from '../utils/scoring';
+import { formatDate } from '../utils/formatDate';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
 import './HasilDiagnostik.css';
@@ -30,10 +31,6 @@ const RANGE_FILTERS = [
 
 const ACTIVITY_ICON = { materi: 'book-open', non_tka: 'activity', tka: 'puzzle' };
 
-function formatDate(iso) {
-  if (!iso) return '-';
-  return new Date(iso).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-}
 function truncate(text, max) {
   if (!text) return '-';
   return text.length <= max ? text : text.slice(0, max).trim() + '…';

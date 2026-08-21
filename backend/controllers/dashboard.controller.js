@@ -1,31 +1,17 @@
 const pool = require('../config/db');
+const { computeOverallProgress } = require('../config/progressWeights');
 
-/* Bobot komposit "Progress Pelatihan" -- BELUM angka resmi dari klien,
-   sengaja satu tempat gampang diubah (pola sama seperti PASSING_SCORE di
-   utils/scoring.js). Materi/Non-TKA/TKA masing-masing dihitung 0-100 dulu,
-   baru dirata-rata berbobot di sini. TKA sengaja TIDAK dikembalikan sebagai
-   "persen" ke frontend (lihat computeTkaPercent) -- cuma dipakai internal
-   untuk komposit, karena kita tidak punya cara sahih menghitung "berapa
-   persen guru sudah menguasai Wordwall". */
-const WEIGHT_MATERI = 0.4;
-const WEIGHT_NON_TKA = 0.3;
-const WEIGHT_TKA = 0.3;
-
-// Placeholder jumlah aktivitas TKA yang dianggap "penuh" (100%) buat 1 guru
-// -- dipilih 3 karena itu jumlah TKA resmi (Kimia/Biologi/Fisika) yang jadi
-// acuan platform saat ini. Ganti kalau klien kasih angka resmi.
-const TKA_TARGET_COUNT = 3;
-
-function computeTkaPercent(tkaCount) {
-  return Math.min(100, Math.round((tkaCount / TKA_TARGET_COUNT) * 100));
-}
-
-// GET /api/dashboard/hasil -- satu endpoint agregat buat Dashboard Hasil,
-// supaya React tidak perlu menembak banyak endpoint + hitung sendiri
-// (PIVOT_PLAN §Dashboard Hasil, permintaan user eksplisit "jangan frontend
-// melakukan 10 query sendiri"). Semua data di sini personal milik guru yang
-// login (guru_id/created_by_guru_id = req.user.id), KECUALI daftar paket
-// published yang dipakai sebagai penyebut persentase (bank soal bersama).
+// GET /api/dashboard/hasil -- satu endpoint agregat, SINGLE SOURCE OF TRUTH
+// untuk "Progress Pelatihan" di SELURUH frontend (Dashboard utama dan
+// Dashboard Hasil sama-sama memanggil endpoint ini dan membaca
+// `progress.overall` dari sini -- tidak ada lagi halaman yang menghitung
+// composite-nya sendiri). Juga menghindari React menembak banyak endpoint +
+// menghitung sendiri (PIVOT_PLAN §Dashboard Hasil, permintaan user eksplisit
+// "jangan frontend melakukan 10 query sendiri"). Semua data di sini personal
+// milik guru yang login (guru_id/created_by_guru_id = req.user.id), KECUALI
+// daftar paket published yang dipakai sebagai penyebut persentase (bank
+// soal bersama). Bobot komposit ada di ../config/progressWeights.js -- satu
+// tempat gampang diubah begitu klien kasih angka resmi.
 async function getHasilSummary(req, res) {
   try {
     const guruId = req.user.id;
@@ -65,6 +51,7 @@ async function getHasilSummary(req, res) {
       category: m.category,
       progress: m.progress,
       status: m.progress >= 100 ? 'selesai' : m.progress > 0 ? 'sedang' : 'belum',
+      lastOpened: m.last_opened,
     }));
     const materiTotal = materiList.length;
     const materiCompleted = materiList.filter((m) => m.status === 'selesai').length;
@@ -125,9 +112,7 @@ async function getHasilSummary(req, res) {
     const tkaDraft = tkaTotal - tkaPublished;
 
     // --- Komposit ---
-    const overallPercent = Math.round(
-      materiPercent * WEIGHT_MATERI + nonTkaPercent * WEIGHT_NON_TKA + computeTkaPercent(tkaTotal) * WEIGHT_TKA
-    );
+    const overallPercent = computeOverallProgress({ materiPercent, nonTkaPercent, tkaCount: tkaTotal });
 
     // --- Riwayat aktivitas gabungan (materi selesai/sedang + non-tka + tka) ---
     const activity = [

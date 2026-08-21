@@ -46,6 +46,13 @@
     white-space: nowrap;
 }
 
+.detail-materi-dates {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-6);
+    margin-top: calc(-1 * var(--space-4));
+}
+
 /* ==========================================================================
    RESPONSIVE
    ========================================================================== */

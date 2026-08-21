@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Save } from 'lucide-react';
 import Layout from '../components/Layout';
+import WordwallGuide from '../components/WordwallGuide';
 import { fetchPaketById, savePaket } from '../data/bankSoalData';
+import { checkWordwallEmbeddable } from '../data/wordwallData';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './DetailSoal.css';
 
@@ -24,6 +26,12 @@ function DetailSoal() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(isEditMode);
   const [saving, setSaving] = useState(false);
+  // Tahap 6 roadmap item #5: validasi URL Wordwall otomatis begitu guru
+  // selesai mengetik/tempel link-nya (bukan cuma pas main di Smart
+  // Diagnostic seperti sebelumnya). Ini murni informasional -- link yang
+  // tidak bisa di-embed TETAP boleh disimpan (fallback "Buka di Wordwall"
+  // sudah ada sejak Fase 7E), guru cuma diberi tahu apa yang akan terjadi.
+  const [urlCheck, setUrlCheck] = useState({ status: 'idle', message: '' });
 
   const heading = isEditMode ? 'Edit Paket TKA' : 'Tambah Paket TKA';
   useDocumentTitle(heading + ' - Smart Diagnostic TKA');
@@ -49,11 +57,33 @@ function DetailSoal() {
         status: paket.status,
       });
       setLoading(false);
+      if (paket.wordwallUrl) checkUrl(paket.wordwallUrl);
     });
   }, [id, isEditMode, navigate]);
 
   function setField(name, value) {
     setForm((f) => ({ ...f, [name]: value }));
+  }
+
+  async function checkUrl(rawUrl) {
+    const url = rawUrl.trim();
+    if (!url) {
+      setUrlCheck({ status: 'idle', message: '' });
+      return;
+    }
+    setUrlCheck({ status: 'checking', message: 'Mengecek URL...' });
+    try {
+      const result = await checkWordwallEmbeddable(url);
+      if (result.uncertain) {
+        setUrlCheck({ status: 'uncertain', message: 'Tidak bisa memastikan sekarang (Wordwall tidak merespons) -- akan dicoba ditampilkan langsung saat dimainkan.' });
+      } else if (result.embeddable) {
+        setUrlCheck({ status: 'valid', message: 'URL Wordwall valid, aktivitas bisa ditampilkan langsung di website.' });
+      } else {
+        setUrlCheck({ status: 'fallback', message: 'URL ini tidak bisa ditampilkan langsung (jenis link ini diblokir Wordwall untuk di-embed) -- guru & siswa akan diarahkan ke tombol "Buka di Wordwall" saat memainkannya. Tetap boleh disimpan.' });
+      }
+    } catch (err) {
+      setUrlCheck({ status: 'invalid', message: err.message || 'URL tidak valid.' });
+    }
   }
 
   function validate() {
@@ -121,6 +151,8 @@ function DetailSoal() {
         </div>
       </div>
 
+      <WordwallGuide />
+
       <div className="card-light detail-soal-form">
         <form onSubmit={handleSubmit} noValidate>
           <div className={'form-field' + (errors.title ? ' has-error' : '')}>
@@ -181,10 +213,15 @@ function DetailSoal() {
             </label>
             <input
               type="url" id="wordwallUrl" className="form-field__input" placeholder="https://wordwall.net/resource/..."
-              value={form.wordwallUrl} onChange={(e) => setField('wordwallUrl', e.target.value)}
+              value={form.wordwallUrl}
+              onChange={(e) => setField('wordwallUrl', e.target.value)}
+              onBlur={(e) => checkUrl(e.target.value)}
             />
             <span className="form-field__error">Link Wordwall wajib diisi jika status Published.</span>
             <span className="form-field__hint">Buat aktivitasnya langsung di Wordwall, lalu tempel link-nya di sini.</span>
+            {urlCheck.status !== 'idle' && (
+              <span className={'wordwall-url-check is-' + urlCheck.status}>{urlCheck.message}</span>
+            )}
           </div>
 
           <div className="form-field">

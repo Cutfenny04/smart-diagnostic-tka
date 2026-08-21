@@ -2,6 +2,8 @@ import { createElement, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { PlayCircle, Activity } from 'lucide-react';
 import Layout from '../components/Layout';
+import TrainingFlow from '../components/TrainingFlow';
+import ResumeCard from '../components/ResumeCard';
 import { fetchDashboardData } from '../data/dashboardData';
 import { useAuth } from '../context/AuthContext';
 import { getIcon } from '../utils/icon';
@@ -89,7 +91,7 @@ function Dashboard() {
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
-    fetchDashboardData(userId).then((result) => {
+    fetchDashboardData().then((result) => {
       if (cancelled) return;
       if (profile) result.greeting.name = profile.nama;
       setData(result);
@@ -115,14 +117,16 @@ function Dashboard() {
         </h1>
         <p className="welcome-hero__message">{data?.greeting.message}</p>
         <div className="welcome-hero__actions">
-          <Link to="/materi" className="btn btn-primary">
-            <PlayCircle size={18} /> Lanjutkan Pelatihan
+          <Link to={data?.currentStage.href || '/materi'} className="btn btn-primary">
+            <PlayCircle size={18} /> {data ? data.currentStage.ctaLabel : 'Lanjutkan Pelatihan'}
           </Link>
           <Link to="/smart-diagnostic" className="btn btn-secondary">
             <Activity size={18} /> Mulai Smart Diagnostic
           </Link>
         </div>
       </section>
+
+      {data && <TrainingFlow stages={data.trainingFlow} currentStage={data.currentStage} />}
 
       <section className="dashboard-section" aria-label="Statistik Ringkas">
         <div className="kpi-grid">
@@ -165,6 +169,8 @@ function Dashboard() {
         </section>
 
         <div className="dashboard-columns__side">
+          {data && <ResumeCard item={data.resumeItem} />}
+
           <section className="dashboard-section card-light" aria-label="Pengumuman">
             <div className="section-heading">
               <h2 className="section-heading__title">Pengumuman</h2>
