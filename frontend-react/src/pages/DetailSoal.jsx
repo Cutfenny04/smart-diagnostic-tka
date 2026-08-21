@@ -5,6 +5,7 @@ import Layout from '../components/Layout';
 import WordwallGuide from '../components/WordwallGuide';
 import { fetchPaketById, savePaket } from '../data/bankSoalData';
 import { checkWordwallEmbeddable } from '../data/wordwallData';
+import { isWordwallUrl } from '../utils/wordwallStage';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './DetailSoal.css';
 
@@ -102,9 +103,17 @@ function DetailSoal() {
         if (!firstInvalidField) firstInvalidField = key;
       }
     });
-    if (values.status === 'published' && !values.wordwallUrl) {
-      nextErrors.wordwallUrl = true;
-      if (!firstInvalidField) firstInvalidField = 'wordwallUrl';
+    if (values.status === 'published') {
+      // Gerbang publish (roadmap item #6): backend menolak publish kalau URL
+      // bukan wordwall.net yang sah -- dicek di sini juga supaya guru dapat
+      // error inline instan, bukan cuma round-trip ke server baru tahu.
+      if (!values.wordwallUrl) {
+        nextErrors.wordwallUrl = true;
+        if (!firstInvalidField) firstInvalidField = 'wordwallUrl';
+      } else if (!isWordwallUrl(values.wordwallUrl)) {
+        nextErrors.wordwallUrl = 'invalid';
+        if (!firstInvalidField) firstInvalidField = 'wordwallUrl';
+      }
     }
 
     setErrors(nextErrors);
@@ -217,7 +226,11 @@ function DetailSoal() {
               onChange={(e) => setField('wordwallUrl', e.target.value)}
               onBlur={(e) => checkUrl(e.target.value)}
             />
-            <span className="form-field__error">Link Wordwall wajib diisi jika status Published.</span>
+            <span className="form-field__error">
+              {errors.wordwallUrl === 'invalid'
+                ? 'Link Wordwall harus URL wordwall.net yang sah sebelum bisa dipublish.'
+                : 'Link Wordwall wajib diisi jika status Published.'}
+            </span>
             <span className="form-field__hint">Buat aktivitasnya langsung di Wordwall, lalu tempel link-nya di sini.</span>
             {urlCheck.status !== 'idle' && (
               <span className={'wordwall-url-check is-' + urlCheck.status}>{urlCheck.message}</span>

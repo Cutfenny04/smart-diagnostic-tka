@@ -2,20 +2,30 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   PlusCircle, Search, SearchX, FlaskConical, GraduationCap,
-  MousePointerClick, Pencil, PlayCircle, Trash2, X, Link as LinkIcon, Unlink,
+  MousePointerClick, Pencil, PlayCircle, Trash2, X,
 } from 'lucide-react';
 import Layout from '../components/Layout';
+import WordwallStageChecklist from '../components/WordwallStageChecklist';
 import { fetchPaketSoal, deletePaket } from '../data/bankSoalData';
 import { getIcon } from '../utils/icon';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './BankSoal.css';
 
+// Roadmap item #8 (2026-08-22): TKA vs Non-TKA sebelumnya cuma salah satu
+// dari 4 filter chip berbobot sama (Tipe/Status/HOTS/Bidang) -- padahal ini
+// pembeda paling penting (guru CRUD penuh TKA, cuma lihat/main Non-TKA).
+// Dinaikkan jadi tab utama halaman, terpisah dari filter sekunder di bawah.
+const TYPE_TABS = [
+  { value: 'semua', label: 'Semua' },
+  { value: 'TKA', label: 'TKA' },
+  { value: 'NON_TKA', label: 'Non-TKA' },
+];
+
+// Urutan tetap dipakai buat mengelompokkan kartu per bidang IPA saat salah
+// satu tab TKA/Non-TKA aktif (lihat groupBySubject).
+const SUBJECT_ORDER = ['Biologi', 'Fisika', 'Kimia'];
+
 const FILTER_GROUPS = [
-  { key: 'type', label: 'Tipe', options: [
-    { value: 'semua', label: 'Semua' },
-    { value: 'TKA', label: 'TKA' },
-    { value: 'NON_TKA', label: 'Non-TKA' },
-  ] },
   { key: 'status', label: 'Status', options: [
     { value: 'semua', label: 'Semua' },
     { value: 'draft', label: 'Draft' },
@@ -57,6 +67,17 @@ function sortPaket(list, sort) {
   else if (sort === 'terlama') copy.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   else copy.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   return copy;
+}
+
+// Dipakai saat tab TKA/Non-TKA aktif -- selalu tampilkan ketiga bidang IPA
+// (bahkan yang kosong) supaya guru langsung lihat bidang mana yang belum
+// punya paket, bukan cuma yang sudah ada (roadmap item #8: struktur
+// "TKA -> Kimia/Biologi/Fisika" dari brief user).
+function groupBySubject(list) {
+  return SUBJECT_ORDER.map((subject) => ({
+    subject,
+    items: list.filter((item) => item.subject === subject),
+  }));
 }
 
 function computeStats(allPaket) {
@@ -116,7 +137,6 @@ function PreviewPanel({ item, onClose, onDeleteRequest }) {
   }
 
   const isTka = item.type !== 'NON_TKA';
-  const wordwallConnected = Boolean(item.wordwallUrl);
 
   return (
     <>
@@ -134,10 +154,8 @@ function PreviewPanel({ item, onClose, onDeleteRequest }) {
       <p className="soal-preview__question">{item.stimulus}</p>
       {isTka && (
         <>
-          <h3 className="soal-preview__section-title">Aktivitas Wordwall</h3>
-          <p className={'soal-preview__wordwall-indicator ' + (wordwallConnected ? 'is-connected' : 'is-disconnected')}>
-            {wordwallConnected ? <LinkIcon size={16} /> : <Unlink size={16} />} {wordwallConnected ? 'Sudah Terhubung' : 'Belum Terhubung'}
-          </p>
+          <h3 className="soal-preview__section-title">Tahap Wordwall</h3>
+          <WordwallStageChecklist item={item} />
         </>
       )}
       <div className="soal-preview__action">
@@ -164,7 +182,8 @@ function PreviewPanel({ item, onClose, onDeleteRequest }) {
 function BankSoal() {
   const [allPaket, setAllPaket] = useState(null);
   const [query, setQuery] = useState('');
-  const [filters, setFilters] = useState({ type: 'semua', status: 'semua', hotsLevel: 'semua', subject: 'semua' });
+  const [activeTab, setActiveTab] = useState('semua');
+  const [filters, setFilters] = useState({ status: 'semua', hotsLevel: 'semua', subject: 'semua' });
   const [sort, setSort] = useState('terbaru');
   const [selectedId, setSelectedId] = useState(null);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
@@ -204,7 +223,7 @@ function BankSoal() {
     const q = query.trim().toLowerCase();
     filtered = allPaket.filter((item) => {
       const matchesQuery = !q || item.title.toLowerCase().includes(q) || item.stimulus.toLowerCase().includes(q);
-      const matchesType = filters.type === 'semua' || item.type === filters.type;
+      const matchesType = activeTab === 'semua' || item.type === activeTab;
       const matchesStatus = filters.status === 'semua' || item.status === filters.status;
       const matchesHots = filters.hotsLevel === 'semua' || item.hotsLevel === filters.hotsLevel;
       const matchesSubject = filters.subject === 'semua' || item.subject === filters.subject;
@@ -212,6 +231,11 @@ function BankSoal() {
     });
     filtered = sortPaket(filtered, sort);
   }
+
+  // Cuma dikelompokkan per bidang IPA saat salah satu tab TKA/Non-TKA aktif
+  // -- tab "Semua" tetap daftar datar seperti sebelumnya (mengelompokkan
+  // dobel per tipe+bidang sekaligus jadi berlebihan di sana).
+  const subjectGroups = activeTab !== 'semua' ? groupBySubject(filtered) : null;
 
   const selectedItem = allPaket?.find((p) => String(p.id) === String(selectedId)) || null;
 
@@ -225,6 +249,21 @@ function BankSoal() {
         <div className="page-header__actions">
           <Link to="/bank-soal/tka/baru" className="btn btn-primary"><PlusCircle size={18} /> Tambah Paket TKA</Link>
         </div>
+      </div>
+
+      <div className="type-tabs" role="tablist" aria-label="Tipe Paket Soal">
+        {TYPE_TABS.map((tab) => (
+          <button
+            key={tab.value}
+            type="button"
+            role="tab"
+            aria-selected={activeTab === tab.value}
+            className={'type-tabs__btn' + (activeTab === tab.value ? ' is-active' : '')}
+            onClick={() => setActiveTab(tab.value)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
       <section className="dashboard-section" aria-label="Statistik Bank Soal">
@@ -321,8 +360,21 @@ function BankSoal() {
               </div>
             )}
 
-            {allPaket && filtered.map((item) => (
+            {allPaket && filtered.length > 0 && !subjectGroups && filtered.map((item) => (
               <PaketCard key={item.id} item={item} selected={String(item.id) === String(selectedId)} onSelect={selectPaket} />
+            ))}
+
+            {allPaket && filtered.length > 0 && subjectGroups && subjectGroups.map((group) => (
+              <div className="subject-group" key={group.subject}>
+                <h3 className="subject-group__title">{group.subject} <span className="subject-group__count">({group.items.length})</span></h3>
+                {group.items.length === 0 ? (
+                  <p className="subject-group__empty">Belum ada paket {typeLabel(activeTab)} untuk {group.subject}.</p>
+                ) : (
+                  group.items.map((item) => (
+                    <PaketCard key={item.id} item={item} selected={String(item.id) === String(selectedId)} onSelect={selectPaket} />
+                  ))
+                )}
+              </div>
             ))}
           </div>
         </div>

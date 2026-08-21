@@ -5,6 +5,7 @@ import { fetchDashboardHasil } from '../data/dashboardHasilData';
 import { getIcon } from '../utils/icon';
 import { isTuntas } from '../utils/scoring';
 import { formatDate } from '../utils/formatDate';
+import { computeWordwallStage } from '../utils/wordwallStage';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
 import './HasilDiagnostik.css';
@@ -30,6 +31,16 @@ const RANGE_FILTERS = [
 ];
 
 const ACTIVITY_ICON = { materi: 'book-open', non_tka: 'activity', tka: 'puzzle' };
+
+// Roadmap item #6 (2026-08-22): tabel Aktivitas TKA sebelumnya cuma
+// Draft/Published (2 badge), sekarang pakai 5 tahap dari computeWordwallStage.
+const WORDWALL_STAGE_BADGE = {
+  draft: 'badge--belum',
+  url_dimasukkan: 'badge--belum',
+  url_valid: 'badge--sedang',
+  published: 'badge--selesai',
+  tersedia: 'badge--selesai',
+};
 
 function truncate(text, max) {
   if (!text) return '-';
@@ -279,14 +290,17 @@ function HasilDiagnostik() {
                 <table className="data-table">
                   <thead><tr><th>Mata Pelajaran</th><th>Judul</th><th>Status</th><th>Tanggal</th></tr></thead>
                   <tbody>
-                    {data.tka.list.map((t) => (
-                      <tr key={t.id}>
-                        <td>{t.subject}</td>
-                        <td>{truncate(t.title, 40)}</td>
-                        <td><span className={'badge ' + (t.status === 'published' ? 'badge--selesai' : 'badge--belum')}>{t.status === 'published' ? 'Published' : 'Draft'}</span></td>
-                        <td>{formatDate(t.createdAt)}</td>
-                      </tr>
-                    ))}
+                    {data.tka.list.map((t) => {
+                      const stage = computeWordwallStage(t);
+                      return (
+                        <tr key={t.id}>
+                          <td>{t.subject}</td>
+                          <td>{truncate(t.title, 40)}</td>
+                          <td><span className={'badge ' + WORDWALL_STAGE_BADGE[stage.key]}>{stage.label}</span></td>
+                          <td>{formatDate(t.createdAt)}</td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

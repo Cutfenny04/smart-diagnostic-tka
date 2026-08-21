@@ -6,6 +6,71 @@
    content.
    ========================================================================== */
 
+/* --- Tab Tipe (TKA / Non-TKA) — roadmap item #8: pembeda paling penting
+   di halaman ini, dinaikkan jadi navigasi utama, bukan filter chip biasa
+   yang berbobot sama dengan Status/HOTS/Bidang. --- */
+.type-tabs {
+    display: flex;
+    gap: var(--space-2);
+    margin-bottom: var(--space-5);
+    border-bottom: 1px solid var(--border-on-light);
+}
+
+.type-tabs__btn {
+    padding: var(--space-3) var(--space-5);
+    font-family: var(--font-body);
+    font-size: var(--text-body-lg);
+    font-weight: 600;
+    color: var(--text-muted-on-light);
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    transition: var(--transition-fast);
+    margin-bottom: -1px;
+}
+
+.type-tabs__btn:hover {
+    color: var(--text-on-light);
+}
+
+.type-tabs__btn.is-active {
+    color: var(--color-rosy-deep);
+    border-bottom-color: var(--color-rosy);
+}
+
+/* --- Kelompok per Bidang IPA (muncul saat tab TKA/Non-TKA aktif) --- */
+.subject-group {
+    margin-bottom: var(--space-6);
+}
+
+.subject-group:last-child {
+    margin-bottom: 0;
+}
+
+.subject-group__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h3);
+    font-weight: 400;
+    color: var(--text-on-light);
+    margin-bottom: var(--space-3);
+    padding-bottom: var(--space-2);
+    border-bottom: 1px solid var(--border-on-light);
+}
+
+.subject-group__count {
+    font-family: var(--font-body);
+    font-size: var(--text-small);
+    font-weight: 500;
+    color: var(--text-muted-on-light);
+}
+
+.subject-group__empty {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    font-style: italic;
+}
+
 /* --- Daftar Paket Soal --- */
 .soal-list {
     display: flex;
@@ -103,31 +168,6 @@
     font-size: var(--text-body);
     color: var(--text-on-light);
     margin-bottom: var(--space-2);
-}
-
-.soal-preview__wordwall-indicator {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-2);
-    font-size: var(--text-small);
-    font-weight: 600;
-    padding: var(--space-2) var(--space-3);
-    border-radius: var(--radius-md);
-}
-
-.soal-preview__wordwall-indicator svg {
-    width: 16px;
-    height: 16px;
-}
-
-.soal-preview__wordwall-indicator.is-connected {
-    background: rgba(131, 153, 88, 0.14);
-    color: #5C6B3A;
-}
-
-.soal-preview__wordwall-indicator.is-disconnected {
-    background: rgba(10, 51, 35, 0.06);
-    color: var(--text-muted-on-light);
 }
 
 .soal-preview__action {

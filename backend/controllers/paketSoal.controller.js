@@ -1,4 +1,5 @@
 const pool = require('../config/db');
+const { isWordwallUrl } = require('../utils/wordwallUrl');
 
 // DB pakai snake_case (hots_level, wordwall_url, created_at), tapi frontend
 // (assets/js/bank-soal.js, detail-soal.js, smart-diagnostic.js) sudah dibangun
@@ -27,17 +28,29 @@ function toApiShape(row) {
 }
 
 // Field wajib untuk Create & Edit -- sama seperti validasi di detail-soal.js
-// (Judul, Bidang, Jenjang, HOTS, Stimulus wajib; Wordwall URL wajib jika
-// status Published). Divalidasi ulang di server karena validasi di frontend
-// saja tidak bisa dipercaya.
+// (Judul, Bidang, Jenjang, HOTS, Stimulus wajib; Wordwall URL wajib DAN
+// harus URL wordwall.net yang sah jika status Published). Divalidasi ulang
+// di server karena validasi di frontend saja tidak bisa dipercaya.
+//
+// Gerbang publish (roadmap item #6, 2026-08-22: "DRAFT -> URL DIMASUKKAN ->
+// URL VALID -> PUBLISHED -> AKTIVITAS TERSEDIA ... kemudian baru bisa
+// publish"): sebelumnya cuma cek URL-nya ADA, sekarang juga cek URL-nya
+// SAH (format wordwall.net). Sengaja tidak mensyaratkan embeddable -- URL
+// yang tidak bisa di-embed tetap boleh dipublish (fallback "Buka di
+// Wordwall" dari Fase 7E), jadi itu bukan gerbang publish.
 function validatePaket(body) {
   const { title, subject, grade, hotsLevel, stimulus, wordwallUrl, status } = body;
 
   if (!title || !subject || !grade || !hotsLevel || !stimulus) {
     return 'Judul, Bidang, Jenjang, Level HOTS, dan Stimulus wajib diisi';
   }
-  if (status === 'published' && !wordwallUrl) {
-    return 'Link Wordwall wajib diisi jika status Published';
+  if (status === 'published') {
+    if (!wordwallUrl) {
+      return 'Link Wordwall wajib diisi jika status Published';
+    }
+    if (!isWordwallUrl(wordwallUrl)) {
+      return 'Link Wordwall belum valid (harus URL wordwall.net) -- tidak bisa dipublish sebelum ini diperbaiki';
+    }
   }
   return null;
 }
