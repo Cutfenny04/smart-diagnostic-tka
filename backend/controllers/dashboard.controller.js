@@ -1,5 +1,6 @@
 const pool = require('../config/db');
 const { computeOverallProgress } = require('../config/progressWeights');
+const { computeSessionQuality } = require('../config/sessionQuality');
 
 // GET /api/dashboard/hasil -- satu endpoint agregat, SINGLE SOURCE OF TRUTH
 // untuk "Progress Pelatihan" di SELURUH frontend (Dashboard utama dan
@@ -69,6 +70,10 @@ async function getHasilSummary(req, res) {
     const materiPercent = materiTotal === 0 ? 0 : Math.round((materiCompleted / materiTotal) * 100);
 
     // --- Non-TKA (hasil_diagnostik milik guru ini) ---
+    // sessionQuality murni indikator tampilan (roadmap item #13) -- SENGAJA
+    // tidak mengecualikan sesi "perlu_ditinjau" dari averageScore/highestScore
+    // di bawah ini, sesuai keputusan user: flag bukan dasar otomatis untuk
+    // menganggap nilai guru tidak sah.
     const hasilList = hasilRes.rows.map((h) => ({
       id: h.id,
       paketId: h.paket_id,
@@ -78,6 +83,11 @@ async function getHasilSummary(req, res) {
       correctCount: h.correct_count,
       totalQuestions: h.total_questions,
       completedAt: h.completed_at || h.created_at,
+      sessionQuality: computeSessionQuality({
+        startedAt: h.started_at,
+        completedAt: h.completed_at,
+        totalQuestions: h.total_questions,
+      }),
     }));
     const totalAttempts = hasilList.length;
     const averageScore = totalAttempts === 0

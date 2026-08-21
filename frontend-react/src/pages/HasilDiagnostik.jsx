@@ -42,6 +42,13 @@ const WORDWALL_STAGE_BADGE = {
   tersedia: 'badge--selesai',
 };
 
+// Roadmap item #13 (2026-08-22): indikator kecepatan sesi Non-TKA -- lihat
+// backend/config/sessionQuality.js untuk definisi & rasional threshold.
+// SENGAJA bukan "Tidak Valid"/"Tidak Selesai" -- flag ini murni informasi,
+// tidak mengubah skor atau mengecualikan sesi dari statistik.
+const SESSION_QUALITY_LABEL = { normal: 'Normal', perlu_ditinjau: 'Perlu Ditinjau' };
+const SESSION_QUALITY_BADGE = { normal: 'badge--selesai', perlu_ditinjau: 'badge--sedang' };
+
 function truncate(text, max) {
   if (!text) return '-';
   return text.length <= max ? text : text.slice(0, max).trim() + '…';
@@ -254,9 +261,10 @@ function HasilDiagnostik() {
 
             {data.nonTka.history.length > 0 && (
               <div className="data-table-wrapper">
+                <p className="hasil-tka__desc">Kolom "Kualitas Sesi" menandai latihan yang diselesaikan sangat cepat -- sekadar indikator untuk ditinjau sendiri, bukan penilaian sah/tidak sah, dan tidak memengaruhi Rata-rata Nilai atau Nilai Tertinggi di atas.</p>
                 <table className="data-table">
                   <thead>
-                    <tr><th>Paket</th><th>Mapel</th><th>Benar</th><th>Nilai</th><th>Tanggal</th><th>Status</th></tr>
+                    <tr><th>Paket</th><th>Mapel</th><th>Benar</th><th>Nilai</th><th>Tanggal</th><th>Status</th><th>Kualitas Sesi</th></tr>
                   </thead>
                   <tbody>
                     {data.nonTka.history.map((h) => (
@@ -267,6 +275,7 @@ function HasilDiagnostik() {
                         <td>{h.score}</td>
                         <td>{formatDate(h.completedAt)}</td>
                         <td><span className={'badge ' + (isTuntas(h.score) ? 'badge--selesai' : 'badge--belum')}>{isTuntas(h.score) ? 'Tuntas' : 'Belum Tuntas'}</span></td>
+                        <td><span className={'badge ' + SESSION_QUALITY_BADGE[h.sessionQuality]}>{SESSION_QUALITY_LABEL[h.sessionQuality]}</span></td>
                       </tr>
                     ))}
                   </tbody>
