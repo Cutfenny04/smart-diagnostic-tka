@@ -201,7 +201,7 @@ function HasilDiagnostik() {
       {data && (
         <>
           <section className="dashboard-section card-light" aria-label="Pembelajaran">
-            <h2 className="section-heading__title">📚 Pembelajaran</h2>
+            <h2 className="section-heading__title">Pembelajaran</h2>
             <div className="hasil-overall">
               <div className="progress-bar" role="progressbar" aria-valuenow={data.progress.materi} aria-valuemin="0" aria-valuemax="100" aria-label="Progress materi & modul">
                 <div className="progress-bar__fill" data-progress={data.progress.materi} />
@@ -223,7 +223,7 @@ function HasilDiagnostik() {
           </section>
 
           <section className="dashboard-section card-light" aria-label="Performa Latihan Non-TKA">
-            <h2 className="section-heading__title">🎮 Non-TKA</h2>
+            <h2 className="section-heading__title">Non-TKA</h2>
             <div className="hasil-summary-grid hasil-summary-grid--compact">
               <StatCard icon="activity" label="Total Latihan" value={data.nonTka.totalAttempts} unit="x" />
               <StatCard icon="bar-chart-2" label="Rata-rata Nilai" value={data.nonTka.averageScore} unit="" />
@@ -276,7 +276,7 @@ function HasilDiagnostik() {
           </section>
 
           <section className="dashboard-section card-light" aria-label="Aktivitas TKA Wordwall">
-            <h2 className="section-heading__title">📝 TKA &amp; Wordwall</h2>
+            <h2 className="section-heading__title">TKA &amp; Wordwall</h2>
             <p className="hasil-tka__desc">Aktivitas Wordwall yang Anda buat dan daftarkan sendiri ke Bank Soal TKA, dan berapa kali Anda membuka/memainkan aktivitas TKA (milik sendiri maupun guru lain). Nilai Wordwall tidak diambil di sini -- lihat langsung di Wordwall (belum ada integrasi resmi).</p>
             <div className="hasil-summary-grid">
               <StatCard icon="puzzle" label="Dibuat" value={data.tka.total} unit="" />
