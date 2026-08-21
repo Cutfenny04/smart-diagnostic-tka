@@ -4,6 +4,7 @@ import { FlaskConical, GraduationCap, PlayCircle, Gamepad2, Inbox, ArrowLeft, Li
 import Layout from '../components/Layout';
 import NonTkaGame from '../components/NonTkaGame';
 import AcehMotifDivider from '../components/AcehMotifDivider';
+import CardCornerFrame from '../components/CardCornerFrame';
 import { fetchPaketSoal } from '../data/bankSoalData';
 import { checkWordwallEmbeddable } from '../data/wordwallData';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -38,7 +39,7 @@ function DiagnosticCard({ item, onOpen }) {
   const isGame = item.type === 'NON_TKA';
   return (
     <article className={'diagnostic-card card-light' + (isGame ? ' diagnostic-card--game' : '')} onClick={() => onOpen(item.id)}>
-      {isGame && <AcehMotifDivider className="diagnostic-card__motif" />}
+      {isGame && <CardCornerFrame />}
       <div className="diagnostic-card__head">
         <h3 className="diagnostic-card__title">{item.title}</h3>
         <span className={'badge ' + hotsBadgeClass(item.hotsLevel)}>{item.hotsLevel}</span>

@@ -18,15 +18,13 @@
     gap: var(--space-3);
 }
 
-/* --- Identitas "Game Interaktif" untuk paket Non-TKA (AcehMotifDivider,
-   dipakai lagi di sini supaya identitasnya menyatu dari kartu -> stimulus
-   -> game -> hasil; definisi CSS-nya di style.css §ACEH MOTIF DIVIDER) --- */
+/* --- Identitas "Game Interaktif" untuk paket Non-TKA: bingkai 4-sudut
+   (CardCornerFrame, lihat components/CardCornerFrame.css) mengintip keluar
+   dari kartu lewat offset negatif -- WAJIB position:relative supaya itu
+   ter-posisi relatif ke kartu ini, bukan ke ancestor lain. Kartu paket TKA
+   (bukan game) tidak dapat bingkai ini, cuma diagnostic-card--game. --- */
 .diagnostic-card--game {
-    padding-top: var(--space-4);
-}
-
-.diagnostic-card__motif {
-    margin-bottom: var(--space-1);
+    position: relative;
 }
 
 .diagnostic-card__type-badge--game {

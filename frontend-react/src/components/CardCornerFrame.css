@@ -1,0 +1,56 @@
+/* ==========================================================================
+   CARD CORNER FRAME — bingkai ukiran emas 4-sudut + strip atas untuk kartu
+   paket Non-TKA. Parent WAJIB position: relative.
+   ========================================================================== */
+.card-corner-frame {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.card-corner-frame__corner {
+    position: absolute;
+    width: clamp(36px, 8vw, 52px);
+    height: clamp(36px, 8vw, 52px);
+    filter: drop-shadow(0 2px 4px rgba(10, 51, 35, 0.18));
+}
+
+.card-corner-frame__corner--tl {
+    top: -10px;
+    left: -10px;
+}
+
+.card-corner-frame__corner--tr {
+    top: -10px;
+    right: -10px;
+    transform: scaleX(-1);
+}
+
+.card-corner-frame__corner--bl {
+    bottom: -10px;
+    left: -10px;
+    transform: scaleY(-1);
+}
+
+.card-corner-frame__corner--br {
+    bottom: -10px;
+    right: -10px;
+    transform: scale(-1, -1);
+}
+
+/* ornamen-horizontal.png di-crop pas ke pola bunganya sendiri (aspect
+   ~5:1) -- tapi itu masih terlalu tinggi (~68px) untuk jadi strip tipis
+   yang muat di atas kartu tanpa menabrak judul, jadi height dikunci lebih
+   pendek dari aspect asli (gambar dipipihkan sedikit secara vertikal,
+   dampak visualnya kecil untuk pola berulang seperti ini). */
+.card-corner-frame__top-strip {
+    position: absolute;
+    top: 6px;
+    left: clamp(36px, 8vw, 52px);
+    right: clamp(36px, 8vw, 52px);
+    width: calc(100% - 2 * clamp(36px, 8vw, 52px));
+    height: 22px;
+    object-fit: fill;
+    opacity: 0.9;
+}
