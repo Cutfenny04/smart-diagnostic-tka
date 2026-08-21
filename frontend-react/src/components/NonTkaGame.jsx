@@ -85,32 +85,45 @@ function optionState(optionKey, selectedKey, correctAnswer) {
   return 'disabled';
 }
 
-/* Tidak ada field tabel terstruktur di data soal (lihat audit di
-   PIVOT_PLAN.md) -- satu-satunya kasus "tabel" yang benar-benar ada
-   diimpor sebagai teks biasa berisi newline (backend/scripts/
-   import_soal_non_tka.js, stimulus fisika soal ke-2: "Tabel Besaran
-   Pokok...:\n1. Panjang — Meter\n..."). Baris pertama diperlakukan sebagai
-   judul/caption, sisanya sebagai daftar rapi -- generik untuk stimulus
-   multi-baris apa pun, bukan hardcode ke satu soal. */
+/* Stimulus SEKARANG murni teks prosa -- tabel punya field & renderer sendiri
+   (TableBlock di bawah, lihat backend/sql/add_soal_table_data.sql, roadmap
+   item #10 2026-08-22). Sebelumnya satu-satunya "tabel" yang ada (Fisika
+   soal ke-2) disisipkan sebagai teks multi-baris lalu di-parse pakai
+   heuristik regex di sini -- itu sudah dimigrasikan ke table_data asli,
+   jadi heuristik itu dihapus, bukan lagi dibutuhkan. */
 function StimulusBlock({ stimulus }) {
   if (!stimulus) return null;
-  const lines = stimulus.split('\n').map((l) => l.trim()).filter(Boolean);
-
-  if (lines.length > 1) {
-    const [caption, ...rows] = lines;
-    return (
-      <div className="game-stimulus game-stimulus--table">
-        <p className="game-stimulus__caption">{caption}</p>
-        <div className="game-stimulus__table-scroll">
-          <ol className="game-stimulus__list">
-            {rows.map((line, i) => <li key={i}>{line.replace(/^\d+\.\s*/, '')}</li>)}
-          </ol>
-        </div>
-      </div>
-    );
-  }
-
   return <blockquote className="game-stimulus game-stimulus--prose">{stimulus}</blockquote>;
+}
+
+/* Tabel terstruktur asli (soal.table_data: { caption, headers, rows }) --
+   4 kombinasi konten soal yang didukung sekarang: teks saja, teks+gambar,
+   teks+tabel, teks+gambar+tabel (lihat question-board__stimulus-col di
+   bawah, tableData dirender berdampingan dengan StimulusBlock/GameImage,
+   bukan saling menggantikan). Scroll horizontal (.game-table__scroll) untuk
+   tabel dengan banyak kolom di layar sempit. */
+function TableBlock({ tableData }) {
+  if (!tableData) return null;
+  const { caption, headers, rows } = tableData;
+  return (
+    <div className="game-table">
+      {caption && <p className="game-table__caption">{caption}</p>}
+      <div className="game-table__scroll">
+        <table className="game-table__table">
+          {headers && headers.length > 0 && (
+            <thead>
+              <tr>{headers.map((h, i) => <th key={i}>{h}</th>)}</tr>
+            </thead>
+          )}
+          <tbody>
+            {rows.map((row, i) => (
+              <tr key={i}>{row.map((cell, j) => <td key={j}>{cell}</td>)}</tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
 
 /* key={current.id} dari pemanggil supaya state lightbox reset tiap ganti
@@ -390,6 +403,7 @@ function NonTkaGame({ paket, onExit }) {
   const isAcehContext = hasAcehContext(current.question, current.stimulus);
   const correctSoFar = answers.filter((a) => a.isCorrect).length;
   const hasImage = Boolean(current.image);
+  const hasTable = Boolean(current.tableData);
 
   return (
     <GameScene background={BG_GAME}>
@@ -405,7 +419,7 @@ function NonTkaGame({ paket, onExit }) {
       />
 
       <div className="question-board">
-        <div className={'question-board__inner' + (hasImage ? ' question-board__inner--split' : '')}>
+        <div className={'question-board__inner' + ((hasImage || hasTable) ? ' question-board__inner--split' : '')}>
           <CardCornerFrame />
 
           <div className="question-board__header">
@@ -422,6 +436,7 @@ function NonTkaGame({ paket, onExit }) {
 
           <div className="question-board__stimulus-col">
             <StimulusBlock stimulus={current.stimulus} />
+            {hasTable && <TableBlock tableData={current.tableData} />}
             {hasImage && (
               <GameImage key={current.id} src={current.image} alt={'Ilustrasi Tantangan ' + currentNumber + ' - ' + paket.title} />
             )}

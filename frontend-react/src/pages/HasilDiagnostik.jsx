@@ -138,7 +138,11 @@ function HasilDiagnostik() {
 
   const chartHistory = useMemo(() => (data ? [...data.nonTka.history].reverse() : []), [data]);
 
-  const hasAnyActivity = data && (data.materi.completed > 0 || data.nonTka.totalAttempts > 0 || data.tka.total > 0);
+  // Sengaja pakai recentActivity.length (bukan cek satu-satu per kategori)
+  // sebagai single source of truth "ada aktivitas atau tidak" -- item #11
+  // menambah kategori baru (TKA dimainkan) yang perlu ikut dihitung di sini
+  // juga, dan recentActivity sudah mengagregasi SEMUA jenis aktivitas.
+  const hasAnyActivity = data && data.recentActivity.length > 0;
 
   return (
     <Layout breadcrumb="Dashboard Hasil">
@@ -196,14 +200,14 @@ function HasilDiagnostik() {
 
       {data && (
         <>
-          <section className="dashboard-section card-light" aria-label="Progress Pelatihan">
-            <h2 className="section-heading__title">Progress Pelatihan</h2>
+          <section className="dashboard-section card-light" aria-label="Pembelajaran">
+            <h2 className="section-heading__title">📚 Pembelajaran</h2>
             <div className="hasil-overall">
-              <div className="progress-bar" role="progressbar" aria-valuenow={data.progress.overall} aria-valuemin="0" aria-valuemax="100" aria-label="Progress pelatihan keseluruhan">
-                <div className="progress-bar__fill" data-progress={data.progress.overall} />
+              <div className="progress-bar" role="progressbar" aria-valuenow={data.progress.materi} aria-valuemin="0" aria-valuemax="100" aria-label="Progress materi & modul">
+                <div className="progress-bar__fill" data-progress={data.progress.materi} />
               </div>
               <p className="hasil-overall__note">
-                {data.materi.completed} dari {data.materi.total} materi selesai &middot; {data.nonTka.totalAttempts} latihan Non-TKA &middot; {data.tka.total} aktivitas TKA tercatat
+                {data.materi.completed} dari {data.materi.total} materi &amp; modul selesai
               </p>
             </div>
 
@@ -219,7 +223,7 @@ function HasilDiagnostik() {
           </section>
 
           <section className="dashboard-section card-light" aria-label="Performa Latihan Non-TKA">
-            <h2 className="section-heading__title">Latihan Smart Diagnostic — Non-TKA</h2>
+            <h2 className="section-heading__title">🎮 Non-TKA</h2>
             <div className="hasil-summary-grid hasil-summary-grid--compact">
               <StatCard icon="activity" label="Total Latihan" value={data.nonTka.totalAttempts} unit="x" />
               <StatCard icon="bar-chart-2" label="Rata-rata Nilai" value={data.nonTka.averageScore} unit="" />
@@ -272,13 +276,20 @@ function HasilDiagnostik() {
           </section>
 
           <section className="dashboard-section card-light" aria-label="Aktivitas TKA Wordwall">
-            <h2 className="section-heading__title">Aktivitas TKA &amp; Wordwall</h2>
-            <p className="hasil-tka__desc">Aktivitas Wordwall yang Anda buat dan daftarkan sendiri ke Bank Soal TKA. Nilai Wordwall tidak diambil di sini -- lihat langsung di Wordwall (belum ada integrasi resmi).</p>
-            <div className="hasil-summary-grid hasil-summary-grid--compact">
-              <StatCard icon="puzzle" label="Total Aktivitas" value={data.tka.total} unit="" />
+            <h2 className="section-heading__title">📝 TKA &amp; Wordwall</h2>
+            <p className="hasil-tka__desc">Aktivitas Wordwall yang Anda buat dan daftarkan sendiri ke Bank Soal TKA, dan berapa kali Anda membuka/memainkan aktivitas TKA (milik sendiri maupun guru lain). Nilai Wordwall tidak diambil di sini -- lihat langsung di Wordwall (belum ada integrasi resmi).</p>
+            <div className="hasil-summary-grid">
+              <StatCard icon="puzzle" label="Dibuat" value={data.tka.total} unit="" />
               <StatCard icon="check-circle" label="Published" value={data.tka.published} unit="" />
               <StatCard icon="file-edit" label="Draft" value={data.tka.draft} unit="" />
+              <StatCard icon="play-circle" label="Dimainkan" value={data.tka.played} unit="x" />
             </div>
+
+            {data.tka.lastPlayedAt && (
+              <p className="hasil-tka__last-played">
+                Aktivitas terakhir dimainkan: <strong>{data.tka.lastPlayedSubject || data.tka.lastPlayedTitle || '-'}</strong> &middot; {formatDate(data.tka.lastPlayedAt)}
+              </p>
+            )}
 
             {data.tka.list.length === 0 ? (
               <div className="empty-state empty-state--compact">

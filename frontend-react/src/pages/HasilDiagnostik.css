@@ -188,6 +188,16 @@
     margin-bottom: var(--space-4);
 }
 
+.hasil-tka__last-played {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    margin-bottom: var(--space-4);
+}
+
+.hasil-tka__last-played strong {
+    color: var(--text-on-light);
+}
+
 /* ==========================================================================
    RESPONSIVE
    ========================================================================== */

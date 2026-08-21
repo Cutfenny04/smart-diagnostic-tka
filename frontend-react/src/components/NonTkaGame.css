@@ -391,7 +391,10 @@
     padding: var(--space-4) var(--space-5);
 }
 
-.game-stimulus--table {
+/* --- Tabel soal asli (soal.table_data, roadmap item #10 2026-08-22) ---
+   Menggantikan .game-stimulus--table/__list lama yang cuma daftar bernomor
+   hasil parsing teks -- sekarang <table> HTML sungguhan. */
+.game-table {
     background: var(--surface-card-tint);
     border: 1px solid var(--border-on-light);
     border-left: 3px solid var(--color-gold);
@@ -399,35 +402,40 @@
     padding: var(--space-4) var(--space-5);
 }
 
-.game-stimulus__caption {
+.game-table__caption {
     font-weight: 700;
     font-size: var(--text-small);
     color: var(--text-on-light);
-    margin-bottom: var(--space-2);
+    margin-bottom: var(--space-3);
 }
 
-.game-stimulus__table-scroll {
+.game-table__scroll {
     overflow-x: auto;
 }
 
-.game-stimulus__list {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
-    padding-left: var(--space-5);
+.game-table__table {
+    width: 100%;
+    min-width: 320px;
+    border-collapse: collapse;
     font-size: var(--text-body);
     color: var(--text-on-light);
-    min-width: 260px;
 }
 
-.game-stimulus__list li {
-    padding-bottom: var(--space-2);
-    border-bottom: 1px dashed var(--border-on-light);
+.game-table__table th,
+.game-table__table td {
+    padding: var(--space-2) var(--space-3);
+    text-align: left;
+    border-bottom: 1px solid var(--border-on-light);
 }
 
-.game-stimulus__list li:last-child {
+.game-table__table th {
+    font-weight: 700;
+    color: var(--color-gold-deep);
+    white-space: nowrap;
+}
+
+.game-table__table tbody tr:last-child td {
     border-bottom: none;
-    padding-bottom: 0;
 }
 
 /* --- Gambar soal + lightbox --- */

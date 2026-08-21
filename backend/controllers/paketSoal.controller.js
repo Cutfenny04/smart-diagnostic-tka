@@ -166,6 +166,35 @@ async function update(req, res) {
   }
 }
 
+// POST /api/paket-soal/:id/played -- roadmap item #11 (2026-08-22): catat
+// bahwa guru yang login ini baru saja membuka aktivitas TKA (dipanggil dari
+// SmartDiagnostic.jsx saat EmbedView mount, sekali per kunjungan). Hanya
+// paket bertipe TKA yang boleh dicatat -- Non-TKA sudah punya tracking
+// sendiri lewat hasil_diagnostik.
+async function logPlay(req, res) {
+  try {
+    const { rows: existing } = await pool.query(
+      'SELECT id, type FROM paket_soal WHERE id = $1',
+      [req.params.id]
+    );
+    if (existing.length === 0) {
+      return res.status(404).json({ message: 'Paket soal tidak ditemukan' });
+    }
+    if (existing[0].type !== 'TKA') {
+      return res.status(400).json({ message: 'Hanya paket TKA yang dicatat sebagai aktivitas dimainkan' });
+    }
+
+    await pool.query(
+      'INSERT INTO tka_play_activity (guru_id, paket_soal_id) VALUES ($1, $2)',
+      [req.user.id, req.params.id]
+    );
+    return res.status(201).json({ message: 'Aktivitas dicatat' });
+  } catch (err) {
+    console.error(err);
+    return res.status(500).json({ message: 'Terjadi kesalahan server' });
+  }
+}
+
 // DELETE - sama seperti update, cuma boleh untuk paket bertipe TKA.
 async function remove(req, res) {
   try {
@@ -188,4 +217,4 @@ async function remove(req, res) {
   }
 }
 
-module.exports = { list, getById, create, update, remove };
+module.exports = { list, getById, create, update, remove, logPlay };

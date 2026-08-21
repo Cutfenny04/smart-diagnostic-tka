@@ -4,7 +4,7 @@ import { FlaskConical, GraduationCap, PlayCircle, Gamepad2, Inbox, ArrowLeft, Li
 import Layout from '../components/Layout';
 import NonTkaGame from '../components/NonTkaGame';
 import CardCornerFrame from '../components/CardCornerFrame';
-import { fetchPaketSoal } from '../data/bankSoalData';
+import { fetchPaketSoal, logTkaPlay } from '../data/bankSoalData';
 import { checkWordwallEmbeddable } from '../data/wordwallData';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './SmartDiagnostic.css';
@@ -143,6 +143,14 @@ function EmbedView({ item, onBack }) {
       });
     return () => { cancelled = true; };
   }, [hasUrl, item.wordwallUrl]);
+
+  // Roadmap item #11 (2026-08-22): catat "aktivitas TKA dimainkan" persis
+  // saat guru menekan "Mulai Diagnostik" dan mendarat di sini -- bukan cuma
+  // saat membuka preview di Bank Soal. Sekali per kunjungan ke view ini.
+  useEffect(() => {
+    if (hasUrl) logTkaPlay(item.id);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="card-light diagnostic-embed">

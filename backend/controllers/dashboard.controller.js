@@ -16,7 +16,7 @@ async function getHasilSummary(req, res) {
   try {
     const guruId = req.user.id;
 
-    const [materiRes, hasilRes, tkaRes, publishedNonTkaRes] = await Promise.all([
+    const [materiRes, hasilRes, tkaRes, publishedNonTkaRes, tkaPlayRes] = await Promise.all([
       pool.query(
         `SELECT m.id, m.title, m.category, COALESCE(p.progress, 0) AS progress, p.last_opened
          FROM materi m
@@ -42,6 +42,17 @@ async function getHasilSummary(req, res) {
         [guruId]
       ),
       pool.query(`SELECT id, subject FROM paket_soal WHERE type = 'NON_TKA' AND status = 'published'`),
+      // Roadmap item #11 (2026-08-22): "dimainkan" per guru -- lihat
+      // sql/add_tka_play_activity.sql untuk rationale kenapa personal, bukan
+      // reach konten.
+      pool.query(
+        `SELECT a.played_at, p.title AS paket_title, p.subject AS paket_subject
+         FROM tka_play_activity a
+         LEFT JOIN paket_soal p ON p.id = a.paket_soal_id
+         WHERE a.guru_id = $1
+         ORDER BY a.played_at DESC`,
+        [guruId]
+      ),
     ]);
 
     // --- Materi ---
@@ -111,6 +122,15 @@ async function getHasilSummary(req, res) {
     const tkaPublished = tkaList.filter((t) => t.status === 'published').length;
     const tkaDraft = tkaTotal - tkaPublished;
 
+    // --- TKA played (roadmap item #11) ---
+    const tkaPlayList = tkaPlayRes.rows.map((r) => ({
+      playedAt: r.played_at,
+      paketTitle: r.paket_title,
+      paketSubject: r.paket_subject,
+    }));
+    const tkaPlayedCount = tkaPlayList.length;
+    const tkaLastPlayed = tkaPlayedCount === 0 ? null : tkaPlayList[0];
+
     // --- Komposit ---
     const overallPercent = computeOverallProgress({ materiPercent, nonTkaPercent, tkaCount: tkaTotal });
 
@@ -133,6 +153,11 @@ async function getHasilSummary(req, res) {
         text: (t.status === 'published' ? 'Menghubungkan Wordwall TKA ' : 'Membuat draft TKA ') + t.subject,
         timestamp: t.createdAt,
       })),
+      ...tkaPlayList.map((p) => ({
+        type: 'tka',
+        text: 'Memainkan aktivitas TKA ' + (p.paketSubject || p.paketTitle || ''),
+        timestamp: p.playedAt,
+      })),
     ]
       .filter((a) => a.timestamp)
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
@@ -141,7 +166,16 @@ async function getHasilSummary(req, res) {
       progress: { overall: overallPercent, materi: materiPercent, nonTka: nonTkaPercent },
       materi: { total: materiTotal, completed: materiCompleted, list: materiList },
       nonTka: { totalAttempts, averageScore, highestScore, bySubject, history: hasilList.slice().reverse() },
-      tka: { total: tkaTotal, published: tkaPublished, draft: tkaDraft, list: tkaList },
+      tka: {
+        total: tkaTotal,
+        published: tkaPublished,
+        draft: tkaDraft,
+        list: tkaList,
+        played: tkaPlayedCount,
+        lastPlayedAt: tkaLastPlayed?.playedAt ?? null,
+        lastPlayedSubject: tkaLastPlayed?.paketSubject ?? null,
+        lastPlayedTitle: tkaLastPlayed?.paketTitle ?? null,
+      },
       recentActivity: activity,
     });
   } catch (err) {

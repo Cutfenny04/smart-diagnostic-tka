@@ -33,6 +33,18 @@ export async function savePaket(paket) {
   }).then(handleAuthResponse);
 }
 
+/* Roadmap item #11 (2026-08-22): catat guru yang login membuka aktivitas
+   TKA (untuk stat "dimainkan" di Dashboard Hasil). Sengaja tidak melempar
+   error ke caller kalau gagal -- gagal mencatat statistik tidak boleh
+   menghalangi guru memainkan aktivitasnya. */
+export async function logTkaPlay(id) {
+  const headers = await authHeaders();
+  return fetch(`${API_BASE_URL}/api/paket-soal/${id}/played`, {
+    method: 'POST',
+    headers,
+  }).catch(() => {});
+}
+
 /* Hapus satu paket TKA, lalu resolve dengan daftar paket terbaru -- caller
    langsung render ulang dari hasil ini. */
 export async function deletePaket(id) {
