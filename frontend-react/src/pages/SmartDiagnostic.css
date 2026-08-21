@@ -116,10 +116,6 @@
     }
 }
 
-.diagnostic-stimulus__motif {
-    margin-bottom: var(--space-4);
-}
-
 .diagnostic-stimulus__title {
     font-family: var(--font-headings);
     font-size: var(--text-h2);

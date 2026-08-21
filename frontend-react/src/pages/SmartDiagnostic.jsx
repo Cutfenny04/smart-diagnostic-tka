@@ -3,7 +3,6 @@ import { useSearchParams } from 'react-router-dom';
 import { FlaskConical, GraduationCap, PlayCircle, Gamepad2, Inbox, ArrowLeft, Link2Off, ExternalLink } from 'lucide-react';
 import Layout from '../components/Layout';
 import NonTkaGame from '../components/NonTkaGame';
-import AcehMotifDivider from '../components/AcehMotifDivider';
 import CardCornerFrame from '../components/CardCornerFrame';
 import { fetchPaketSoal } from '../data/bankSoalData';
 import { checkWordwallEmbeddable } from '../data/wordwallData';
@@ -89,7 +88,7 @@ function StimulusView({ item, onBack, onStart }) {
   const isGame = item.type === 'NON_TKA';
   return (
     <div className={'card-light diagnostic-stimulus' + (isGame ? ' diagnostic-stimulus--game' : '')}>
-      {isGame && <AcehMotifDivider className="diagnostic-stimulus__motif" />}
+      {isGame && <CardCornerFrame />}
       {isGame && (
         <img
           className="diagnostic-stimulus__mascot"
