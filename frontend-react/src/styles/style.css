@@ -953,6 +953,38 @@ input:focus-visible,
     grid-column: 1 / -1;
 }
 
+/* ==========================================================================
+   ACEH MOTIF DIVIDER (components/AcehMotifDivider.jsx) — identitas visual
+   permanen perjalanan Non-TKA, dipakai di 4 tempat (SmartDiagnostic.jsx
+   kartu daftar + stimulus, NonTkaGame.jsx papan soal + hasil). Didefinisikan
+   di sini (bukan per-halaman) karena benar-benar dipakai lintas file.
+   Redesign 2026-08-21: ornamen ukiran emas asli di kedua ujung + garis tipis
+   di tengah, menggantikan segitiga SVG polos.
+   ========================================================================== */
+.aceh-motif-divider {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
+}
+
+.aceh-motif-divider__corner {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
+}
+
+.aceh-motif-divider__corner--start {
+    transform: scaleX(-1);
+}
+
+.aceh-motif-divider__line {
+    flex: 1;
+    height: 2px;
+    background: linear-gradient(90deg, transparent 0%, #C9A15C 15%, #C9A15C 85%, transparent 100%);
+}
+
 /* Generic 2-column recommendation grid (Materi, Bank Stimulus, …) */
 .recommended-grid {
     display: grid;

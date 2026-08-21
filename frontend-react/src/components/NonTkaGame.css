@@ -115,19 +115,10 @@
     min-height: 420px;
 }
 
-/* --- Identitas visual Aceh (motif "pucuk rebung") --- */
-.aceh-motif-divider {
-    width: 100%;
-    height: 10px;
-    display: block;
-}
-
-.question-board__motif {
-    color: var(--color-gold);
-}
-
+/* --- Identitas visual Aceh (ornamen ukiran emas, redesign 2026-08-21) ---
+   Definisi lengkap .aceh-motif-divider ada di style.css (shared, dipakai 4
+   tempat termasuk SmartDiagnostic.css) -- di sini cuma spacing per-konteks. */
 .game-result__motif {
-    color: var(--color-gold-deep);
     margin-bottom: var(--space-2);
 }
 

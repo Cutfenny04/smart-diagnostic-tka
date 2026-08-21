@@ -18,15 +18,14 @@
     gap: var(--space-3);
 }
 
-/* --- Identitas "Game Interaktif" untuk paket Non-TKA (motif pucuk rebung
-   dari NonTkaGame.css, dipakai lagi di sini supaya identitasnya menyatu dari
-   kartu -> stimulus -> game) --- */
+/* --- Identitas "Game Interaktif" untuk paket Non-TKA (AcehMotifDivider,
+   dipakai lagi di sini supaya identitasnya menyatu dari kartu -> stimulus
+   -> game -> hasil; definisi CSS-nya di style.css §ACEH MOTIF DIVIDER) --- */
 .diagnostic-card--game {
     padding-top: var(--space-4);
 }
 
 .diagnostic-card__motif {
-    color: var(--color-moss);
     margin-bottom: var(--space-1);
 }
 
@@ -120,7 +119,6 @@
 }
 
 .diagnostic-stimulus__motif {
-    color: var(--color-moss);
     margin-bottom: var(--space-4);
 }
 
