@@ -115,13 +115,6 @@
     min-height: 420px;
 }
 
-/* --- Identitas visual Aceh (ornamen ukiran emas, redesign 2026-08-21) ---
-   Definisi lengkap .aceh-motif-divider ada di style.css (shared, dipakai 4
-   tempat termasuk SmartDiagnostic.css) -- di sini cuma spacing per-konteks. */
-.game-result__motif {
-    margin-bottom: var(--space-2);
-}
-
 .game-panel__aceh-badge {
     display: inline-flex;
     align-items: center;
@@ -370,14 +363,12 @@
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
         grid-template-areas:
-            "motif motif"
             "header header"
             "stimulus question";
         column-gap: var(--space-6);
         row-gap: var(--space-5);
     }
 
-    .question-board__inner--split .question-board__motif { grid-area: motif; }
     .question-board__inner--split .question-board__header { grid-area: header; }
     .question-board__inner--split .question-board__stimulus-col { grid-area: stimulus; }
     .question-board__inner--split .question-board__question-col { grid-area: question; }
@@ -703,6 +694,7 @@
    HASIL AKHIR
    ========================================================================== */
 .game-result {
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;

@@ -39,18 +39,18 @@
     transform: scale(-1, -1);
 }
 
-/* ornamen-horizontal.png di-crop pas ke pola bunganya sendiri (aspect
-   ~5:1) -- tapi itu masih terlalu tinggi (~68px) untuk jadi strip tipis
-   yang muat di atas kartu tanpa menabrak judul, jadi height dikunci lebih
-   pendek dari aspect asli (gambar dipipihkan sedikit secara vertikal,
-   dampak visualnya kecil untuk pola berulang seperti ini). */
+/* Tile berulang, bukan satu gambar diregangkan -- lihat catatan di
+   CardCornerFrame.jsx. background-size: auto 100% menjaga aspect ratio tiap
+   tile (tinggi ikut box, lebar ikut aspect asli), repeat-x mengulang
+   sebanyak perlu mengisi lebar kontainer apa pun. */
 .card-corner-frame__top-strip {
     position: absolute;
     top: 6px;
     left: clamp(36px, 8vw, 52px);
     right: clamp(36px, 8vw, 52px);
-    width: calc(100% - 2 * clamp(36px, 8vw, 52px));
     height: 22px;
-    object-fit: fill;
+    background-repeat: repeat-x;
+    background-size: auto 100%;
+    background-position: center;
     opacity: 0.9;
 }

@@ -8,7 +8,7 @@ import { saveHasil } from '../data/hasilData';
 import { isTuntas } from '../utils/scoring';
 import { useAuth } from '../context/AuthContext';
 import { useGameSounds } from '../hooks/useGameSounds';
-import AcehMotifDivider from './AcehMotifDivider';
+import CardCornerFrame from './CardCornerFrame';
 import './NonTkaGame.css';
 
 /* Game Non-TKA "Ekspedisi Sains Aceh" (Revisi 8 Fase 5, redesign UI
@@ -270,7 +270,7 @@ function ResultView({ answers, total, saveStatus, onRestart, onExit }) {
   return (
     <GameScene background={BG_RESULT} className="game-scene--result" landmark={LANDMARK} mascot={MASCOT_ALT}>
       <div className="game-result">
-        <AcehMotifDivider className="game-result__motif" />
+        <CardCornerFrame />
         <div className="game-result__icon"><Trophy size={32} /></div>
         <span className="game-result__eyebrow">Ekspedisi Selesai</span>
         <h2 className="game-result__title">Sains Aceh</h2>
@@ -406,7 +406,7 @@ function NonTkaGame({ paket, onExit }) {
 
       <div className="question-board">
         <div className={'question-board__inner' + (hasImage ? ' question-board__inner--split' : '')}>
-          <AcehMotifDivider className="question-board__motif" />
+          <CardCornerFrame />
 
           <div className="question-board__header">
             <div className="question-board__eyebrow-wrap">
