@@ -3,6 +3,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Materi from './pages/Materi';
 import DetailMateri from './pages/DetailMateri';
+import PanduanPenggunaan from './pages/PanduanPenggunaan';
 import BankSoal from './pages/BankSoal';
 import DetailSoal from './pages/DetailSoal';
 import SmartDiagnostic from './pages/SmartDiagnostic';
@@ -41,6 +42,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/dashboard" element={protect(<Dashboard />)} />
           <Route path="/materi" element={protect(<Materi />)} />
+          <Route path="/materi/panduan-penggunaan" element={protect(<PanduanPenggunaan />)} />
           <Route path="/materi/:id" element={protect(<DetailMateriRoute />)} />
           <Route path="/bank-soal" element={protect(<BankSoal />)} />
           <Route path="/bank-soal/tka/baru" element={protect(<DetailSoal />)} />

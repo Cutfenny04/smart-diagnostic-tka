@@ -18,6 +18,7 @@ export const dashboardGreeting = {
 };
 
 export const quickAccessItems = [
+  { href: '/materi/panduan-penggunaan', icon: 'file-text', title: 'Panduan Penggunaan', desc: 'Pelajari cara menggunakan Smart Diagnostic dari login hingga hasil pelatihan.' },
   { href: '/materi', icon: 'book-open', title: 'Materi & Modul', desc: 'Video, PDF, dan artikel pelatihan HOTS IPA.' },
   { href: '/bank-soal', icon: 'landmark', title: 'Bank Soal Berbasis Budaya Aceh', desc: 'Jelajahi paket soal budaya Aceh, TKA maupun Non-TKA.' },
   { href: '/smart-diagnostic', icon: 'activity', title: 'Smart Diagnostic', desc: 'Uji kompetensi penyusunan soal HOTS Anda.' },

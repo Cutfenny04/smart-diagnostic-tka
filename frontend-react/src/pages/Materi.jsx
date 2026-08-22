@@ -1,6 +1,6 @@
 import { createElement, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Clock, Layers, PlayCircle, SearchX, Inbox, FileText, Download } from 'lucide-react';
+import { Search, Clock, Layers, PlayCircle, SearchX, Inbox, FileText, Download, BookOpen } from 'lucide-react';
 import Layout from '../components/Layout';
 import FetchError from '../components/FetchError';
 import { fetchMateri, materiCategoryMeta as CATEGORY_META, materiCategoryOrder as CATEGORY_ORDER, computeMateriOverallProgress } from '../data/materiData';
@@ -11,6 +11,7 @@ import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Materi.css';
 
 const GURU_GUIDE_PDF = '/assets/modul/modul-tutorial-wordwall.pdf';
+const PANDUAN_PENGGUNAAN_HALAMAN = 35;
 
 const FILTERS = [
   { value: 'semua', label: 'Semua' },
@@ -110,6 +111,27 @@ function Materi() {
           <p className="page-header__desc">Pelajari seluruh materi penyusunan soal HOTS IPA berbasis budaya Aceh secara bertahap.</p>
         </div>
       </div>
+
+      <section className="dashboard-section card-light guide-module-card getting-started-card" aria-label="Mulai di Sini: Panduan Penggunaan Smart Diagnostic TKA">
+        <div className="guide-module-card__header">
+          <div className="guide-module-card__icon" aria-hidden="true"><BookOpen size={24} /></div>
+          <div className="guide-module-card__text">
+            <span className="getting-started-card__eyebrow">Mulai di Sini</span>
+            <h2 className="section-heading__title">Panduan Penggunaan Smart Diagnostic TKA</h2>
+            <p className="guide-module-card__desc">
+              Belum pernah menggunakan platform ini? Ikuti panduan {PANDUAN_PENGGUNAAN_HALAMAN} halaman ini
+              terlebih dahulu untuk mengenal alur penggunaan mulai dari login, Materi, Wordwall, Bank Soal,
+              Smart Diagnostic, hingga Dashboard Hasil.
+            </p>
+          </div>
+          <div className="getting-started-card__actions">
+            <Link to="/materi/panduan-penggunaan" className="btn btn-primary"><BookOpen size={16} /> Baca Panduan</Link>
+            <a href="/assets/modul/panduan-penggunaan-smart-diagnostic-tka.pdf" download className="btn btn-secondary">
+              <Download size={16} /> Unduh PDF
+            </a>
+          </div>
+        </div>
+      </section>
 
       <section className="dashboard-section card-light guide-module-card" aria-label="Modul Panduan Guru">
         <div className="guide-module-card__header">
