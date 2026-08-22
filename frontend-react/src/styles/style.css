@@ -226,9 +226,13 @@ input:focus-visible,
     font-size: var(--text-body);
     font-weight: 500;
     border-left: 3px solid transparent;
-    white-space: nowrap;
     min-height: 44px;
     transition: var(--transition-fast);
+}
+
+.sidebar__link .sidebar__label {
+    white-space: normal;
+    line-height: 1.25;
 }
 
 .sidebar__link:hover {
