@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { Clock, Layers, CheckCircle2, SearchX } from 'lucide-react';
 import Layout from '../components/Layout';
+import FetchError from '../components/FetchError';
+import InlineError from '../components/InlineError';
 import { fetchMateriById, updateMateriProgress, materiCategoryMeta as CATEGORY_META } from '../data/materiData';
+import { friendlyErrorMessage } from '../services/api';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import { formatDate } from '../utils/formatDate';
@@ -30,14 +33,23 @@ function DetailMateri() {
   const { id } = useParams();
   const [modul, setModul] = useState(undefined); // undefined = loading, null = not found
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+  const [fetchErrorMsg, setFetchErrorMsg] = useState('');
+  const [autoStartError, setAutoStartError] = useState('');
+  const [retryTick, setRetryTick] = useState(0);
   const autoStartedRef = useRef(false);
   const progressBarRef = useRef(null);
 
   // Reset ke loading tiap ganti id ditangani lewat key={id} di App.jsx
   // (remount penuh), bukan setState manual di sini.
   useEffect(() => {
-    fetchMateriById(id).then(setModul);
-  }, [id]);
+    fetchMateriById(id)
+      .then((result) => {
+        setModul(result);
+        setFetchErrorMsg('');
+      })
+      .catch((err) => setFetchErrorMsg(friendlyErrorMessage(err)));
+  }, [id, retryTick]);
 
   // Begitu modul pertama kali dibuka (progress masih 0), otomatis catat
   // sebagai "Sedang Dipelajari" -- ini yang bikin Dashboard/Materi.jsx
@@ -45,16 +57,27 @@ function DetailMateri() {
   useEffect(() => {
     if (!modul || modul.progress > 0 || autoStartedRef.current) return;
     autoStartedRef.current = true;
-    updateMateriProgress(modul.id, STARTED_PROGRESS).then(() => {
-      setModul((prev) => (prev ? { ...prev, progress: STARTED_PROGRESS, startedAt: prev.startedAt || new Date().toISOString() } : prev));
-    });
+    updateMateriProgress(modul.id, STARTED_PROGRESS)
+      .then(() => {
+        setModul((prev) => (prev ? { ...prev, progress: STARTED_PROGRESS, startedAt: prev.startedAt || new Date().toISOString() } : prev));
+      })
+      .catch((err) => {
+        // Kegagalan di sini tidak menghalangi guru membaca materinya (halaman
+        // tetap tampil) -- cukup dikasih tahu progres otomatisnya tidak
+        // tersimpan, bukan disembunyikan diam-diam seperti sebelumnya.
+        autoStartedRef.current = false;
+        setAutoStartError(friendlyErrorMessage(err));
+      });
   }, [modul]);
 
   async function handleTandaiSelesai() {
     setSaving(true);
+    setSaveError('');
     try {
       await updateMateriProgress(modul.id, 100);
       setModul((prev) => (prev ? { ...prev, progress: 100, completedAt: prev.completedAt || new Date().toISOString() } : prev));
+    } catch (err) {
+      setSaveError(friendlyErrorMessage(err));
     } finally {
       setSaving(false);
     }
@@ -72,6 +95,14 @@ function DetailMateri() {
     }
   }, [modul?.progress]);
   useDocumentTitle(modul ? modul.title + ' - Smart Diagnostic TKA' : 'Detail Materi - Smart Diagnostic TKA');
+
+  if (fetchErrorMsg) {
+    return (
+      <Layout breadcrumb={[{ label: 'Materi & Modul Pelatihan', to: '/materi' }, { label: 'Gagal Memuat' }]}>
+        <FetchError message={fetchErrorMsg} onRetry={() => setRetryTick((n) => n + 1)} />
+      </Layout>
+    );
+  }
 
   if (modul === undefined) {
     return (
@@ -133,6 +164,8 @@ function DetailMateri() {
           </p>
         )}
 
+        <InlineError message={autoStartError} />
+
         <div className="form-actions">
           <Link to="/materi" className="btn btn-secondary">Kembali ke Materi</Link>
           {modul.progress < 100 ? (
@@ -143,6 +176,7 @@ function DetailMateri() {
             <Link to="/smart-diagnostic" className="btn btn-primary">{actionLabel(modul)}</Link>
           )}
         </div>
+        <InlineError message={saveError} />
       </div>
     </Layout>
   );

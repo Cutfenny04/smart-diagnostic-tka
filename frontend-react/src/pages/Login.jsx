@@ -1,6 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '../services/supabaseClient';
+import InlineError from '../components/InlineError';
+import { friendlyErrorMessage } from '../services/api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Login.css';
 
@@ -13,6 +15,7 @@ function Login() {
   const [passwordError, setPasswordError] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const canvasRef = useRef(null);
   const navigate = useNavigate();
@@ -263,27 +266,36 @@ function Login() {
     if (!isValid) return;
 
     setIsSubmitting(true);
+    setFormError('');
 
-    // signInWithPassword() tidak throw untuk kredensial salah -- errornya
-    // dikembalikan lewat field `error`, bukan exception (beda dari fetch()
-    // ke /api/auth/login yang lama). Lihat catatan migrasi Auth: NIP dipakai
-    // sebagai password di Supabase Auth, email tetap jadi username.
-    const { error } = await supabase.auth.signInWithPassword({
-      email: emailValue,
-      password: passwordValue,
-    });
+    try {
+      // signInWithPassword() tidak throw untuk kredensial salah -- errornya
+      // dikembalikan lewat field `error`, bukan exception (beda dari fetch()
+      // ke /api/auth/login yang lama). Lihat catatan migrasi Auth: NIP dipakai
+      // sebagai password di Supabase Auth, email tetap jadi username. Tapi
+      // panggilan ini TETAP bisa throw untuk kegagalan lain (network down,
+      // dsb) -- roadmap item #14: dibungkus try/catch supaya tombol tidak
+      // macet diam di "Memverifikasi..." kalau itu terjadi.
+      const { error } = await supabase.auth.signInWithPassword({
+        email: emailValue,
+        password: passwordValue,
+      });
 
-    if (error) {
-      setPasswordError('Email atau password salah.');
+      if (error) {
+        setPasswordError('Email atau password salah.');
+        setIsSubmitting(false);
+        return;
+      }
+
+      // Sesi disimpan & dikelola supabase-js sendiri (lihat AuthContext, Fase
+      // 5) -- tidak perlu lagi menulis token manual ke localStorage di sini.
+      // 'guru' (nama utk sapaan Topbar/Dashboard) juga belum diisi di sini --
+      // itu baru datang dari tabel profiles di Fase 6 (Migrasikan Profile).
+      navigate('/dashboard');
+    } catch (err) {
+      setFormError(friendlyErrorMessage(err));
       setIsSubmitting(false);
-      return;
     }
-
-    // Sesi disimpan & dikelola supabase-js sendiri (lihat AuthContext, Fase
-    // 5) -- tidak perlu lagi menulis token manual ke localStorage di sini.
-    // 'guru' (nama utk sapaan Topbar/Dashboard) juga belum diisi di sini --
-    // itu baru datang dari tabel profiles di Fase 6 (Migrasikan Profile).
-    navigate('/dashboard');
   }
 
   return (
@@ -406,6 +418,8 @@ function Login() {
                     <span className="checkbox-text">Tampilkan password</span>
                   </label>
                 </div>
+
+                <InlineError message={formError} />
 
                 <button
                   type="submit"

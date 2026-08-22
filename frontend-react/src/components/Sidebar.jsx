@@ -27,8 +27,16 @@ function Sidebar({ collapsed, onToggleCollapse }) {
   const { signOut } = useAuth();
 
   async function handleLogout() {
-    await signOut();
-    navigate('/login');
+    // Roadmap item #14: lihat catatan yang sama di Topbar.jsx -- selalu
+    // arahkan ke /login di finally supaya guru tidak macet di halaman lama
+    // kalau signOut() gagal (mis. network).
+    try {
+      await signOut();
+    } catch (err) {
+      console.error('Gagal logout:', err);
+    } finally {
+      navigate('/login');
+    }
   }
 
   return (

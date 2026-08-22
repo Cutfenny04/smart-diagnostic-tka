@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
+const { apiLimiter } = require('./middleware/rateLimit.middleware');
 const materiRoutes = require('./routes/materi.routes');
 const paketSoalRoutes = require('./routes/paketSoal.routes');
 const soalRoutes = require('./routes/soal.routes');
@@ -39,6 +40,11 @@ app.use(express.json()); // supaya bisa baca req.body dalam format JSON
 app.get('/', (req, res) => {
   res.send('Backend Platform Pelatihan Guru aktif 🚀');
 });
+
+// Roadmap item #16: lapisan pertahanan umum untuk seluruh /api/* -- limiter
+// yang lebih ketat untuk endpoint tulis tertentu (paket-soal, hasil-diagnostik)
+// dipasang terpisah di masing-masing file route-nya.
+app.use('/api', apiLimiter);
 
 app.use('/api/materi', materiRoutes);
 

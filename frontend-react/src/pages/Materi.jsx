@@ -1,8 +1,10 @@
 import { createElement, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Clock, Layers, PlayCircle, SearchX, FileText, Download } from 'lucide-react';
+import { Search, Clock, Layers, PlayCircle, SearchX, Inbox, FileText, Download } from 'lucide-react';
 import Layout from '../components/Layout';
+import FetchError from '../components/FetchError';
 import { fetchMateri, materiCategoryMeta as CATEGORY_META, materiCategoryOrder as CATEGORY_ORDER, computeMateriOverallProgress } from '../data/materiData';
+import { friendlyErrorMessage } from '../services/api';
 import { getIcon } from '../utils/icon';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
@@ -66,13 +68,20 @@ function ModuleCard({ m }) {
 
 function Materi() {
   const [modules, setModules] = useState(null);
+  const [fetchErrorMsg, setFetchErrorMsg] = useState('');
+  const [retryTick, setRetryTick] = useState(0);
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('semua');
   const [sort, setSort] = useState('terbaru');
 
   useEffect(() => {
-    fetchMateri().then(setModules);
-  }, []);
+    fetchMateri()
+      .then((result) => {
+        setModules(result);
+        setFetchErrorMsg('');
+      })
+      .catch((err) => setFetchErrorMsg(friendlyErrorMessage(err)));
+  }, [retryTick]);
 
   useProgressBarAnimation(Boolean(modules));
   useDocumentTitle('Materi & Modul Pelatihan - Smart Diagnostic TKA');
@@ -193,7 +202,9 @@ function Materi() {
         </div>
       </section>
 
-      {!modules && (
+      {fetchErrorMsg && <FetchError message={fetchErrorMsg} onRetry={() => setRetryTick((n) => n + 1)} />}
+
+      {!modules && !fetchErrorMsg && (
         <div className="module-grid">
           {Array.from({ length: 6 }, (_, i) => (
             <div className="card-light module-card" key={i}>
@@ -211,11 +222,19 @@ function Materi() {
 
       {modules && filtered.length === 0 && (
         <div className="card-light">
-          <div className="empty-state">
-            <div className="empty-state__icon"><SearchX size={28} /></div>
-            <h3 className="empty-state__title">Materi tidak ditemukan</h3>
-            <p className="empty-state__desc">Coba ubah kata kunci pencarian atau pilih filter status lain.</p>
-          </div>
+          {isFilteringActive ? (
+            <div className="empty-state">
+              <div className="empty-state__icon"><SearchX size={28} /></div>
+              <h3 className="empty-state__title">Materi tidak ditemukan</h3>
+              <p className="empty-state__desc">Coba ubah kata kunci pencarian atau pilih filter status lain.</p>
+            </div>
+          ) : (
+            <div className="empty-state">
+              <div className="empty-state__icon"><Inbox size={28} /></div>
+              <h3 className="empty-state__title">Belum ada materi tersedia</h3>
+              <p className="empty-state__desc">Materi & modul pelatihan akan muncul di sini begitu tersedia.</p>
+            </div>
+          )}
         </div>
       )}
 

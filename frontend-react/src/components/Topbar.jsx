@@ -36,8 +36,18 @@ function Topbar({ onOpenDrawer }) {
   }, []);
 
   async function handleLogout() {
-    await signOut();
-    navigate('/login');
+    // Roadmap item #14: signOut() bisa throw (mis. network gagal menghubungi
+    // Supabase) -- sebelumnya kalau itu terjadi, navigate() tidak pernah
+    // jalan dan guru klik "Keluar" tanpa efek apa pun tanpa penjelasan.
+    // Selalu arahkan ke /login di finally supaya guru tidak pernah macet di
+    // halaman lama, baik signOut berhasil maupun gagal.
+    try {
+      await signOut();
+    } catch (err) {
+      console.error('Gagal logout:', err);
+    } finally {
+      navigate('/login');
+    }
   }
 
   return (

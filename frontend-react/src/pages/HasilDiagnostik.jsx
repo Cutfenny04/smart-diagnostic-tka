@@ -1,7 +1,10 @@
 import { createElement, useEffect, useMemo, useState } from 'react';
-import { BarChart3, Puzzle } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { BarChart3, Puzzle, Activity } from 'lucide-react';
 import Layout from '../components/Layout';
+import FetchError from '../components/FetchError';
 import { fetchDashboardHasil } from '../data/dashboardHasilData';
+import { friendlyErrorMessage } from '../services/api';
 import { getIcon } from '../utils/icon';
 import { isTuntas } from '../utils/scoring';
 import { formatDate } from '../utils/formatDate';
@@ -121,14 +124,21 @@ function TrendChart({ history }) {
 
 function HasilDiagnostik() {
   const [data, setData] = useState(null);
+  const [fetchErrorMsg, setFetchErrorMsg] = useState('');
+  const [retryTick, setRetryTick] = useState(0);
   const [activityFilter, setActivityFilter] = useState('semua');
   const [rangeFilter, setRangeFilter] = useState('semua');
 
   useDocumentTitle('Dashboard Hasil - Smart Diagnostic TKA');
 
   useEffect(() => {
-    fetchDashboardHasil().then(setData);
-  }, []);
+    fetchDashboardHasil()
+      .then((result) => {
+        setData(result);
+        setFetchErrorMsg('');
+      })
+      .catch((err) => setFetchErrorMsg(friendlyErrorMessage(err)));
+  }, [retryTick]);
 
   useProgressBarAnimation(Boolean(data));
 
@@ -160,6 +170,9 @@ function HasilDiagnostik() {
         </div>
       </div>
 
+      {fetchErrorMsg && <FetchError message={fetchErrorMsg} onRetry={() => setRetryTick((n) => n + 1)} />}
+
+      {!fetchErrorMsg && (
       <section className="catalog-controls card-light hasil-filters" aria-label="Saring Aktivitas">
         <div className="catalog-sort">
           <label htmlFor="hasilActivityFilter" className="catalog-sort__label">Aktivitas</label>
@@ -174,7 +187,9 @@ function HasilDiagnostik() {
           </select>
         </div>
       </section>
+      )}
 
+      {!fetchErrorMsg && (
       <section className="dashboard-section" aria-label="Ringkasan Progress">
         <div className="kpi-grid">
           {data ? (
@@ -194,6 +209,7 @@ function HasilDiagnostik() {
           )}
         </div>
       </section>
+      )}
 
       {data && !hasAnyActivity && (
         <div className="card-light">
@@ -218,15 +234,19 @@ function HasilDiagnostik() {
               </p>
             </div>
 
-            <ul className="hasil-checklist" aria-label="Checklist materi">
-              {data.materi.list.map((m) => (
-                <li className={'hasil-checklist__item' + (m.status === 'selesai' ? ' is-done' : '')} key={m.id}>
-                  <span className="hasil-checklist__icon" aria-hidden="true">{materiStatusIcon(m.status)}</span>
-                  <span className="hasil-checklist__title">{m.title}</span>
-                  <span className="hasil-checklist__status">{materiStatusLabel(m.status)}</span>
-                </li>
-              ))}
-            </ul>
+            {data.materi.list.length === 0 ? (
+              <p className="hasil-tka__desc">Belum ada materi tersedia.</p>
+            ) : (
+              <ul className="hasil-checklist" aria-label="Checklist materi">
+                {data.materi.list.map((m) => (
+                  <li className={'hasil-checklist__item' + (m.status === 'selesai' ? ' is-done' : '')} key={m.id}>
+                    <span className="hasil-checklist__icon" aria-hidden="true">{materiStatusIcon(m.status)}</span>
+                    <span className="hasil-checklist__title">{m.title}</span>
+                    <span className="hasil-checklist__status">{materiStatusLabel(m.status)}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
           </section>
 
           <section className="dashboard-section card-light" aria-label="Performa Latihan Non-TKA">
@@ -237,50 +257,65 @@ function HasilDiagnostik() {
               <StatCard icon="award" label="Nilai Tertinggi" value={data.nonTka.highestScore} unit="" />
             </div>
 
-            <h3 className="hasil-subheading">Perkembangan Nilai</h3>
-            <TrendChart history={chartHistory} />
-
-            {data.nonTka.bySubject.length > 0 && (
+            {data.nonTka.totalAttempts === 0 ? (
+              // Roadmap item #15: sebelumnya bagian tren/per-mapel/riwayat di
+              // bawah ini cuma diam-diam hilang tanpa penjelasan kalau guru
+              // belum pernah mengerjakan Non-TKA -- persis skenario contoh
+              // user ("belum ada hasil latihan"). Satu empty-state kohesif
+              // dengan CTA, menggantikan 3 bagian yang tadinya masing-masing
+              // hilang sendiri-sendiri tanpa pesan.
+              <div className="empty-state empty-state--compact">
+                <div className="empty-state__icon"><Activity size={22} /></div>
+                <h3 className="empty-state__title">Belum ada hasil latihan</h3>
+                <p className="empty-state__desc">Mulai latihan Non-TKA untuk melihat perkembangan Anda di sini.</p>
+                <Link to="/smart-diagnostic" className="btn btn-primary">Mulai Latihan Non-TKA</Link>
+              </div>
+            ) : (
               <>
-                <h3 className="hasil-subheading">Performa per Mata Pelajaran</h3>
-                <div className="hasil-subject-bars">
-                  {data.nonTka.bySubject.map((s) => (
-                    <div className="hasil-subject-bars__row" key={s.subject}>
-                      <div className="hasil-subject-bars__label">
-                        <span>{s.subject}</span>
-                        <span>{s.average} ({s.attempts}x)</span>
-                      </div>
-                      <div className="progress-bar" role="progressbar" aria-valuenow={s.average} aria-valuemin="0" aria-valuemax="100" aria-label={'Rata-rata ' + s.subject}>
-                        <div className="progress-bar__fill" data-progress={s.average} />
-                      </div>
+                <h3 className="hasil-subheading">Perkembangan Nilai</h3>
+                <TrendChart history={chartHistory} />
+
+                {data.nonTka.bySubject.length > 0 && (
+                  <>
+                    <h3 className="hasil-subheading">Performa per Mata Pelajaran</h3>
+                    <div className="hasil-subject-bars">
+                      {data.nonTka.bySubject.map((s) => (
+                        <div className="hasil-subject-bars__row" key={s.subject}>
+                          <div className="hasil-subject-bars__label">
+                            <span>{s.subject}</span>
+                            <span>{s.average} ({s.attempts}x)</span>
+                          </div>
+                          <div className="progress-bar" role="progressbar" aria-valuenow={s.average} aria-valuemin="0" aria-valuemax="100" aria-label={'Rata-rata ' + s.subject}>
+                            <div className="progress-bar__fill" data-progress={s.average} />
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </>
+                )}
+
+                <div className="data-table-wrapper">
+                  <p className="hasil-tka__desc">Kolom "Kualitas Sesi" menandai latihan yang diselesaikan sangat cepat -- sekadar indikator untuk ditinjau sendiri, bukan penilaian sah/tidak sah, dan tidak memengaruhi Rata-rata Nilai atau Nilai Tertinggi di atas.</p>
+                  <table className="data-table">
+                    <thead>
+                      <tr><th>Paket</th><th>Mapel</th><th>Benar</th><th>Nilai</th><th>Tanggal</th><th>Status</th><th>Kualitas Sesi</th></tr>
+                    </thead>
+                    <tbody>
+                      {data.nonTka.history.map((h) => (
+                        <tr key={h.id}>
+                          <td>{truncate(h.paketTitle, 40)}</td>
+                          <td>{h.paketSubject || '-'}</td>
+                          <td>{h.correctCount} / {h.totalQuestions}</td>
+                          <td>{h.score}</td>
+                          <td>{formatDate(h.completedAt)}</td>
+                          <td><span className={'badge ' + (isTuntas(h.score) ? 'badge--selesai' : 'badge--belum')}>{isTuntas(h.score) ? 'Tuntas' : 'Belum Tuntas'}</span></td>
+                          <td><span className={'badge ' + SESSION_QUALITY_BADGE[h.sessionQuality]}>{SESSION_QUALITY_LABEL[h.sessionQuality]}</span></td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
                 </div>
               </>
-            )}
-
-            {data.nonTka.history.length > 0 && (
-              <div className="data-table-wrapper">
-                <p className="hasil-tka__desc">Kolom "Kualitas Sesi" menandai latihan yang diselesaikan sangat cepat -- sekadar indikator untuk ditinjau sendiri, bukan penilaian sah/tidak sah, dan tidak memengaruhi Rata-rata Nilai atau Nilai Tertinggi di atas.</p>
-                <table className="data-table">
-                  <thead>
-                    <tr><th>Paket</th><th>Mapel</th><th>Benar</th><th>Nilai</th><th>Tanggal</th><th>Status</th><th>Kualitas Sesi</th></tr>
-                  </thead>
-                  <tbody>
-                    {data.nonTka.history.map((h) => (
-                      <tr key={h.id}>
-                        <td>{truncate(h.paketTitle, 40)}</td>
-                        <td>{h.paketSubject || '-'}</td>
-                        <td>{h.correctCount} / {h.totalQuestions}</td>
-                        <td>{h.score}</td>
-                        <td>{formatDate(h.completedAt)}</td>
-                        <td><span className={'badge ' + (isTuntas(h.score) ? 'badge--selesai' : 'badge--belum')}>{isTuntas(h.score) ? 'Tuntas' : 'Belum Tuntas'}</span></td>
-                        <td><span className={'badge ' + SESSION_QUALITY_BADGE[h.sessionQuality]}>{SESSION_QUALITY_LABEL[h.sessionQuality]}</span></td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
             )}
           </section>
 

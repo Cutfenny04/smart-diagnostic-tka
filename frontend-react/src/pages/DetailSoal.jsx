@@ -3,8 +3,10 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Save } from 'lucide-react';
 import Layout from '../components/Layout';
 import WordwallGuide from '../components/WordwallGuide';
+import InlineError from '../components/InlineError';
 import { fetchPaketById, savePaket } from '../data/bankSoalData';
 import { checkWordwallEmbeddable } from '../data/wordwallData';
+import { friendlyErrorMessage } from '../services/api';
 import { isWordwallUrl } from '../utils/wordwallStage';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './DetailSoal.css';
@@ -27,6 +29,7 @@ function DetailSoal() {
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(isEditMode);
   const [saving, setSaving] = useState(false);
+  const [submitError, setSubmitError] = useState('');
   // Tahap 6 roadmap item #5: validasi URL Wordwall otomatis begitu guru
   // selesai mengetik/tempel link-nya (bukan cuma pas main di Smart
   // Diagnostic seperti sebelumnya). Ini murni informasional -- link yang
@@ -130,12 +133,18 @@ function DetailSoal() {
     if (!values) return;
 
     setSaving(true);
+    setSubmitError('');
     const paket = isEditMode
       ? { id, ...values, wordwallUrl: values.wordwallUrl || null }
       : { ...values, wordwallUrl: values.wordwallUrl || null };
 
-    await savePaket(paket);
-    navigate('/bank-soal');
+    try {
+      await savePaket(paket);
+      navigate('/bank-soal');
+    } catch (err) {
+      setSubmitError(friendlyErrorMessage(err));
+      setSaving(false);
+    }
   }
 
   const breadcrumb = [{ label: 'Bank Soal Berbasis Budaya Aceh', to: '/bank-soal' }, { label: heading }];
@@ -245,6 +254,8 @@ function DetailSoal() {
             </select>
             <span className="form-field__hint">Paket Published akan tampil sebagai pilihan di Smart Diagnostic.</span>
           </div>
+
+          <InlineError message={submitError} />
 
           <div className="form-actions">
             <Link to="/bank-soal" className="btn btn-secondary">Batal</Link>

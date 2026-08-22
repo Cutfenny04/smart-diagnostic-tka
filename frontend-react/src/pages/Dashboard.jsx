@@ -4,7 +4,9 @@ import { PlayCircle, Activity } from 'lucide-react';
 import Layout from '../components/Layout';
 import TrainingFlow from '../components/TrainingFlow';
 import ResumeCard from '../components/ResumeCard';
+import FetchError from '../components/FetchError';
 import { fetchDashboardData } from '../data/dashboardData';
+import { friendlyErrorMessage } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { getIcon } from '../utils/icon';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
@@ -85,21 +87,28 @@ function LearningProgressItem({ item }) {
 
 function Dashboard() {
   const [data, setData] = useState(null);
+  const [fetchErrorMsg, setFetchErrorMsg] = useState('');
+  const [retryTick, setRetryTick] = useState(0);
   const { user, profile } = useAuth();
   const userId = user?.id;
 
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
-    fetchDashboardData().then((result) => {
-      if (cancelled) return;
-      if (profile) result.greeting.name = profile.nama;
-      setData(result);
-    });
+    fetchDashboardData()
+      .then((result) => {
+        if (cancelled) return;
+        if (profile) result.greeting.name = profile.nama;
+        setData(result);
+        setFetchErrorMsg('');
+      })
+      .catch((err) => {
+        if (!cancelled) setFetchErrorMsg(friendlyErrorMessage(err));
+      });
     return () => {
       cancelled = true;
     };
-  }, [userId, profile]);
+  }, [userId, profile, retryTick]);
 
   useProgressBarAnimation(Boolean(data));
   useDocumentTitle('Dashboard - Smart Diagnostic TKA');
@@ -126,21 +135,27 @@ function Dashboard() {
         </div>
       </section>
 
-      {data && <TrainingFlow stages={data.trainingFlow} currentStage={data.currentStage} />}
+      {fetchErrorMsg && <FetchError message={fetchErrorMsg} onRetry={() => setRetryTick((n) => n + 1)} />}
 
-      <section className="dashboard-section" aria-label="Statistik Ringkas">
-        <div className="kpi-grid">
-          {data
-            ? data.stats.map((stat) => <StatCard key={stat.id} stat={stat} />)
-            : Array.from({ length: 4 }, (_, i) => (
-                <div className="card-stat" key={i}>
-                  <div className="skeleton skeleton--text" style={{ width: '50%' }} />
-                  <div className="skeleton skeleton--title" />
-                </div>
-              ))}
-        </div>
-      </section>
+      {!fetchErrorMsg && data && <TrainingFlow stages={data.trainingFlow} currentStage={data.currentStage} />}
 
+      {!fetchErrorMsg && (
+        <section className="dashboard-section" aria-label="Statistik Ringkas">
+          <div className="kpi-grid">
+            {data
+              ? data.stats.map((stat) => <StatCard key={stat.id} stat={stat} />)
+              : Array.from({ length: 4 }, (_, i) => (
+                  <div className="card-stat" key={i}>
+                    <div className="skeleton skeleton--text" style={{ width: '50%' }} />
+                    <div className="skeleton skeleton--title" />
+                  </div>
+                ))}
+          </div>
+        </section>
+      )}
+
+      {!fetchErrorMsg && (
+      <>
       <section className="dashboard-section" aria-label="Akses Cepat">
         <div className="section-heading">
           <h2 className="section-heading__title">Akses Cepat</h2>
@@ -190,6 +205,8 @@ function Dashboard() {
           </section>
         </div>
       </div>
+      </>
+      )}
     </Layout>
   );
 }

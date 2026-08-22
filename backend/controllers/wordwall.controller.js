@@ -1,4 +1,6 @@
+const dns = require('dns').promises;
 const { isWordwallUrl } = require('../utils/wordwallUrl');
+const { isPrivateIp } = require('../utils/ssrfGuard');
 
 // Cek apakah sebuah URL Wordwall bisa di-embed lewat <iframe> di website ini.
 // Beberapa jenis link Wordwall (mis. /resource/...) mengirim header
@@ -28,10 +30,30 @@ const FETCH_TIMEOUT_MS = 6000;
 // menggantung tanpa batas kalau wordwall.net tidak merespons) -- pakai
 // AbortController per hop, bukan satu timer global, supaya beberapa hop
 // lambat tidak saling "mencuri" sisa waktu satu sama lain secara aneh.
+// Resolve hostname lalu tolak kalau salah satu alamat hasil lookup termasuk
+// rentang privat/internal -- lihat catatan batasan (TOCTOU) di ssrfGuard.js.
+async function assertPublicHostname(hostname) {
+  let addresses;
+  try {
+    addresses = await dns.lookup(hostname, { all: true });
+  } catch (err) {
+    const wrapped = new Error('Gagal me-resolve hostname: ' + hostname);
+    wrapped.code = 'DNS_LOOKUP_FAILED';
+    throw wrapped;
+  }
+  if (addresses.some((a) => isPrivateIp(a.address))) {
+    const err = new Error('Hostname resolve ke alamat internal, ditolak');
+    err.code = 'INTERNAL_IP_BLOCKED';
+    throw err;
+  }
+}
+
 async function fetchWithValidatedRedirects(startUrl) {
   let currentUrl = startUrl;
 
   for (let hop = 0; hop <= MAX_REDIRECTS; hop++) {
+    await assertPublicHostname(new URL(currentUrl).hostname);
+
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS);
     let response;
@@ -82,7 +104,7 @@ async function checkEmbeddable(req, res) {
     try {
       response = await fetchWithValidatedRedirects(url);
     } catch (err) {
-      if (err.code === 'REDIRECT_OFF_HOST' || err.code === 'TOO_MANY_REDIRECTS') {
+      if (err.code === 'REDIRECT_OFF_HOST' || err.code === 'TOO_MANY_REDIRECTS' || err.code === 'INTERNAL_IP_BLOCKED') {
         // Sinyal nyata (bukan sekadar network hiccup) -- gagal aman: anggap
         // tidak bisa di-embed, biar frontend tampilkan fallback "Buka di
         // Wordwall" alih-alih mengikuti redirect yang mencurigakan.

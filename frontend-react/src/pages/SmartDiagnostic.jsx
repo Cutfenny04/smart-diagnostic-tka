@@ -4,8 +4,10 @@ import { FlaskConical, GraduationCap, PlayCircle, Gamepad2, Inbox, ArrowLeft, Li
 import Layout from '../components/Layout';
 import NonTkaGame from '../components/NonTkaGame';
 import CardCornerFrame from '../components/CardCornerFrame';
+import FetchError from '../components/FetchError';
 import { fetchPaketSoal, logTkaPlay } from '../data/bankSoalData';
 import { checkWordwallEmbeddable } from '../data/wordwallData';
+import { friendlyErrorMessage } from '../services/api';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './SmartDiagnostic.css';
 
@@ -196,29 +198,34 @@ function EmbedView({ item, onBack }) {
 function SmartDiagnostic() {
   const [searchParams] = useSearchParams();
   const [publishedPaket, setPublishedPaket] = useState(null);
+  const [fetchErrorMsg, setFetchErrorMsg] = useState('');
+  const [retryTick, setRetryTick] = useState(0);
   const [view, setView] = useState('list');
   const [selectedPaket, setSelectedPaket] = useState(null);
 
   useDocumentTitle('Smart Diagnostic - Smart Diagnostic TKA');
 
   useEffect(() => {
-    fetchPaketSoal().then((allPaket) => {
-      const published = allPaket.filter((p) => p.status === 'published');
-      setPublishedPaket(published);
+    fetchPaketSoal()
+      .then((allPaket) => {
+        const published = allPaket.filter((p) => p.status === 'published');
+        setPublishedPaket(published);
+        setFetchErrorMsg('');
 
-      // Direct-link support: bank-soal.html/BankSoal.jsx menaut ke sini sebagai
-      // /smart-diagnostic?paket=<id> untuk paket Published. Selalu mendarat di
-      // view Stimulus, tidak pernah langsung ke iframe. Id tidak dikenal atau
-      // bukan Published diam-diam jatuh ke daftar.
-      const paketId = searchParams.get('paket');
-      const target = paketId && published.find((p) => String(p.id) === String(paketId));
-      if (target) {
-        setSelectedPaket(target);
-        setView('stimulus');
-      }
-    });
+        // Direct-link support: bank-soal.html/BankSoal.jsx menaut ke sini sebagai
+        // /smart-diagnostic?paket=<id> untuk paket Published. Selalu mendarat di
+        // view Stimulus, tidak pernah langsung ke iframe. Id tidak dikenal atau
+        // bukan Published diam-diam jatuh ke daftar.
+        const paketId = searchParams.get('paket');
+        const target = paketId && published.find((p) => String(p.id) === String(paketId));
+        if (target) {
+          setSelectedPaket(target);
+          setView('stimulus');
+        }
+      })
+      .catch((err) => setFetchErrorMsg(friendlyErrorMessage(err)));
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [retryTick]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -240,7 +247,11 @@ function SmartDiagnostic() {
         </div>
       </div>
 
-      {view === 'list' && (
+      {view === 'list' && fetchErrorMsg && (
+        <FetchError message={fetchErrorMsg} onRetry={() => setRetryTick((n) => n + 1)} />
+      )}
+
+      {view === 'list' && !fetchErrorMsg && (
         publishedPaket === null ? (
           <div className="diagnostic-grid">
             {Array.from({ length: 3 }, (_, i) => (

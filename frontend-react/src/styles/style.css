@@ -846,6 +846,11 @@ input:focus-visible,
     height: 28px;
 }
 
+.empty-state__icon--danger {
+    background: rgba(255, 82, 82, 0.12);
+    color: var(--color-danger);
+}
+
 .empty-state__title {
     font-family: var(--font-headings);
     font-size: var(--text-h3);
@@ -1282,6 +1287,25 @@ input:focus-visible,
     margin-top: var(--space-6);
     padding-top: var(--space-5);
     border-top: 1px solid var(--border-on-light);
+}
+
+/* Roadmap item #14 (2026-08-22): banner error generik untuk write/destructive
+   action (save, delete, login, logout) -- lihat components/InlineError.jsx. */
+.inline-error {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    background: rgba(255, 82, 82, 0.08);
+    border: 1px solid var(--color-danger);
+    border-radius: var(--radius-md);
+    padding: var(--space-3) var(--space-4);
+    color: var(--color-danger);
+    font-size: var(--text-small);
+    margin-top: var(--space-4);
+}
+
+.inline-error svg {
+    flex-shrink: 0;
 }
 
 /* ==========================================================================

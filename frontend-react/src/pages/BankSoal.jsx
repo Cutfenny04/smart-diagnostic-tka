@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
-  PlusCircle, Search, SearchX, FlaskConical, GraduationCap,
+  PlusCircle, Search, SearchX, Inbox, FlaskConical, GraduationCap,
   MousePointerClick, Pencil, PlayCircle, Trash2, X,
 } from 'lucide-react';
 import Layout from '../components/Layout';
 import WordwallStageChecklist from '../components/WordwallStageChecklist';
+import FetchError from '../components/FetchError';
+import InlineError from '../components/InlineError';
 import { fetchPaketSoal, deletePaket } from '../data/bankSoalData';
+import { friendlyErrorMessage } from '../services/api';
 import { getIcon } from '../utils/icon';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './BankSoal.css';
@@ -188,11 +191,23 @@ function BankSoal() {
   const [selectedId, setSelectedId] = useState(null);
   const [mobilePreviewOpen, setMobilePreviewOpen] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+  const [fetchErrorMsg, setFetchErrorMsg] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState('');
 
   useDocumentTitle('Bank Soal Berbasis Budaya Aceh - Smart Diagnostic TKA');
 
+  function loadPaket() {
+    fetchPaketSoal()
+      .then((result) => {
+        setAllPaket(result);
+        setFetchErrorMsg('');
+      })
+      .catch((err) => setFetchErrorMsg(friendlyErrorMessage(err)));
+  }
+
   useEffect(() => {
-    fetchPaketSoal().then(setAllPaket);
+    loadPaket();
   }, []);
 
   useEffect(() => {
@@ -210,13 +225,32 @@ function BankSoal() {
     setMobilePreviewOpen(true);
   }
 
-  async function confirmDelete() {
-    const updated = await deletePaket(deleteTarget.id);
-    setAllPaket(updated);
-    setDeleteTarget(null);
-    setMobilePreviewOpen(false);
-    setSelectedId(null);
+  function requestDelete(item) {
+    setDeleteError('');
+    setDeleteTarget(item);
   }
+
+  async function confirmDelete() {
+    setDeleting(true);
+    setDeleteError('');
+    try {
+      const updated = await deletePaket(deleteTarget.id);
+      setAllPaket(updated);
+      setDeleteTarget(null);
+      setMobilePreviewOpen(false);
+      setSelectedId(null);
+    } catch (err) {
+      setDeleteError(friendlyErrorMessage(err));
+    } finally {
+      setDeleting(false);
+    }
+  }
+
+  // Roadmap item #15: dipakai buat bedakan pesan "tidak ketemu karena dicari/
+  // disaring" vs "memang belum ada paket sama sekali" -- sebelumnya cuma ada
+  // satu pesan generik untuk kedua kasus.
+  const isFilteringActive = query.trim() !== '' || activeTab !== 'semua'
+    || filters.status !== 'semua' || filters.hotsLevel !== 'semua' || filters.subject !== 'semua';
 
   let filtered = [];
   if (allPaket) {
@@ -281,7 +315,7 @@ function BankSoal() {
                   </div>
                 );
               })
-            : Array.from({ length: 4 }, (_, i) => (
+            : !fetchErrorMsg && Array.from({ length: 4 }, (_, i) => (
                 <div className="card-stat" key={i}>
                   <div className="skeleton skeleton--text" style={{ width: '50%' }} />
                   <div className="skeleton skeleton--title" />
@@ -342,7 +376,9 @@ function BankSoal() {
       <div className="catalog-layout">
         <div className="soal-main">
           <div className="soal-list">
-            {!allPaket && Array.from({ length: 5 }, (_, i) => (
+            {!allPaket && fetchErrorMsg && <FetchError message={fetchErrorMsg} onRetry={loadPaket} />}
+
+            {!allPaket && !fetchErrorMsg && Array.from({ length: 5 }, (_, i) => (
               <div className="card-light soal-card" key={i}>
                 <div className="skeleton skeleton--text" style={{ width: '50%' }} />
                 <div className="skeleton skeleton--title" />
@@ -352,11 +388,19 @@ function BankSoal() {
 
             {allPaket && filtered.length === 0 && (
               <div className="card-light">
-                <div className="empty-state">
-                  <div className="empty-state__icon"><SearchX size={28} /></div>
-                  <h3 className="empty-state__title">Paket soal tidak ditemukan</h3>
-                  <p className="empty-state__desc">Coba ubah kata kunci pencarian atau pilih filter lain.</p>
-                </div>
+                {isFilteringActive ? (
+                  <div className="empty-state">
+                    <div className="empty-state__icon"><SearchX size={28} /></div>
+                    <h3 className="empty-state__title">Paket soal tidak ditemukan</h3>
+                    <p className="empty-state__desc">Coba ubah kata kunci pencarian atau pilih filter lain.</p>
+                  </div>
+                ) : (
+                  <div className="empty-state">
+                    <div className="empty-state__icon"><Inbox size={28} /></div>
+                    <h3 className="empty-state__title">Belum ada paket soal</h3>
+                    <p className="empty-state__desc">Tambahkan paket TKA pertama Anda lewat tombol "Tambah Paket TKA" di atas.</p>
+                  </div>
+                )}
               </div>
             )}
 
@@ -380,7 +424,7 @@ function BankSoal() {
         </div>
 
         <aside className={'soal-preview preview-panel card-light' + (mobilePreviewOpen ? ' is-open' : '')} aria-label="Pratinjau Paket Soal">
-          <PreviewPanel item={selectedItem} onClose={() => setMobilePreviewOpen(false)} onDeleteRequest={setDeleteTarget} />
+          <PreviewPanel item={selectedItem} onClose={() => setMobilePreviewOpen(false)} onDeleteRequest={requestDelete} />
         </aside>
       </div>
       <div className={'preview-panel-backdrop' + (mobilePreviewOpen ? ' is-open' : '')} onClick={() => setMobilePreviewOpen(false)} />
@@ -391,9 +435,10 @@ function BankSoal() {
           <p className="confirm-modal__desc">
             {deleteTarget ? `Paket "${deleteTarget.title}" akan dihapus secara permanen dan tidak dapat dikembalikan.` : ''}
           </p>
+          <InlineError message={deleteError} />
           <div className="confirm-modal__actions">
-            <button type="button" className="btn btn-secondary" onClick={() => setDeleteTarget(null)}>Batal</button>
-            <button type="button" className="btn btn-danger" onClick={confirmDelete}>Ya, Hapus</button>
+            <button type="button" className="btn btn-secondary" onClick={() => setDeleteTarget(null)} disabled={deleting}>Batal</button>
+            <button type="button" className="btn btn-danger" onClick={confirmDelete} disabled={deleting}>{deleting ? 'Menghapus...' : 'Ya, Hapus'}</button>
           </div>
         </div>
       </div>

@@ -24,6 +24,20 @@ export async function authHeaders() {
   };
 }
 
+/* Roadmap item #14 (2026-08-22): fetch() yang gagal terhubung sama sekali
+   (server mati, tidak ada internet) reject dengan pesan mentah browser
+   ("Failed to fetch", "NetworkError when attempting to fetch resource.",
+   dst) -- tidak informatif untuk guru. Diterjemahkan di satu tempat supaya
+   semua try/catch di halaman-halaman lain cukup panggil ini, bukan
+   menampilkan pesan teknis browser apa adanya. */
+export function friendlyErrorMessage(err) {
+  const raw = err?.message || '';
+  if (/Failed to fetch|NetworkError|Load failed/i.test(raw)) {
+    return 'Tidak dapat terhubung ke server. Periksa koneksi internet Anda dan coba lagi.';
+  }
+  return raw || 'Terjadi kesalahan. Silakan coba lagi.';
+}
+
 /* Dipakai setelah fetch() ke endpoint yang butuh login. Kalau token sudah
    tidak valid/kadaluarsa (401/403), sign-out sesi Supabase yang mungkin
    sudah rusak lalu lempar ke halaman login -- dipakai bersama oleh semua
