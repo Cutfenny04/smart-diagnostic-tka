@@ -41,6 +41,7 @@ function WordwallGuide() {
         ))}
       </ol>
       <div className="wordwall-guide__links">
+        <Link to="/materi/panduan-penggunaan" className="wordwall-guide__link">Baca Panduan Penggunaan (Bab 4–5: Wordwall &amp; TKA)</Link>
         <Link to="/materi" className="wordwall-guide__link">Baca Modul Panduan Wordwall</Link>
         <a href="https://wordwall.net" target="_blank" rel="noopener noreferrer" className="wordwall-guide__link">
           Buka Wordwall.net <ExternalLink size={13} />

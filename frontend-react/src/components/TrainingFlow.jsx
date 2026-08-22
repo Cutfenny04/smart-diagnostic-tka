@@ -54,8 +54,8 @@ function TrainingFlow({ stages, currentStage }) {
       <div className="section-heading">
         <h2 className="section-heading__title">Alur Pelatihan Anda</h2>
         <p className="training-flow__desc">
-          Ikuti langkah berikut dari awal sampai akhir: pelajari materi, buat dan daftarkan aktivitas Wordwall (TKA),
-          kerjakan latihan Smart Diagnostic (Non-TKA), lalu pantau progress Anda.
+          Ikuti langkah berikut dari awal sampai akhir: baca panduan penggunaan dan pelajari materi, buat dan
+          daftarkan aktivitas Wordwall (TKA), kerjakan latihan Smart Diagnostic (Non-TKA), lalu pantau progress Anda.
         </p>
       </div>
       <ol className="training-flow__list">

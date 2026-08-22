@@ -90,15 +90,18 @@ Poin penting:
 Alur ideal yang jadi acuan desain seluruh aplikasi:
 
 ```
-Login → Dashboard → Pelajari Materi → Pelajari Modul Wordwall → Buat Soal di Wordwall.net
-→ Publish di Wordwall.net → Salin Play URL → Daftarkan ke Bank Soal TKA (di situs ini)
-→ Coba Aktivitas TKA → Kerjakan Game Non-TKA → Pantau Progress di Dashboard Hasil
+Login → Dashboard → Baca Panduan Penggunaan → Pelajari Materi → Pelajari Modul Wordwall
+→ Buat Soal di Wordwall.net → Publish di Wordwall.net → Salin Play URL
+→ Daftarkan ke Bank Soal TKA (di situs ini) → Coba Aktivitas TKA → Kerjakan Game Non-TKA
+→ Pantau Progress di Dashboard Hasil
 ```
+
+**Baca Panduan Penggunaan** merujuk ke `Modul Penggunaan Website Smart Diagnostic TKA` (35 halaman, `/materi/panduan-penggunaan`) — panduan lengkap seluruh platform dari login sampai Dashboard Hasil, disajikan sebagai kartu "Mulai di Sini" paling atas di halaman Materi (`Materi.jsx`) dan akses cepat di Dashboard. Ini berbeda dari `Modul Panduan Guru` (`modul-tutorial-wordwall.pdf`) yang tetap ada terpisah di halaman yang sama — modul itu tutorial pembuatan game Wordwall secara spesifik, bukan alur platform secara keseluruhan.
 
 Beberapa langkah (membuat & publish soal di Wordwall.net) terjadi **di luar situs ini** — aplikasi tidak bisa memverifikasi langkah itu terjadi, jadi UI-nya (komponen `TrainingFlow`, ditampilkan di Dashboard) sengaja hanya menandai langkah yang bisa diverifikasi (✓) dan menandai langkah eksternal dengan simbol berbeda (↗), tidak berpura-pura tahu itu sudah dilakukan.
 
-Alur 10 langkah di atas dikelompokkan jadi **4 tahap yang bisa dilacak** di Dashboard:
-1. **Pelajari Materi & Modul** — dari `progress_materi`
+Alur 11 langkah di atas dikelompokkan jadi **4 tahap yang bisa dilacak** di Dashboard:
+1. **Pelajari Materi & Modul** — dari `progress_materi`. Baca Panduan Penggunaan dan Modul Wordwall sama-sama ditampilkan sebagai substep di tahap ini tapi **tidak dilacak** (`trackable: false`) — keduanya PDF statis tanpa progress tersendiri di database.
 2. **Buat & Daftarkan Aktivitas TKA** — dari `paket_soal` tipe TKA milik guru
 3. **Kerjakan Latihan Smart Diagnostic (Non-TKA)** — dari `hasil_diagnostik`
 4. **Lihat Progress Pelatihan** — Dashboard Hasil
