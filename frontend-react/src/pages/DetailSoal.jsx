@@ -230,7 +230,7 @@ function DetailSoal() {
               Link Wordwall<span className="form-field__optional">(opsional untuk Draft)</span>
             </label>
             <input
-              type="url" id="wordwallUrl" className="form-field__input" placeholder="https://wordwall.net/resource/..."
+              type="url" id="wordwallUrl" className="form-field__input" placeholder="https://wordwall.net/embed/..."
               value={form.wordwallUrl}
               onChange={(e) => setField('wordwallUrl', e.target.value)}
               onBlur={(e) => checkUrl(e.target.value)}
@@ -240,7 +240,10 @@ function DetailSoal() {
                 ? 'Link Wordwall harus URL wordwall.net yang sah sebelum bisa dipublish.'
                 : 'Link Wordwall wajib diisi jika status Published.'}
             </span>
-            <span className="form-field__hint">Buat aktivitasnya langsung di Wordwall, lalu tempel link-nya di sini.</span>
+            <span className="form-field__hint">
+              Gunakan link <strong>Embed</strong> (tombol Share &rarr; tab Embed di Wordwall.net), bukan Play URL --
+              Play URL memicu banner cookie Wordwall yang muncul berulang dan membuat aktivitas terlihat kembali ke awal.
+            </span>
             {urlCheck.status !== 'idle' && (
               <span className={'wordwall-url-check is-' + urlCheck.status}>{urlCheck.message}</span>
             )}

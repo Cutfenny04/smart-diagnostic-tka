@@ -123,9 +123,19 @@ function StimulusView({ item, onBack, onStart }) {
    tidak semua link Wordwall bisa di-embed -- link berformat /resource/...
    mengirim X-Frame-Options: SAMEORIGIN yang memblokir iframe lintas origin
    (sudah dikonfirmasi manual dengan 2 link dari klien), sedangkan link
-   /play/... biasanya tidak. Daripada menampilkan iframe kosong tanpa
-   penjelasan, cek dulu ke backend (GET /api/wordwall/check-embed) sebelum
-   memutuskan render iframe atau fallback "buka di tab baru". */
+   /play/... dan /embed/... biasanya tidak. Daripada menampilkan iframe
+   kosong tanpa penjelasan, cek dulu ke backend (GET /api/wordwall/check-embed)
+   sebelum memutuskan render iframe atau fallback "buka di tab baru".
+
+   Bugfix cookie popup berulang (2026-08-24, lihat WordwallGuide.jsx): guru
+   diarahkan memakai link Embed (wordwall.net/embed/...) dari tombol Share
+   Wordwall, bukan Play URL dari address bar -- Play URL memuat halaman situs
+   Wordwall lengkap dengan banner cookie consent milik Wordwall sendiri, yang
+   gagal tersimpan di context iframe cross-origin (cookie pihak ketiga
+   diblokir browser) sehingga muncul berulang dan reload balik ke awal saat
+   ditekan "Terima semua". `allow="storage-access"` di bawah membantu
+   browser yang mendukung Storage Access API mengizinkan Wordwall meminta
+   akses cookie first-party miliknya sendiri di dalam iframe ini. */
 function EmbedView({ item, onBack }) {
   const hasUrl = Boolean(item.wordwallUrl);
   const [embedStatus, setEmbedStatus] = useState(hasUrl ? 'checking' : 'no-url');
@@ -169,7 +179,12 @@ function EmbedView({ item, onBack }) {
 
       {embedStatus === 'embeddable' && (
         <div className="embed-frame">
-          <iframe src={item.wordwallUrl} title={'Aktivitas Wordwall - ' + item.title} allowFullScreen />
+          <iframe
+            src={item.wordwallUrl}
+            title={'Aktivitas Wordwall - ' + item.title}
+            allow="storage-access; fullscreen"
+            allowFullScreen
+          />
         </div>
       )}
 

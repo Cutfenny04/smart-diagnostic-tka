@@ -7,13 +7,25 @@ import './WordwallGuide.css';
    8 tahap ini persis urutan yang diminta user -- 4 tahap pertama terjadi di
    Wordwall.net sendiri (situs ini tidak bisa melacaknya), 2 tahap terakhir
    otomatis begitu form ini disimpan (makanya tidak charged sebagai langkah
-   guru yang harus dilakukan manual). */
+   guru yang harus dilakukan manual).
+
+   Bugfix cookie popup berulang (2026-08-24): tahap 4 SEBELUMNYA menyuruh
+   guru menyalin "Play URL" (wordwall.net/play/...) dari address bar. Link
+   itu memuat halaman situs Wordwall yang lengkap (form nama pemain + banner
+   cookie consent Wordwall sendiri). Di dalam iframe cross-origin, browser
+   memblokir cookie pihak ketiga sehingga persetujuan cookie itu tidak
+   pernah tersimpan -- banner-nya muncul lagi setiap kali Wordwall
+   berpindah halaman internal, dan menekan "Terima semua" memicu reload
+   yang terlihat seperti aktivitas kembali ke awal. Wordwall.net -> tombol
+   Share pada aktivitas yang sudah dipublish -> tab "Embed" menyediakan
+   link wordwall.net/embed/... yang dirancang khusus untuk iframe: tanpa
+   chrome situs, tanpa form nama, dan tanpa banner cookie itu. */
 const STEPS = [
   { n: 1, label: 'Pelajari Modul Panduan Wordwall', where: 'here' },
   { n: 2, label: 'Buat soal di Wordwall.net', where: 'external' },
   { n: 3, label: 'Publish aktivitasnya di Wordwall.net', where: 'external' },
-  { n: 4, label: 'Salin Play URL dari Wordwall.net', where: 'external' },
-  { n: 5, label: 'Tempel URL ke form di bawah ini', where: 'here' },
+  { n: 4, label: 'Klik Share > Embed, lalu salin link embed-nya (bukan Play URL)', where: 'external' },
+  { n: 5, label: 'Tempel link embed ke form di bawah ini', where: 'here' },
   { n: 6, label: 'Website mengecek URL-nya otomatis', where: 'auto' },
   { n: 7, label: 'Aktivitas masuk ke Bank Soal TKA', where: 'auto' },
   { n: 8, label: 'Aktivitas bisa dimainkan langsung di Smart Diagnostic', where: 'auto' },
@@ -29,6 +41,11 @@ function WordwallGuide() {
         <p className="wordwall-guide__desc">
           Soal HOTS tetap dibuat langsung di Wordwall.net, bukan di website ini. Ikuti 8 langkah berikut dari awal
           sampai aktivitas Anda bisa dimainkan di Smart Diagnostic.
+        </p>
+        <p className="wordwall-guide__warning">
+          Penting: gunakan link <strong>Embed</strong> (tombol Share &rarr; tab Embed di Wordwall.net), <em>bukan</em>{' '}
+          Play URL dari address bar. Play URL memunculkan banner cookie Wordwall yang terus berulang dan membuat
+          aktivitas seolah kembali ke awal saat ditekan &quot;Terima semua&quot;.
         </p>
       </div>
       <ol className="wordwall-guide__list">

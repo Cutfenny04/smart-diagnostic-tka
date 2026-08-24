@@ -92,7 +92,7 @@ function computeTrainingFlow(data) {
         : 'Belum ada aktivitas TKA terdaftar',
       subSteps: [
         { label: 'Buat soal & publish langsung di Wordwall.net', trackable: false },
-        { label: 'Salin Play URL, lalu daftarkan ke Bank Soal TKA di sini', trackable: true, done: tkaRegistered },
+        { label: 'Salin link Embed (Share > Embed), lalu daftarkan ke Bank Soal TKA di sini', trackable: true, done: tkaRegistered },
         { label: 'Coba mainkan aktivitas TKA yang sudah didaftarkan', trackable: false },
       ],
     },
