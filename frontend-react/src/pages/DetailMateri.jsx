@@ -164,6 +164,15 @@ function DetailMateri() {
           </p>
         )}
 
+        {modul.kontenUrl && (
+          <section className="detail-materi-viewer" aria-label={`Materi pembelajaran - ${modul.title}`}>
+            <iframe
+              src={modul.kontenUrl}
+              title={`Materi pembelajaran - ${modul.title}`}
+            />
+          </section>
+        )}
+
         <InlineError message={autoStartError} />
 
         <div className="form-actions">
