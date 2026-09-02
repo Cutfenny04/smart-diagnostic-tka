@@ -1,21 +1,42 @@
 import { createElement, useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, Clock, Layers, PlayCircle, SearchX, Inbox, FileText, Download, BookOpen } from 'lucide-react';
+import {
+  Search,
+  Clock,
+  BookOpen,
+  PlayCircle,
+  SearchX,
+  Inbox,
+  FileText,
+  Download,
+  CheckCircle2,
+  Gamepad2,
+  ArrowRight,
+  Sparkles,
+  Layers,
+  ExternalLink,
+} from 'lucide-react';
 import Layout from '../components/Layout';
 import FetchError from '../components/FetchError';
-import { fetchMateri, materiCategoryMeta as CATEGORY_META, materiCategoryOrder as CATEGORY_ORDER, computeMateriOverallProgress } from '../data/materiData';
+import {
+  fetchMateri,
+  materiCategoryMeta as CATEGORY_META,
+  computeMateriOverallProgress,
+} from '../data/materiData';
 import { friendlyErrorMessage } from '../services/api';
 import { getIcon } from '../utils/icon';
 import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Materi.css';
 
-const GURU_GUIDE_PDF = '/assets/modul/modul-tutorial-wordwall.pdf';
+const WORDWALL_GUIDE_PDF = '/assets/modul/modul-tutorial-wordwall.pdf';
+const PANDUAN_PLATFORM_PDF = '/assets/modul/panduan-penggunaan-smart-diagnostic-tka.pdf';
+const MATERI_PELATIHAN_RESMI_PDF = '/assets/modul/modul-pelatihan-hots-ipa.pdf';
 const PANDUAN_PENGGUNAAN_HALAMAN = 35;
 
 const FILTERS = [
-  { value: 'semua', label: 'Semua' },
-  { value: 'belum', label: 'Belum Dipelajari' },
+  { value: 'semua', label: 'Semua Modul' },
+  { value: 'belum', label: 'Belum Dimulai' },
   { value: 'sedang', label: 'Sedang Dipelajari' },
   { value: 'selesai', label: 'Selesai' },
 ];
@@ -26,41 +47,67 @@ function getStatus(m) {
   return 'sedang';
 }
 
-const STATUS_LABEL = { selesai: 'Selesai', sedang: 'Sedang Dipelajari', belum: 'Belum Dipelajari' };
-const ACTION_LABEL = { selesai: 'Lihat Kembali', sedang: 'Lanjutkan', belum: 'Mulai Belajar' };
+const STATUS_LABEL = {
+  selesai: '✓ Selesai',
+  sedang: '◐ Sedang Dipelajari',
+  belum: '○ Belum Dimulai',
+};
+
+const ACTION_LABEL = {
+  selesai: 'Lihat Kembali',
+  sedang: 'Lanjutkan',
+  belum: 'Mulai Belajar',
+};
 
 function sortModules(list, sort) {
   const copy = list.slice();
   if (sort === 'nama') copy.sort((a, b) => a.title.localeCompare(b.title));
-  else if (sort === 'terlama') copy.sort((a, b) => new Date(a.dateAdded) - new Date(b.dateAdded));
-  else copy.sort((a, b) => new Date(b.dateAdded) - new Date(a.dateAdded));
+  else if (sort === 'terlama') copy.sort((a, b) => a.id - b.id);
+  else copy.sort((a, b) => a.id - b.id); // Default urut ID 1-5
   return copy;
 }
 
 function ModuleCard({ m }) {
   const status = getStatus(m);
-  const meta = CATEGORY_META[m.category];
+  const meta = CATEGORY_META[m.category] || { label: 'HOTS & Asesmen', thumbClass: 'module-card__thumb--hots', icon: 'brain' };
   const btnClass = status === 'selesai' ? 'btn-secondary' : 'btn-primary';
 
   return (
-    <article className="module-card card-light">
-      <div className={'module-card__thumb ' + meta.thumbClass} aria-hidden="true">{createElement(getIcon(meta.icon), { size: 22 })}</div>
+    <article className={`module-card card-light module-card--${status}`}>
+      <div className={'module-card__thumb ' + meta.thumbClass} aria-hidden="true">
+        <span className="module-card__thumb-num">Modul {m.number || m.id}</span>
+        {createElement(getIcon(meta.icon), { size: 28 })}
+      </div>
       <div className="module-card__body">
-        <span className="module-card__category">{meta.label}</span>
-        <h3 className="module-card__title">{m.title}</h3>
+        <div className="module-card__header-meta">
+          <span className="module-card__category">{meta.label}</span>
+          <span className={'badge badge--' + status}>{STATUS_LABEL[status]}</span>
+        </div>
+        <h3 className="module-card__title">
+          {m.number ? `0${m.id}. ` : ''}{m.title}
+        </h3>
         <p className="module-card__desc">{m.desc}</p>
         <div className="module-card__meta">
           <span><Clock size={14} /> {m.duration}</span>
-          <span><Layers size={14} /> {m.materiCount} Materi</span>
+          <span><Layers size={14} /> {m.materiCount} Bagian</span>
         </div>
         <div className="module-card__progress">
-          <div className="progress-bar progress-bar--sm" role="progressbar" aria-valuenow={m.progress} aria-valuemin="0" aria-valuemax="100" aria-label={'Progress ' + m.title}>
+          <div
+            className="progress-bar progress-bar--sm"
+            role="progressbar"
+            aria-valuenow={m.progress}
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-label={'Progress ' + m.title}
+          >
             <div className="progress-bar__fill" data-progress={m.progress} />
           </div>
         </div>
         <div className="module-card__footer">
-          <span className={'badge badge--' + status}>{STATUS_LABEL[status]}</span>
-          <Link to={`/materi/${m.id}`} className={'btn ' + btnClass}>{ACTION_LABEL[status]}</Link>
+          <span className="module-card__progress-text">{m.progress}% selesai</span>
+          <Link to={`/materi/${m.id}`} className={'btn ' + btnClass}>
+            {ACTION_LABEL[status]}
+          </Link>
         </div>
       </div>
     </article>
@@ -73,7 +120,7 @@ function Materi() {
   const [retryTick, setRetryTick] = useState(0);
   const [query, setQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState('semua');
-  const [sort, setSort] = useState('terbaru');
+  const [sort, setSort] = useState('urutan');
 
   useEffect(() => {
     fetchMateri()
@@ -100,7 +147,7 @@ function Materi() {
     filtered = sortModules(filtered, sort);
   }
 
-  const continueModule = modules?.find((m) => m.lastOpened);
+  const continueModule = modules?.find((m) => m.progress > 0 && m.progress < 100) || modules?.find((m) => m.lastOpened);
   const overallProgress = computeMateriOverallProgress(modules || []);
 
   return (
@@ -108,179 +155,260 @@ function Materi() {
       <div className="page-header">
         <div className="page-header__text">
           <h1 className="page-header__title">Materi &amp; Modul Pelatihan</h1>
-          <p className="page-header__desc">Pelajari seluruh materi penyusunan soal HOTS IPA berbasis budaya Aceh secara bertahap.</p>
+          <p className="page-header__desc">
+            Kurikulum resmi pelatihan penyusunan instrumen HOTS IPA berbasis Smart Diagnostic TKA terintegrasi kearifan lokal budaya Aceh.
+          </p>
         </div>
       </div>
 
-      <section className="dashboard-section card-light guide-module-card getting-started-card" aria-label="Mulai di Sini: Panduan Penggunaan Smart Diagnostic TKA">
+      {/* ====================================================================
+          ZONA 1: 🚀 MULAI DI SINI (Panduan Platform Penggunaan 35 Halaman)
+          ==================================================================== */}
+      <section className="dashboard-section card-light guide-module-card getting-started-card" aria-label="Mulai di Sini: Panduan Penggunaan Platform">
         <div className="guide-module-card__header">
           <div className="guide-module-card__icon" aria-hidden="true"><BookOpen size={24} /></div>
           <div className="guide-module-card__text">
-            <span className="getting-started-card__eyebrow">Mulai di Sini</span>
+            <span className="getting-started-card__eyebrow">🚀 Mulai di Sini &bull; Panduan Sistem</span>
             <h2 className="section-heading__title">Panduan Penggunaan Smart Diagnostic TKA</h2>
             <p className="guide-module-card__desc">
-              Belum pernah menggunakan platform ini? Ikuti panduan {PANDUAN_PENGGUNAAN_HALAMAN} halaman ini
-              terlebih dahulu untuk mengenal alur penggunaan mulai dari login, Materi, Wordwall, Bank Soal,
-              Smart Diagnostic, hingga Dashboard Hasil.
+              Panduan operasional {PANDUAN_PENGGUNAAN_HALAMAN} halaman untuk membantu Bapak/Ibu guru mengenal alur kerja platform:
+              mulai dari login, membaca materi, membuat dan mendaftarkan aktivitas Wordwall (TKA), memainkan latihan diagnostik (Non-TKA), hingga memantau Dashboard Hasil.
             </p>
           </div>
           <div className="getting-started-card__actions">
-            <Link to="/materi/panduan-penggunaan" className="btn btn-primary"><BookOpen size={16} /> Baca Panduan</Link>
-            <a href="/assets/modul/panduan-penggunaan-smart-diagnostic-tka.pdf" download className="btn btn-secondary">
-              <Download size={16} /> Unduh PDF
+            <Link to="/materi/panduan-penggunaan" className="btn btn-primary">
+              <BookOpen size={16} /> Baca Panduan
+            </Link>
+            <a href={PANDUAN_PLATFORM_PDF} download className="btn btn-secondary">
+              <Download size={16} /> Unduh PDF ({PANDUAN_PENGGUNAAN_HALAMAN} Halaman)
             </a>
           </div>
         </div>
       </section>
 
-      <section className="dashboard-section card-light guide-module-card" aria-label="Modul Panduan Guru">
-        <div className="guide-module-card__header">
-          <div className="guide-module-card__icon" aria-hidden="true"><FileText size={24} /></div>
-          <div className="guide-module-card__text">
-            <h2 className="section-heading__title">Modul Panduan Guru</h2>
-            <p className="guide-module-card__desc">Modul Tutorial Pembuatan Game Edukasi Interaktif Menggunakan Wordwall — panduan langkah demi langkah bagi Bapak/Ibu guru untuk membuat dan memainkan game edukasi di kelas.</p>
+      {/* ====================================================================
+          ZONA 2: 📚 MATERI UTAMA PELATIHAN (Modul 01 - 05)
+          ==================================================================== */}
+      <section className="dashboard-section materi-main-section" aria-label="Materi Utama Pelatihan">
+        {/* Header Seksi & Progress Overview */}
+        <div className="materi-section-header">
+          <div>
+            <span className="materi-section-eyebrow">📚 Materi Utama Pelatihan</span>
+            <h2 className="section-heading__title">5 Modul Pembelajaran HOTS &amp; TKA</h2>
           </div>
-          <a href={GURU_GUIDE_PDF} download className="btn btn-primary guide-module-card__download">
-            <Download size={16} /> Unduh PDF
-          </a>
-        </div>
-        <div className="guide-module-card__viewer">
-          <iframe src={GURU_GUIDE_PDF} title="Modul Panduan Guru - Tutorial Wordwall" />
-        </div>
-      </section>
 
-      <section className="dashboard-section card-light" aria-label="Progress Belajar Keseluruhan">
-        <div className="learning-overview">
-          <div className="learning-overview__text">
-            <h2 className="section-heading__title">Progress Belajar Anda</h2>
-            <p className="learning-overview__count">{overallProgress.completed} dari {overallProgress.total} materi selesai</p>
-          </div>
-          <div className="learning-overview__figure">
-            <span className="learning-overview__percent">{overallProgress.percent}%</span>
+          <div className="materi-progress-pill card-light">
+            <div className="materi-progress-pill__head">
+              <span className="materi-progress-pill__label">Progress Pelatihan:</span>
+              <strong className="materi-progress-pill__count">
+                {overallProgress.completed} dari {overallProgress.total} Selesai ({overallProgress.percent}%)
+              </strong>
+            </div>
+            <div
+              className="progress-bar progress-bar--sm"
+              role="progressbar"
+              aria-valuenow={overallProgress.percent}
+              aria-valuemin="0"
+              aria-valuemax="100"
+              aria-label="Progress belajar keseluruhan"
+            >
+              <div className="progress-bar__fill" data-progress={overallProgress.percent} />
+            </div>
+            <div className="materi-progress-pill__status-row">
+              <span className="pill-status pill-status--done">✓ {overallProgress.completed} Selesai</span>
+              <span className="pill-status pill-status--progress">◐ {overallProgress.inProgress} Sedang Berjalan</span>
+              <span className="pill-status pill-status--todo">○ {overallProgress.notStarted} Belum Dimulai</span>
+            </div>
           </div>
         </div>
-        <div className="progress-bar" role="progressbar" aria-valuenow={overallProgress.percent} aria-valuemin="0" aria-valuemax="100" aria-label="Progress belajar keseluruhan">
-          <div className="progress-bar__fill" data-progress={overallProgress.percent} />
-        </div>
-      </section>
 
-      {continueModule && (
-        <section className="dashboard-section" aria-label="Lanjutkan Belajar">
+        {/* Continue Learning Card */}
+        {continueModule && (
           <div className="card-light continue-card">
             <div className="continue-card__thumb" aria-hidden="true">
-              {(() => { const Icon = getIcon(CATEGORY_META[continueModule.category].icon); return <Icon size={24} />; })()}
+              {(() => {
+                const Icon = getIcon(CATEGORY_META[continueModule.category]?.icon || 'brain');
+                return <Icon size={24} />;
+              })()}
             </div>
             <div className="continue-card__body">
-              <span className="continue-card__eyebrow">Lanjutkan Belajar</span>
-              <h2 className="continue-card__title">{continueModule.title}</h2>
+              <span className="continue-card__eyebrow">Lanjutkan Modul Terakhir</span>
+              <h3 className="continue-card__title">Modul {continueModule.number || continueModule.id}: {continueModule.title}</h3>
               <div className="continue-card__progress">
-                <div className="progress-bar" role="progressbar" aria-valuenow={continueModule.progress} aria-valuemin="0" aria-valuemax="100" aria-label={'Progress ' + continueModule.title}>
+                <div
+                  className="progress-bar"
+                  role="progressbar"
+                  aria-valuenow={continueModule.progress}
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                  aria-label={'Progress ' + continueModule.title}
+                >
                   <div className="progress-bar__fill" data-progress={continueModule.progress} />
                 </div>
                 <span className="continue-card__percent">{continueModule.progress}% selesai</span>
               </div>
             </div>
             <div className="continue-card__action">
-              <Link to={`/materi/${continueModule.id}`} className="btn btn-primary"><PlayCircle size={16} /> Lanjutkan Belajar</Link>
+              <Link to={`/materi/${continueModule.id}`} className="btn btn-primary">
+                <PlayCircle size={16} /> Lanjutkan Belajar
+              </Link>
             </div>
           </div>
-        </section>
-      )}
+        )}
 
-      <section className="catalog-controls card-light" aria-label="Cari dan Saring Materi">
-        <div className="catalog-search">
-          <span className="catalog-search__icon" aria-hidden="true"><Search size={16} /></span>
-          <input
-            type="search"
-            className="catalog-search__input"
-            placeholder="Cari materi..."
-            aria-label="Cari materi"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-          />
+        {/* Search & Filter Controls */}
+        <div className="catalog-controls card-light" aria-label="Cari dan Saring Modul Pelatihan">
+          <div className="catalog-search">
+            <span className="catalog-search__icon" aria-hidden="true"><Search size={16} /></span>
+            <input
+              type="search"
+              className="catalog-search__input"
+              placeholder="Cari materi HOTS, instrumen, stimulus..."
+              aria-label="Cari materi"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+            />
+          </div>
+
+          <div className="filter-group" role="group" aria-label="Saring berdasarkan status">
+            {FILTERS.map((f) => (
+              <button
+                key={f.value}
+                type="button"
+                className={'filter-chip' + (statusFilter === f.value ? ' is-active' : '')}
+                aria-pressed={statusFilter === f.value}
+                onClick={() => setStatusFilter(f.value)}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        <div className="filter-group" role="group" aria-label="Saring berdasarkan status">
-          {FILTERS.map((f) => (
-            <button
-              key={f.value}
-              type="button"
-              className={'filter-chip' + (statusFilter === f.value ? ' is-active' : '')}
-              aria-pressed={statusFilter === f.value}
-              onClick={() => setStatusFilter(f.value)}
-            >
-              {f.label}
-            </button>
-          ))}
+        {fetchErrorMsg && <FetchError message={fetchErrorMsg} onRetry={() => setRetryTick((n) => n + 1)} />}
+
+        {!modules && !fetchErrorMsg && (
+          <div className="module-grid">
+            {Array.from({ length: 5 }, (_, i) => (
+              <div className="card-light module-card" key={i}>
+                <div className="skeleton" style={{ height: 120, borderRadius: 0 }} />
+                <div className="module-card__body">
+                  <div className="skeleton skeleton--text" style={{ width: '35%' }} />
+                  <div className="skeleton skeleton--title" />
+                  <div className="skeleton skeleton--text" />
+                  <div className="skeleton skeleton--text" />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {modules && filtered.length === 0 && (
+          <div className="card-light">
+            <div className="empty-state">
+              <div className="empty-state__icon"><SearchX size={28} /></div>
+              <h3 className="empty-state__title">Modul tidak ditemukan</h3>
+              <p className="empty-state__desc">Coba sesuaikan kata kunci pencarian atau ubah filter status.</p>
+            </div>
+          </div>
+        )}
+
+        {modules && filtered.length > 0 && (
+          <div className="module-grid">
+            {filtered.map((m) => (
+              <ModuleCard key={m.id} m={m} />
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* ====================================================================
+          ZONA 3: 🛠️ PRAKTIK & IMPLEMENTASI (Action Flow / Alur Tindakan)
+          ==================================================================== */}
+      <section className="dashboard-section practice-flow-section card-light" aria-label="Praktik & Implementasi">
+        <div className="section-heading">
+          <span className="getting-started-card__eyebrow">🛠️ Praktik &amp; Implementasi</span>
+          <h2 className="section-heading__title">Alur Tindakan: Dari Teori Menjadi Praktik Nyata</h2>
+          <p className="practice-flow__desc">
+            Setelah menyelesaikan pembelajaran materi di atas, ikuti alur tiga langkah berikut untuk menyusun, mendaftarkan, dan menguji instrumen HOTS Anda:
+          </p>
         </div>
 
-        <div className="catalog-sort">
-          <label htmlFor="materiSortSelect" className="catalog-sort__label">Urutkan</label>
-          <select id="materiSortSelect" className="catalog-sort__select" aria-label="Urutkan materi" value={sort} onChange={(e) => setSort(e.target.value)}>
-            <option value="terbaru">Terbaru</option>
-            <option value="terlama">Terlama</option>
-            <option value="nama">Nama (A-Z)</option>
-          </select>
+        <div className="practice-flow-grid">
+          {/* Step 1: Wordwall */}
+          <div className="practice-flow-card">
+            <div className="practice-flow-card__head">
+              <span className="practice-flow-card__step">Tahap 1</span>
+              <span className="badge badge--new">Praktik Digital</span>
+            </div>
+            <h3 className="practice-flow-card__title">① Membuat Soal di Wordwall</h3>
+            <p className="practice-flow-card__desc">
+              Pindahkan stimulus dan butir soal HOTS IPA yang telah Anda susun ke template game interaktif Wordwall (Quiz, Match up, Game show).
+            </p>
+            <div className="practice-flow-card__actions">
+              <a href={WORDWALL_GUIDE_PDF} download className="btn btn-secondary">
+                <FileText size={14} /> Unduh Modul Wordwall (PDF)
+              </a>
+              <a href="https://wordwall.net/create/template" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                Buka Wordwall.net <ExternalLink size={14} />
+              </a>
+            </div>
+          </div>
+
+          {/* Step 2: Register to Bank Soal */}
+          <div className="practice-flow-card">
+            <div className="practice-flow-card__head">
+              <span className="practice-flow-card__step">Tahap 2</span>
+              <span className="badge badge--info">Integrasi Platform</span>
+            </div>
+            <h3 className="practice-flow-card__title">② Mendaftarkan TKA ke Bank Soal</h3>
+            <p className="practice-flow-card__desc">
+              Daftarkan tautan aktivitas Wordwall Anda ke dalam Bank Soal Berbasis Budaya Aceh agar siap dimainkan dan terdokumentasi.
+            </p>
+            <div className="practice-flow-card__actions">
+              <Link to="/bank-soal/tka/baru" className="btn btn-primary">
+                + Daftarkan Paket TKA Baru
+              </Link>
+            </div>
+          </div>
+
+          {/* Step 3: Smart Diagnostic */}
+          <div className="practice-flow-card">
+            <div className="practice-flow-card__head">
+              <span className="practice-flow-card__step">Tahap 3</span>
+              <span className="badge badge--important">Uji Coba &amp; Simulasi</span>
+            </div>
+            <h3 className="practice-flow-card__title">③ Mencoba Smart Diagnostic</h3>
+            <p className="practice-flow-card__desc">
+              Jalankan simulasi asesmen diagnostik untuk menguji respons sistem, melihat analisis kompetensi, dan memantau hasil pengerjaan.
+            </p>
+            <div className="practice-flow-card__actions">
+              <Link to="/smart-diagnostic" className="btn btn-primary">
+                <Gamepad2 size={16} /> Mulai Smart Diagnostic
+              </Link>
+            </div>
+          </div>
         </div>
       </section>
 
-      {fetchErrorMsg && <FetchError message={fetchErrorMsg} onRetry={() => setRetryTick((n) => n + 1)} />}
-
-      {!modules && !fetchErrorMsg && (
-        <div className="module-grid">
-          {Array.from({ length: 6 }, (_, i) => (
-            <div className="card-light module-card" key={i}>
-              <div className="skeleton" style={{ height: 120, borderRadius: 0 }} />
-              <div className="module-card__body">
-                <div className="skeleton skeleton--text" style={{ width: '35%' }} />
-                <div className="skeleton skeleton--title" />
-                <div className="skeleton skeleton--text" />
-                <div className="skeleton skeleton--text" />
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {modules && filtered.length === 0 && (
-        <div className="card-light">
-          {isFilteringActive ? (
-            <div className="empty-state">
-              <div className="empty-state__icon"><SearchX size={28} /></div>
-              <h3 className="empty-state__title">Materi tidak ditemukan</h3>
-              <p className="empty-state__desc">Coba ubah kata kunci pencarian atau pilih filter status lain.</p>
-            </div>
-          ) : (
-            <div className="empty-state">
-              <div className="empty-state__icon"><Inbox size={28} /></div>
-              <h3 className="empty-state__title">Belum ada materi tersedia</h3>
-              <p className="empty-state__desc">Materi & modul pelatihan akan muncul di sini begitu tersedia.</p>
-            </div>
-          )}
-        </div>
-      )}
-
-      {modules && filtered.length > 0 && isFilteringActive && (
-        <section className="module-category" aria-label={`Hasil Pencarian (${filtered.length})`}>
-          <div className="section-heading"><h2 className="section-heading__title">Hasil Pencarian ({filtered.length})</h2></div>
-          <div className="module-grid">
-            {filtered.map((m) => <ModuleCard key={m.id} m={m} />)}
+      {/* ====================================================================
+          ZONA 4: 📎 DOKUMEN REFERENSI RESMI
+          ==================================================================== */}
+      <section className="dashboard-section card-light official-reference-card" aria-label="Dokumen Referensi Pelatihan Resmi">
+        <div className="guide-module-card__header">
+          <div className="guide-module-card__icon" aria-hidden="true"><FileText size={24} /></div>
+          <div className="guide-module-card__text">
+            <span className="getting-started-card__eyebrow">Dokumen Resmi Pelatihan</span>
+            <h2 className="section-heading__title">Bahan Tayang Pelatihan Penyusunan Instrumen HOTS IPA</h2>
+            <p className="guide-module-card__desc">
+              Dokumen materi pelatihan resmi Universitas Syiah Kuala (USK) dalam kegiatan pengabdian di SMP Negeri 3 Ingin Jaya Aceh Besar.
+            </p>
           </div>
-        </section>
-      )}
-
-      {modules && filtered.length > 0 && !isFilteringActive && CATEGORY_ORDER.map((cat) => {
-        const items = filtered.filter((m) => m.category === cat);
-        if (!items.length) return null;
-        return (
-          <section className="module-category" key={cat} aria-label={CATEGORY_META[cat].label}>
-            <div className="section-heading"><h2 className="section-heading__title">{CATEGORY_META[cat].label}</h2></div>
-            <div className="module-grid">
-              {items.map((m) => <ModuleCard key={m.id} m={m} />)}
-            </div>
-          </section>
-        );
-      })}
+          <a href={MATERI_PELATIHAN_RESMI_PDF} download className="btn btn-primary">
+            <Download size={16} /> Unduh PDF Lengkap
+          </a>
+        </div>
+      </section>
     </Layout>
   );
 }

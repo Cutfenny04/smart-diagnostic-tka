@@ -4,347 +4,444 @@
    live in assets/css/style.css. This file only arranges/extends them here.
    ========================================================================== */
 
-/* --- Modul Panduan Guru (PDF embed + download) --- */
+/* --- Guide Module Card (Shared style for top guide & bottom reference) --- */
 .guide-module-card__header {
-    display: flex;
-    align-items: flex-start;
-    gap: var(--space-4);
-    margin-bottom: var(--space-4);
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
 }
 
 .guide-module-card__icon {
-    width: 48px;
-    height: 48px;
-    border-radius: var(--radius-lg);
-    background: var(--gradient-midnight);
-    color: var(--color-beige);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-lg);
+  background: var(--gradient-midnight);
+  color: var(--color-beige);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .guide-module-card__text {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .guide-module-card__desc {
-    font-size: var(--text-small);
-    color: var(--text-muted-on-light);
-    margin-top: var(--space-1);
-}
-
-.guide-module-card__download {
-    flex-shrink: 0;
-    white-space: nowrap;
-}
-
-.guide-module-card__viewer {
-    border: 1px solid var(--border-light);
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-}
-
-.guide-module-card__viewer iframe {
-    width: 100%;
-    height: 600px;
-    border: none;
-    display: block;
-}
-
-@media (max-width: 768px) {
-    .guide-module-card__header {
-        flex-wrap: wrap;
-    }
-
-    .guide-module-card__download {
-        width: 100%;
-        justify-content: center;
-    }
-
-    .guide-module-card__viewer iframe {
-        height: 420px;
-    }
+  font-size: var(--text-small);
+  color: var(--text-muted-on-light);
+  margin-top: var(--space-1);
+  line-height: 1.5;
 }
 
 /* --- Panduan Penggunaan (Mulai di Sini) --- */
-.getting-started-card .guide-module-card__header {
-    margin-bottom: 0;
-}
-
 .getting-started-card__eyebrow {
-    display: block;
-    font-size: var(--text-small);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    color: var(--color-primary-mid);
-    margin-bottom: var(--space-1);
+  display: block;
+  font-size: var(--text-micro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-rosy);
+  margin-bottom: var(--space-1);
 }
 
 .getting-started-card__actions {
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2);
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
 }
 
 @media (max-width: 768px) {
-    .getting-started-card__actions {
-        width: 100%;
-        flex-direction: row;
-    }
-
-    .getting-started-card__actions .btn {
-        flex: 1;
-        justify-content: center;
-    }
-}
-
-/* --- Learning Progress overview --- */
-.learning-overview {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-4);
-    margin-bottom: var(--space-4);
-}
-
-.learning-overview__count {
-    font-size: var(--text-body);
-    color: var(--text-muted-on-light);
-    margin-top: var(--space-1);
-}
-
-.learning-overview__percent {
-    font-family: var(--font-headings);
-    font-size: var(--text-h1);
-    color: var(--color-rosy);
-}
-
-/* Search/filter/sort bar now lives in style.css as .catalog-controls (shared
-   across every catalog page). This file only keeps Materi-specific layout. */
-
-/* --- Module category sections --- */
-.module-category {
-    margin-bottom: var(--space-6);
-}
-
-.module-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: var(--space-5);
-}
-
-/* --- Module card --- */
-.module-card {
-    display: flex;
+  .getting-started-card__actions {
+    width: 100%;
     flex-direction: column;
-    padding: 0;
-    overflow: hidden;
+  }
+
+  .getting-started-card__actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
+/* --- Materi Section Header & Progress Pill --- */
+.materi-main-section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+}
+
+.materi-section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+}
+
+.materi-section-eyebrow {
+  display: block;
+  font-size: var(--text-micro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-moss);
+  margin-bottom: var(--space-1);
+}
+
+.materi-progress-pill {
+  padding: var(--space-3) var(--space-4);
+  min-width: 320px;
+  flex: 1;
+  max-width: 480px;
+}
+
+.materi-progress-pill__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+  font-size: var(--text-small);
+}
+
+.materi-progress-pill__label {
+  color: var(--text-muted-on-light);
+}
+
+.materi-progress-pill__count {
+  color: var(--color-primary-dark);
+}
+
+.materi-progress-pill__status-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-2);
+  font-size: var(--text-micro);
+  flex-wrap: wrap;
+}
+
+.pill-status--done {
+  color: var(--color-moss);
+  font-weight: 600;
+}
+
+.pill-status--progress {
+  color: var(--color-rosy);
+  font-weight: 600;
+}
+
+.pill-status--todo {
+  color: var(--text-muted-on-light);
+}
+
+/* --- Module Grid & Cards --- */
+.module-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+}
+
+.module-card {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  position: relative;
+  transition: var(--transition-fast);
+}
+
+.module-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-md);
 }
 
 .module-card__thumb {
-    height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: var(--color-beige);
+  height: 110px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-beige);
+  position: relative;
 }
 
-.module-card__thumb svg {
-    width: 40px;
-    height: 40px;
+.module-card__thumb-num {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  font-size: var(--text-micro);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  background: rgba(0, 0, 0, 0.25);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  color: var(--color-beige);
 }
 
 .module-card__thumb--hots {
-    background: var(--gradient-midnight);
+  background: var(--gradient-midnight);
 }
 
 .module-card__thumb--budaya {
-    background: var(--gradient-rosy);
+  background: var(--gradient-rosy);
 }
 
 .module-card__thumb--soal {
-    background: var(--gradient-sidebar);
+  background: var(--gradient-sidebar);
 }
 
 .module-card__body {
-    display: flex;
-    flex-direction: column;
-    padding: var(--space-5);
-    flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-5);
+  flex: 1;
+}
+
+.module-card__header-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
 }
 
 .module-card__category {
-    font-size: var(--text-micro);
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--color-moss);
-    margin-bottom: var(--space-2);
+  font-size: var(--text-micro);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-moss);
 }
 
 .module-card__title {
-    font-family: var(--font-headings);
-    font-size: var(--text-h3);
-    font-weight: 400;
-    color: var(--text-on-light);
-    margin-bottom: var(--space-2);
+  font-family: var(--font-headings);
+  font-size: 1.15rem;
+  font-weight: 400;
+  color: var(--color-primary-dark);
+  margin: 0 0 var(--space-2) 0;
+  line-height: 1.35;
 }
 
 .module-card__desc {
-    font-size: var(--text-small);
-    color: var(--text-muted-on-light);
-    margin-bottom: var(--space-4);
-    flex: 1;
+  font-size: var(--text-small);
+  color: var(--text-muted-on-light);
+  margin-bottom: var(--space-4);
+  line-height: 1.45;
+  flex: 1;
 }
 
 .module-card__meta {
-    display: flex;
-    gap: var(--space-4);
-    font-size: var(--text-micro);
-    color: var(--text-muted-on-light);
-    margin-bottom: var(--space-3);
+  display: flex;
+  gap: var(--space-4);
+  font-size: var(--text-micro);
+  color: var(--text-muted-on-light);
+  margin-bottom: var(--space-3);
 }
 
 .module-card__meta span {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-}
-
-.module-card__meta svg {
-    width: 14px;
-    height: 14px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .module-card__progress {
-    margin-bottom: var(--space-4);
+  margin-bottom: var(--space-4);
 }
 
 .module-card__footer {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: var(--space-2);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
 }
 
-/* --- Continue Learning card --- */
+.module-card__progress-text {
+  font-size: var(--text-micro);
+  font-weight: 600;
+  color: var(--text-muted-on-light);
+}
+
+/* --- Continue Learning Card --- */
 .continue-card {
-    display: flex;
-    align-items: center;
-    gap: var(--space-5);
+  display: flex;
+  align-items: center;
+  gap: var(--space-5);
+  padding: var(--space-5);
 }
 
 .continue-card__thumb {
-    width: 72px;
-    height: 72px;
-    border-radius: var(--radius-lg);
-    background: var(--gradient-rosy);
-    color: var(--color-beige);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-}
-
-.continue-card__thumb svg {
-    width: 32px;
-    height: 32px;
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-lg);
+  background: var(--gradient-rosy);
+  color: var(--color-beige);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
 }
 
 .continue-card__body {
-    flex: 1;
-    min-width: 0;
+  flex: 1;
+  min-width: 0;
 }
 
 .continue-card__eyebrow {
-    font-size: var(--text-micro);
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    color: var(--color-rosy);
-    margin-bottom: var(--space-1);
+  font-size: var(--text-micro);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--color-rosy);
+  display: block;
+  margin-bottom: 2px;
 }
 
 .continue-card__title {
-    font-family: var(--font-headings);
-    font-size: var(--text-h3);
-    font-weight: 400;
-    color: var(--text-on-light);
-    margin-bottom: var(--space-2);
+  font-family: var(--font-headings);
+  font-size: var(--text-h3);
+  font-weight: 400;
+  color: var(--text-on-light);
+  margin: 0 0 var(--space-2) 0;
 }
 
 .continue-card__progress {
-    display: flex;
-    align-items: center;
-    gap: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .continue-card__progress .progress-bar {
-    flex: 1;
-    max-width: 320px;
+  flex: 1;
+  max-width: 320px;
 }
 
 .continue-card__percent {
-    font-size: var(--text-small);
-    font-weight: 600;
-    color: var(--text-muted-on-light);
-    white-space: nowrap;
+  font-size: var(--text-small);
+  font-weight: 600;
+  color: var(--text-muted-on-light);
 }
 
 .continue-card__action {
-    flex-shrink: 0;
+  flex-shrink: 0;
+}
+
+/* --- Praktik & Implementasi Action Flow --- */
+.practice-flow-section {
+  padding: var(--space-6);
+}
+
+.practice-flow__desc {
+  font-size: var(--text-small);
+  color: var(--text-muted-on-light);
+  margin-top: var(--space-1);
+}
+
+.practice-flow-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+  margin-top: var(--space-5);
+}
+
+.practice-flow-card {
+  background: var(--surface-card-tint);
+  border: 1px solid var(--border-on-light);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5);
+  display: flex;
+  flex-direction: column;
+}
+
+.practice-flow-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-3);
+}
+
+.practice-flow-card__step {
+  font-size: var(--text-micro);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--color-primary-dark);
+}
+
+.practice-flow-card__title {
+  font-family: var(--font-headings);
+  font-size: 1.15rem;
+  color: var(--color-primary-dark);
+  margin: 0 0 var(--space-2) 0;
+  line-height: 1.35;
+}
+
+.practice-flow-card__desc {
+  font-size: var(--text-small);
+  color: var(--text-muted-on-light);
+  line-height: 1.5;
+  margin-bottom: var(--space-4);
+  flex: 1;
+}
+
+.practice-flow-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.practice-flow-card__actions .btn {
+  justify-content: center;
+  font-size: var(--text-small);
+}
+
+/* --- Official Reference Card --- */
+.official-reference-card {
+  padding: var(--space-5);
 }
 
 /* ==========================================================================
-   RESPONSIVE
-   Desktop: 3 cards/row · Laptop: 2-3 · Tablet: 2 · Mobile: 1
+   RESPONSIVE BREAKPOINTS
    ========================================================================== */
-
-/* Laptop */
 @media (max-width: 1280px) {
-    .module-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  .module-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
-/* Tablet */
 @media (max-width: 1024px) {
-    .continue-card {
-        flex-wrap: wrap;
-    }
+  .practice-flow-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .continue-card__action {
-        width: 100%;
-    }
+  .continue-card {
+    flex-wrap: wrap;
+  }
 
-    .continue-card__action .btn {
-        width: 100%;
-    }
+  .continue-card__action {
+    width: 100%;
+  }
+
+  .continue-card__action .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 @media (max-width: 768px) {
-    .module-grid {
-        grid-template-columns: repeat(2, 1fr);
-    }
+  .module-grid {
+    grid-template-columns: 1fr;
+  }
 
-    .learning-overview {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-}
+  .guide-module-card__header {
+    flex-wrap: wrap;
+  }
 
-/* Mobile */
-@media (max-width: 480px) {
-    .module-grid {
-        grid-template-columns: 1fr;
-    }
+  .guide-module-card__download {
+    width: 100%;
+    justify-content: center;
+  }
 
-    .continue-card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
+  .materi-progress-pill {
+    max-width: 100%;
+  }
 }

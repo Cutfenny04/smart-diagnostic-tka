@@ -75,9 +75,9 @@ function computeTrainingFlow(data) {
       status: materiStatus,
       note: `${data.materi.completed} dari ${data.materi.total} materi selesai`,
       subSteps: [
-        { label: 'Baca Panduan Penggunaan Smart Diagnostic TKA (PDF)', trackable: false },
-        { label: 'Pelajari materi pelatihan HOTS & Budaya Aceh', trackable: true, done: materiStarted },
-        { label: 'Baca Modul Panduan Wordwall (PDF)', trackable: false },
+        { label: 'Baca Panduan Penggunaan Platform (35 Halaman)', trackable: false },
+        { label: 'Pelajari 5 Modul Pelatihan HOTS & TKA', trackable: true, done: materiStarted },
+        { label: 'Pelajari Panduan Pembuatan Game Wordwall (PDF)', trackable: false },
       ],
     },
     {

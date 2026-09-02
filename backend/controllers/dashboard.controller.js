@@ -22,7 +22,7 @@ async function getHasilSummary(req, res) {
         `SELECT m.id, m.title, m.category, COALESCE(p.progress, 0) AS progress, p.last_opened
          FROM materi m
          LEFT JOIN progress_materi p ON p.materi_id = m.id AND p.guru_id = $1
-         ORDER BY m.created_at`,
+         ORDER BY m.id ASC`,
         [guruId]
       ),
       pool.query(

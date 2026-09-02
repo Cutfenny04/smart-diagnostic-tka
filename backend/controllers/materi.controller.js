@@ -21,7 +21,7 @@ async function getAllMateri(req, res) {
        FROM materi m
        LEFT JOIN progress_materi p
          ON p.materi_id = m.id AND p.guru_id = $1
-       ORDER BY m.created_at DESC`,
+       ORDER BY m.id ASC`,
       [guruId]
     );
 
