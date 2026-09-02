@@ -7,12 +7,8 @@ import {
   SearchX,
   ArrowLeft,
   ArrowRight,
-  Download,
-  FileText,
   Target,
-  Sparkles,
   Gamepad2,
-  Share2,
 } from 'lucide-react';
 import Layout from '../components/Layout';
 import FetchError from '../components/FetchError';
@@ -20,6 +16,7 @@ import InlineError from '../components/InlineError';
 import LearningSection from '../components/LearningSection';
 import AcehCallout from '../components/AcehCallout';
 import ReflectionChecklist from '../components/ReflectionChecklist';
+import PdfViewer from '../components/PdfViewer';
 import {
   fetchMateriById,
   updateMateriProgress,
@@ -55,7 +52,6 @@ function DetailMateri() {
   const [fetchErrorMsg, setFetchErrorMsg] = useState('');
   const [autoStartError, setAutoStartError] = useState('');
   const [retryTick, setRetryTick] = useState(0);
-  const [showPdfViewer, setShowPdfViewer] = useState(false);
 
   const autoStartedRef = useRef(false);
   const progressBarRef = useRef(null);
@@ -164,7 +160,7 @@ function DetailMateri() {
 
   const meta = CATEGORY_META[modul.category] || { label: 'Pelatihan HOTS', icon: 'brain' };
   const status = statusOf(modul);
-  const pdfLink = content?.pdfUrl || modul.kontenUrl || '/assets/modul/modul-pelatihan-hots-ipa.pdf';
+  const pdfLink = content?.pdfUrl || modul.kontenUrl || '/pdf/bahan-tayang-pelatihan.pdf';
 
   return (
     <Layout breadcrumb={[{ label: 'Materi & Modul Pelatihan', to: '/materi' }, { label: `Modul ${content?.number || modul.id}: ${modul.title}` }]}>
@@ -183,9 +179,6 @@ function DetailMateri() {
           <Link to="/materi" className="btn btn-secondary">
             <ArrowLeft size={16} /> Daftar Materi
           </Link>
-          <a href={pdfLink} download className="btn btn-secondary">
-            <Download size={16} /> Unduh PDF
-          </a>
         </div>
       </div>
 
@@ -260,38 +253,16 @@ function DetailMateri() {
             />
           )}
 
-          {/* Dokumen Referensi PDF */}
-          <section className="card-light pdf-reference-card" aria-label="Dokumen Referensi Resmi">
-            <div className="pdf-reference-card__head">
-              <div className="pdf-reference-card__info">
-                <FileText size={22} className="pdf-reference-card__icon" />
-                <div>
-                  <h3 className="pdf-reference-card__title">Dokumen Materi Pelatihan Resmi</h3>
-                  <p className="pdf-reference-card__desc">
-                    Pelatihan Penyusunan Instrumen HOTS IPA Berbasis Smart Diagnostic TKA (USK &amp; SMPN 3 Ingin Jaya)
-                  </p>
-                </div>
-              </div>
-              <div className="pdf-reference-card__actions">
-                <button
-                  type="button"
-                  className="btn btn-secondary"
-                  onClick={() => setShowPdfViewer(!showPdfViewer)}
-                >
-                  <BookOpen size={16} /> {showPdfViewer ? 'Sembunyikan PDF' : 'Buka Viewer PDF'}
-                </button>
-                <a href={pdfLink} download className="btn btn-primary">
-                  <Download size={16} /> Unduh PDF Asli
-                </a>
-              </div>
-            </div>
-
-            {showPdfViewer && (
-              <div className="pdf-reference-card__viewer">
-                <iframe src={pdfLink} title={`Dokumen PDF Resmi - ${modul.title}`} />
-              </div>
-            )}
-          </section>
+          {/* Dokumen Referensi PDF (Reusable PdfViewer) */}
+          <PdfViewer
+            title="Dokumen Materi Pelatihan Resmi"
+            subtitle="Bahan tayang resmi Pelatihan Penyusunan Instrumen HOTS IPA Berbasis Smart Diagnostic TKA (USK &amp; SMPN 3 Ingin Jaya)"
+            pdfUrl={pdfLink}
+            downloadName="bahan-tayang-pelatihan-hots-ipa-usk.pdf"
+            initialOpen={false}
+            badgeText="📎 Dokumen Referensi Resmi"
+            pageCountText="15 Slide"
+          />
 
           {/* Aksi & Navigasi Modul */}
           <div className="detail-materi-nav-bar card-light">

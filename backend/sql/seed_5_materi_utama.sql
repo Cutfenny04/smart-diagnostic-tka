@@ -13,7 +13,7 @@ INSERT INTO materi (id, title, deskripsi, category, duration, materi_count, kont
     'hots',
     '30 menit',
     2,
-    '/assets/modul/modul-pelatihan-hots-ipa.pdf',
+    '/pdf/bahan-tayang-pelatihan.pdf',
     '2026-08-01 08:00:00'
 ),
 (
@@ -23,7 +23,7 @@ INSERT INTO materi (id, title, deskripsi, category, duration, materi_count, kont
     'hots',
     '45 menit',
     3,
-    '/assets/modul/modul-pelatihan-hots-ipa.pdf',
+    '/pdf/bahan-tayang-pelatihan.pdf',
     '2026-08-01 08:30:00'
 ),
 (
@@ -33,7 +33,7 @@ INSERT INTO materi (id, title, deskripsi, category, duration, materi_count, kont
     'soal',
     '40 menit',
     3,
-    '/assets/modul/modul-pelatihan-hots-ipa.pdf',
+    '/pdf/bahan-tayang-pelatihan.pdf',
     '2026-08-01 09:00:00'
 ),
 (
@@ -43,7 +43,7 @@ INSERT INTO materi (id, title, deskripsi, category, duration, materi_count, kont
     'soal',
     '50 menit',
     3,
-    '/assets/modul/modul-pelatihan-hots-ipa.pdf',
+    '/pdf/bahan-tayang-pelatihan.pdf',
     '2026-08-01 09:30:00'
 ),
 (
@@ -53,7 +53,7 @@ INSERT INTO materi (id, title, deskripsi, category, duration, materi_count, kont
     'budaya',
     '45 menit',
     4,
-    '/assets/modul/modul-pelatihan-hots-ipa.pdf',
+    '/pdf/bahan-tayang-pelatihan.pdf',
     '2026-08-01 10:00:00'
 )
 ON CONFLICT (id) DO UPDATE SET

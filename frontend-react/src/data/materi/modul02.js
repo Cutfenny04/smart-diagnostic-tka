@@ -5,7 +5,7 @@ export const modul02 = {
   desc: 'Mengidentifikasi konsep HOTS sebagai proses berpikir kompleks serta tangga kognitif LOTS-MOTS-HOTS pada pembelajaran IPA.',
   category: 'hots',
   duration: '45 menit',
-  pdfUrl: '/assets/modul/modul-pelatihan-hots-ipa.pdf',
+  pdfUrl: '/pdf/bahan-tayang-pelatihan.pdf',
   learningObjective: 'Guru mampu memahami hakikat HOTS sebagai proses berpikir tingkat tinggi (bukan sekadar soal sulit), mengidentifikasi 6 dimensi kemampuan berpikir HOTS, serta membedakan tingkatan kognitif LOTS, MOTS, dan HOTS dalam materi IPA.',
   quote: {
     text: 'HOTS bukan sekadar "soal sulit", tetapi berkaitan dengan proses berpikir yang kompleks.',

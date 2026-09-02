@@ -6,18 +6,14 @@ import {
   BookOpen,
   PlayCircle,
   SearchX,
-  Inbox,
-  FileText,
-  Download,
-  CheckCircle2,
   Gamepad2,
-  ArrowRight,
-  Sparkles,
   Layers,
   ExternalLink,
+  FileText,
 } from 'lucide-react';
 import Layout from '../components/Layout';
 import FetchError from '../components/FetchError';
+import PdfViewer from '../components/PdfViewer';
 import {
   fetchMateri,
   materiCategoryMeta as CATEGORY_META,
@@ -29,10 +25,9 @@ import { useProgressBarAnimation } from '../hooks/useProgressBarAnimation';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
 import './Materi.css';
 
-const WORDWALL_GUIDE_PDF = '/assets/modul/modul-tutorial-wordwall.pdf';
-const PANDUAN_PLATFORM_PDF = '/assets/modul/panduan-penggunaan-smart-diagnostic-tka.pdf';
-const MATERI_PELATIHAN_RESMI_PDF = '/assets/modul/modul-pelatihan-hots-ipa.pdf';
-const PANDUAN_PENGGUNAAN_HALAMAN = 35;
+const WORDWALL_GUIDE_PDF = '/pdf/tutorial-wordwall.pdf';
+const PANDUAN_PLATFORM_PDF = '/pdf/panduan-smart-diagnostic.pdf';
+const BAHAN_TAYANG_RESMI_PDF = '/pdf/bahan-tayang-pelatihan.pdf';
 
 const FILTERS = [
   { value: 'semua', label: 'Semua Modul' },
@@ -156,34 +151,24 @@ function Materi() {
         <div className="page-header__text">
           <h1 className="page-header__title">Materi &amp; Modul Pelatihan</h1>
           <p className="page-header__desc">
-            Kurikulum resmi pelatihan penyusunan instrumen HOTS IPA berbasis Smart Diagnostic TKA terintegrasi kearifan lokal budaya Aceh.
+            Pusat pembelajaran dan kurikulum resmi pelatihan penyusunan instrumen HOTS IPA berbasis Smart Diagnostic TKA terintegrasi budaya Aceh.
           </p>
         </div>
       </div>
 
       {/* ====================================================================
-          ZONA 1: 🚀 MULAI DI SINI (Panduan Platform Penggunaan 35 Halaman)
+          ZONA 1: 🚀 MULAI DI SINI (Panduan Platform 35 Halaman)
           ==================================================================== */}
-      <section className="dashboard-section card-light guide-module-card getting-started-card" aria-label="Mulai di Sini: Panduan Penggunaan Platform">
-        <div className="guide-module-card__header">
-          <div className="guide-module-card__icon" aria-hidden="true"><BookOpen size={24} /></div>
-          <div className="guide-module-card__text">
-            <span className="getting-started-card__eyebrow">🚀 Mulai di Sini &bull; Panduan Sistem</span>
-            <h2 className="section-heading__title">Panduan Penggunaan Smart Diagnostic TKA</h2>
-            <p className="guide-module-card__desc">
-              Panduan operasional {PANDUAN_PENGGUNAAN_HALAMAN} halaman untuk membantu Bapak/Ibu guru mengenal alur kerja platform:
-              mulai dari login, membaca materi, membuat dan mendaftarkan aktivitas Wordwall (TKA), memainkan latihan diagnostik (Non-TKA), hingga memantau Dashboard Hasil.
-            </p>
-          </div>
-          <div className="getting-started-card__actions">
-            <Link to="/materi/panduan-penggunaan" className="btn btn-primary">
-              <BookOpen size={16} /> Baca Panduan
-            </Link>
-            <a href={PANDUAN_PLATFORM_PDF} download className="btn btn-secondary">
-              <Download size={16} /> Unduh PDF ({PANDUAN_PENGGUNAAN_HALAMAN} Halaman)
-            </a>
-          </div>
-        </div>
+      <section className="dashboard-section" aria-label="Mulai di Sini: Panduan Penggunaan Platform">
+        <PdfViewer
+          title="Panduan Penggunaan Smart Diagnostic TKA"
+          subtitle="Panduan operasional 35 halaman untuk membantu Bapak/Ibu guru mengenal seluruh alur fitur platform: login, materi, Wordwall, Bank Soal, Smart Diagnostic, dan Dashboard Hasil."
+          pdfUrl={PANDUAN_PLATFORM_PDF}
+          downloadName="panduan-penggunaan-smart-diagnostic-tka.pdf"
+          initialOpen={false}
+          badgeText="🚀 Mulai di Sini"
+          pageCountText="35 Halaman &bull; Panduan Sistem"
+        />
       </section>
 
       {/* ====================================================================
@@ -346,8 +331,8 @@ function Materi() {
               Pindahkan stimulus dan butir soal HOTS IPA yang telah Anda susun ke template game interaktif Wordwall (Quiz, Match up, Game show).
             </p>
             <div className="practice-flow-card__actions">
-              <a href={WORDWALL_GUIDE_PDF} download className="btn btn-secondary">
-                <FileText size={14} /> Unduh Modul Wordwall (PDF)
+              <a href={WORDWALL_GUIDE_PDF} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
+                <FileText size={14} /> Buka Panduan Wordwall (PDF) ↗
               </a>
               <a href="https://wordwall.net/create/template" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
                 Buka Wordwall.net <ExternalLink size={14} />
@@ -394,20 +379,16 @@ function Materi() {
       {/* ====================================================================
           ZONA 4: 📎 DOKUMEN REFERENSI RESMI
           ==================================================================== */}
-      <section className="dashboard-section card-light official-reference-card" aria-label="Dokumen Referensi Pelatihan Resmi">
-        <div className="guide-module-card__header">
-          <div className="guide-module-card__icon" aria-hidden="true"><FileText size={24} /></div>
-          <div className="guide-module-card__text">
-            <span className="getting-started-card__eyebrow">Dokumen Resmi Pelatihan</span>
-            <h2 className="section-heading__title">Bahan Tayang Pelatihan Penyusunan Instrumen HOTS IPA</h2>
-            <p className="guide-module-card__desc">
-              Dokumen materi pelatihan resmi Universitas Syiah Kuala (USK) dalam kegiatan pengabdian di SMP Negeri 3 Ingin Jaya Aceh Besar.
-            </p>
-          </div>
-          <a href={MATERI_PELATIHAN_RESMI_PDF} download className="btn btn-primary">
-            <Download size={16} /> Unduh PDF Lengkap
-          </a>
-        </div>
+      <section className="dashboard-section" aria-label="Dokumen Referensi Pelatihan Resmi">
+        <PdfViewer
+          title="Bahan Tayang Pelatihan Resmi HOTS IPA &amp; TKA"
+          subtitle="Dokumen sumber materi pelatihan resmi Universitas Syiah Kuala (USK) dalam kegiatan pengabdian di SMP Negeri 3 Ingin Jaya Aceh Besar."
+          pdfUrl={BAHAN_TAYANG_RESMI_PDF}
+          downloadName="bahan-tayang-pelatihan-hots-ipa-usk.pdf"
+          initialOpen={true}
+          badgeText="📎 Dokumen Referensi Resmi"
+          pageCountText="15 Slide &bull; Presentasi Resmi USK"
+        />
       </section>
     </Layout>
   );

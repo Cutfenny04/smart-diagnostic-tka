@@ -5,7 +5,7 @@ export const modul01 = {
   desc: 'Memahami alasan pentingnya transformasi asesmen IPA dan fungsi asesmen sebagai dasar perbaikan pembelajaran.',
   category: 'hots',
   duration: '30 menit',
-  pdfUrl: '/assets/modul/modul-pelatihan-hots-ipa.pdf',
+  pdfUrl: '/pdf/bahan-tayang-pelatihan.pdf',
   learningObjective: 'Setelah menyelesaikan materi ini, guru diharapkan memahami pentingnya transformasi asesmen IPA dari sekadar evaluasi hasil belajar akhir (testing) menjadi asesmen diagnostik cerdas yang memetakan profil penguasaan kompetensi dan kebutuhan belajar siswa.',
   quote: {
     text: 'Asesmen bukan hanya untuk mengetahui berapa nilai siswa, tetapi untuk mengetahui apa yang sudah dikuasai dan apa yang masih perlu diperbaiki.',

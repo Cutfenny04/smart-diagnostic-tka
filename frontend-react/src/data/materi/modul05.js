@@ -5,7 +5,7 @@ export const modul05 = {
   desc: 'Mengembangkan 9 bentuk stimulus kontekstual dan menerapkan 4 prinsip kunci stimulus untuk pembuatan game Wordwall dan Bank Soal.',
   category: 'budaya',
   duration: '45 menit',
-  pdfUrl: '/assets/modul/modul-pelatihan-hots-ipa.pdf',
+  pdfUrl: '/pdf/bahan-tayang-pelatihan.pdf',
   learningObjective: 'Guru mampu mengidentifikasi dan merancang 9 bentuk stimulus HOTS yang kontekstual dan menantang penalaran, menerapkan 4 prinsip utama penyusunan stimulus, serta menghubungkannya langsung dengan pembuatan game edukasi di Wordwall dan Bank Soal Smart Diagnostic TKA.',
   quote: {
     text: 'Stimulus yang baik adalah pintu masuk penalaran: bukan menyajikan jawaban langsung, melainkan menyediakan data dan konteks nyata bagi siswa untuk berpikir kritis.',

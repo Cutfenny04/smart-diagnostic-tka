@@ -5,7 +5,7 @@ export const modul04 = {
   desc: 'Panduan langkah demi langkah menyusun indikator soal ABCD dan menentukan level kognitif Taksonomi Bloom Revisi C4–C6.',
   category: 'soal',
   duration: '50 menit',
-  pdfUrl: '/assets/modul/modul-pelatihan-hots-ipa.pdf',
+  pdfUrl: '/pdf/bahan-tayang-pelatihan.pdf',
   learningObjective: 'Guru mampu merumuskan indikator soal HOTS dengan kaidah ABCD (Audience, Behavior, Condition, Degree) dan memilih Kata Kerja Operasional (KKO) Taksonomi Bloom Revisi C4–C6 yang terukur dan aplikatif pada mata pelajaran IPA.',
   quote: {
     text: 'Tujuan utama asesmen bukan hanya mencari jawaban benar, tetapi melihat bagaimana siswa berpikir.',

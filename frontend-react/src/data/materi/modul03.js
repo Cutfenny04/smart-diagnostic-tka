@@ -5,7 +5,7 @@ export const modul03 = {
   desc: 'Memahami konsep Tes Kemampuan Akademik (TKA), karakteristik instrumen, dan integrasi HOTS dalam penilaian terstandar.',
   category: 'soal',
   duration: '40 menit',
-  pdfUrl: '/assets/modul/modul-pelatihan-hots-ipa.pdf',
+  pdfUrl: '/pdf/bahan-tayang-pelatihan.pdf',
   learningObjective: 'Guru memahami hakikat Tes Kemampuan Akademik (TKA), 4 tujuan utama pelaksanaan TKA, karakteristik soal TKA berbasis mata pelajaran, serta bagaimana TKA dirancang berbasis HOTS untuk mengukur penguasaan kurikulum IPA.',
   quote: {
     text: 'TKA adalah asesmen terstandar untuk memperoleh informasi tentang capaian kemampuan akademik murid pada mata pelajaran tertentu secara objektif dan adil.',
