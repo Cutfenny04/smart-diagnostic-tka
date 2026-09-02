@@ -6,7 +6,7 @@
 
 import { supabase } from './supabaseClient';
 
-const PRODUCTION_API_BASE_URL = 'https://resilient-manifestation-production-6f44.up.railway.app';
+const PRODUCTION_API_BASE_URL = 'https://diplomatic-joy-production-6bba.up.railway.app';
 
 const isLocal = ['localhost', '127.0.0.1'].includes(window.location.hostname);
 
