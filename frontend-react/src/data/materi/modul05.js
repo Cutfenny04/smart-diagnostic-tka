@@ -106,17 +106,17 @@ export const modul05 = {
       lead: 'Setelah merumuskan stimulus HOTS yang berkualitas, langkah berikutnya adalah menerapkannya ke dalam instrumen interaktif:',
       stepsToPractice: [
         {
-          order: '①',
+          order: '1',
           action: 'Buat Game di Wordwall',
           desc: 'Pindahkan stimulus, narasi kasus, dan opsi jawaban ke template interaktif Wordwall (Quiz, Match up, atau Game show).',
         },
         {
-          order: '②',
+          order: '2',
           action: 'Daftarkan ke Bank Soal TKA',
           desc: 'Masukkan tautan aktivitas Wordwall dan ringkasan stimulus budaya Aceh ke dalam menu Bank Soal di platform ini.',
         },
         {
-          order: '③',
+          order: '3',
           action: 'Uji Coba & Mainkan',
           desc: 'Jalankan aktivitas TKA di menu Smart Diagnostic untuk melihat pengalaman bermain siswa secara langsung.',
         },

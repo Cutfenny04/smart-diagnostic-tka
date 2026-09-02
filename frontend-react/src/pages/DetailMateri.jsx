@@ -260,7 +260,7 @@ function DetailMateri() {
             pdfUrl={pdfLink}
             downloadName="bahan-tayang-pelatihan-hots-ipa-usk.pdf"
             initialOpen={false}
-            badgeText="📎 Dokumen Referensi Resmi"
+            badgeText="Dokumen Referensi Resmi"
             pageCountText="15 Slide"
           />
 

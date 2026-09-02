@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { CheckCircle2, Circle } from 'lucide-react';
+import { CheckCircle2, Circle, FileCheck } from 'lucide-react';
 import { loadChecklistState, saveChecklistState } from '../data/materiData';
 
 function ReflectionChecklist({ items = [], guruId, materiId, onChecklistChange }) {
@@ -32,7 +32,7 @@ function ReflectionChecklist({ items = [], guruId, materiId, onChecklistChange }
     <div className="reflection-box card-light" aria-label="Checklist Refleksi Mandiri">
       <div className="reflection-box__header">
         <div className="reflection-box__title-wrap">
-          <span className="reflection-box__icon" aria-hidden="true">📝</span>
+          <FileCheck size={24} className="reflection-box__icon" />
           <div>
             <h3 className="reflection-box__title">Refleksi Pemahaman Mandiri</h3>
             <p className="reflection-box__subtitle">

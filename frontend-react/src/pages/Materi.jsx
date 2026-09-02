@@ -43,9 +43,9 @@ function getStatus(m) {
 }
 
 const STATUS_LABEL = {
-  selesai: '✓ Selesai',
-  sedang: '◐ Sedang Dipelajari',
-  belum: '○ Belum Dimulai',
+  selesai: 'Selesai',
+  sedang: 'Sedang Dipelajari',
+  belum: 'Belum Dimulai',
 };
 
 const ACTION_LABEL = {
@@ -157,7 +157,7 @@ function Materi() {
       </div>
 
       {/* ====================================================================
-          ZONA 1: 🚀 MULAI DI SINI (Panduan Platform 35 Halaman)
+          ZONA 1: MULAI DI SINI (Panduan Platform 35 Halaman)
           ==================================================================== */}
       <section className="dashboard-section" aria-label="Mulai di Sini: Panduan Penggunaan Platform">
         <PdfViewer
@@ -166,19 +166,19 @@ function Materi() {
           pdfUrl={PANDUAN_PLATFORM_PDF}
           downloadName="panduan-penggunaan-smart-diagnostic-tka.pdf"
           initialOpen={false}
-          badgeText="🚀 Mulai di Sini"
+          badgeText="Mulai di Sini"
           pageCountText="35 Halaman &bull; Panduan Sistem"
         />
       </section>
 
       {/* ====================================================================
-          ZONA 2: 📚 MATERI UTAMA PELATIHAN (Modul 01 - 05)
+          ZONA 2: MATERI UTAMA PELATIHAN (Modul 01 - 05)
           ==================================================================== */}
       <section className="dashboard-section materi-main-section" aria-label="Materi Utama Pelatihan">
         {/* Header Seksi & Progress Overview */}
         <div className="materi-section-header">
           <div>
-            <span className="materi-section-eyebrow">📚 Materi Utama Pelatihan</span>
+            <span className="materi-section-eyebrow">Materi Utama Pelatihan</span>
             <h2 className="section-heading__title">5 Modul Pembelajaran HOTS &amp; TKA</h2>
           </div>
 
@@ -200,9 +200,9 @@ function Materi() {
               <div className="progress-bar__fill" data-progress={overallProgress.percent} />
             </div>
             <div className="materi-progress-pill__status-row">
-              <span className="pill-status pill-status--done">✓ {overallProgress.completed} Selesai</span>
-              <span className="pill-status pill-status--progress">◐ {overallProgress.inProgress} Sedang Berjalan</span>
-              <span className="pill-status pill-status--todo">○ {overallProgress.notStarted} Belum Dimulai</span>
+              <span className="pill-status pill-status--done">{overallProgress.completed} Selesai</span>
+              <span className="pill-status pill-status--progress">{overallProgress.inProgress} Sedang Berjalan</span>
+              <span className="pill-status pill-status--todo">{overallProgress.notStarted} Belum Dimulai</span>
             </div>
           </div>
         </div>
@@ -308,11 +308,11 @@ function Materi() {
       </section>
 
       {/* ====================================================================
-          ZONA 3: 🛠️ PRAKTIK & IMPLEMENTASI (Action Flow / Alur Tindakan)
+          ZONA 3: PRAKTIK & IMPLEMENTASI (Alur Tindakan / Action Flow)
           ==================================================================== */}
       <section className="dashboard-section practice-flow-section card-light" aria-label="Praktik & Implementasi">
         <div className="section-heading">
-          <span className="getting-started-card__eyebrow">🛠️ Praktik &amp; Implementasi</span>
+          <span className="getting-started-card__eyebrow">Praktik &amp; Implementasi</span>
           <h2 className="section-heading__title">Alur Tindakan: Dari Teori Menjadi Praktik Nyata</h2>
           <p className="practice-flow__desc">
             Setelah menyelesaikan pembelajaran materi di atas, ikuti alur tiga langkah berikut untuk menyusun, mendaftarkan, dan menguji instrumen HOTS Anda:
@@ -326,13 +326,13 @@ function Materi() {
               <span className="practice-flow-card__step">Tahap 1</span>
               <span className="badge badge--new">Praktik Digital</span>
             </div>
-            <h3 className="practice-flow-card__title">① Membuat Soal di Wordwall</h3>
+            <h3 className="practice-flow-card__title">1. Membuat Soal di Wordwall</h3>
             <p className="practice-flow-card__desc">
               Pindahkan stimulus dan butir soal HOTS IPA yang telah Anda susun ke template game interaktif Wordwall (Quiz, Match up, Game show).
             </p>
             <div className="practice-flow-card__actions">
               <a href={WORDWALL_GUIDE_PDF} target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
-                <FileText size={14} /> Buka Panduan Wordwall (PDF) ↗
+                <FileText size={14} /> Buka Panduan Wordwall (PDF)
               </a>
               <a href="https://wordwall.net/create/template" target="_blank" rel="noopener noreferrer" className="btn btn-secondary">
                 Buka Wordwall.net <ExternalLink size={14} />
@@ -346,7 +346,7 @@ function Materi() {
               <span className="practice-flow-card__step">Tahap 2</span>
               <span className="badge badge--info">Integrasi Platform</span>
             </div>
-            <h3 className="practice-flow-card__title">② Mendaftarkan TKA ke Bank Soal</h3>
+            <h3 className="practice-flow-card__title">2. Mendaftarkan TKA ke Bank Soal</h3>
             <p className="practice-flow-card__desc">
               Daftarkan tautan aktivitas Wordwall Anda ke dalam Bank Soal Berbasis Budaya Aceh agar siap dimainkan dan terdokumentasi.
             </p>
@@ -363,7 +363,7 @@ function Materi() {
               <span className="practice-flow-card__step">Tahap 3</span>
               <span className="badge badge--important">Uji Coba &amp; Simulasi</span>
             </div>
-            <h3 className="practice-flow-card__title">③ Mencoba Smart Diagnostic</h3>
+            <h3 className="practice-flow-card__title">3. Mencoba Smart Diagnostic</h3>
             <p className="practice-flow-card__desc">
               Jalankan simulasi asesmen diagnostik untuk menguji respons sistem, melihat analisis kompetensi, dan memantau hasil pengerjaan.
             </p>
@@ -377,7 +377,7 @@ function Materi() {
       </section>
 
       {/* ====================================================================
-          ZONA 4: 📎 DOKUMEN REFERENSI RESMI
+          ZONA 4: DOKUMEN REFERENSI RESMI
           ==================================================================== */}
       <section className="dashboard-section" aria-label="Dokumen Referensi Pelatihan Resmi">
         <PdfViewer
@@ -386,7 +386,7 @@ function Materi() {
           pdfUrl={BAHAN_TAYANG_RESMI_PDF}
           downloadName="bahan-tayang-pelatihan-hots-ipa-usk.pdf"
           initialOpen={true}
-          badgeText="📎 Dokumen Referensi Resmi"
+          badgeText="Dokumen Referensi Resmi"
           pageCountText="15 Slide &bull; Presentasi Resmi USK"
         />
       </section>
