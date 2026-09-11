@@ -1,0 +1,783 @@
+/* ==========================================================================
+   GAME REFLEKSI BUDAYA ACEH — STYLESHEET
+   Arah Visual: Aceh Heritage × Fantasy Zuma × 3D Jewel
+   Dominan: Merah Marun, Emas Aceh, Hijau Hutan Tropis, Beludru Hitam
+   ========================================================================== */
+
+.game-refleksi-page {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  user-select: none;
+}
+
+/* --- HUD Header --- */
+.zuma-hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #0A3323 0%, #062418 100%);
+  border: 1.5px solid #D49B2A;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(6, 36, 24, 0.35);
+  color: #F7F4D5;
+}
+
+.zuma-hud__left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.zuma-hud__icon {
+  font-size: 1.5rem;
+}
+
+.zuma-hud__title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #FFE082;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.zuma-hud__subtitle {
+  font-size: 0.75rem;
+  color: rgba(247, 244, 213, 0.7);
+}
+
+.zuma-hud__center {
+  flex: 1;
+  max-width: 320px;
+}
+
+.zuma-hud__progress-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.zuma-hud__progress-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #D49B2A;
+}
+
+.zuma-hud__progress-bar {
+  width: 100%;
+  height: 8px;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(212, 155, 42, 0.4);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.zuma-hud__progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #D49B2A 0%, #FFE082 100%);
+  border-radius: 999px;
+  transition: width 0.3s ease-out;
+}
+
+.zuma-hud__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.zuma-hud__score-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1.5px solid #D49B2A;
+  border-radius: 999px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.4);
+}
+
+.zuma-hud__star-icon {
+  color: #F2C94C;
+  fill: #F2C94C;
+}
+
+.zuma-hud__score-text {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.zuma-hud__btn-pause {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(212, 155, 42, 0.15);
+  color: #FFE082;
+  border: 1.5px solid #D49B2A;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.85rem;
+  transition: all 0.2s ease;
+}
+
+.zuma-hud__btn-pause:hover {
+  background: #D49B2A;
+  color: #0A3323;
+  transform: translateY(-1px);
+}
+
+/* --- Viewport & Stage --- */
+.zuma-viewport {
+  position: relative;
+  width: 100%;
+  height: clamp(520px, 78vh, 760px);
+  background: #081D17;
+  border: 2px solid #9E7410;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  touch-action: none; /* Mencegah pull-to-refresh & default scrolling di mobile */
+}
+
+.zuma-stage {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Kontainer Engine Zuma --- */
+.zuma-canvas-anchor {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.zuma-container {
+  position: relative;
+  flex-shrink: 0;
+  background-image: url('/assets/game-refleksi/background/aceh-bg.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-shadow: 0 0 60px rgba(0, 0, 0, 0.8) inset;
+  border-radius: 16px;
+  transform-origin: center center;
+}
+
+.zuma-container canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 4;
+  pointer-events: none;
+}
+
+/* Jalur SVG (tersembunyi secara DOM, koordinatnya disampel engine) */
+.zuma-container svg {
+  opacity: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+/* Gerbang Masuk & Keluar Lubang (Portals) */
+.zuma-container .start-hole--aceh {
+  position: absolute;
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, #2D0B12 30%, #000000 85%);
+  border: 3px solid #D49B2A;
+  box-shadow: 0 0 24px rgba(212, 155, 42, 0.6), inset 0 0 16px #000;
+  z-index: 3;
+}
+
+.zuma-container .final-hole--aceh {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background: radial-gradient(circle, #4A0E1A 20%, #150205 75%, #000 100%);
+  border: 3.5px solid #FF5252;
+  box-shadow: 0 0 30px rgba(255, 82, 82, 0.7), inset 0 0 20px #000;
+  z-index: 3;
+  animation: final-hole-pulse 2s infinite ease-in-out;
+}
+
+@keyframes final-hole-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.06); filter: drop-shadow(0 0 12px #FF5252); }
+}
+
+/* --- Player Launcher Aceh --- */
+.zuma-container .player {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 180px;
+  height: 180px;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Garis Pemandu Bidikan (Aiming Ray) */
+.zuma-container .player::before {
+  content: "";
+  display: block;
+  width: 2px;
+  height: 600px;
+  margin-left: -1px;
+  position: absolute;
+  left: 50%;
+  bottom: 40px;
+  background: linear-gradient(to top, rgba(255, 224, 130, 0.6) 0%, rgba(255, 224, 130, 0) 100%);
+  box-shadow: 0 0 6px rgba(255, 224, 130, 0.4);
+  z-index: 1;
+}
+
+/* Karakter Aceh */
+.zuma-container .player::after {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-image: url('/assets/game-refleksi/character/character-aceh.svg');
+  z-index: 2;
+  filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.5));
+}
+
+/* Kelereng Aktif di Launcher */
+.zuma-container .player .marble-1 {
+  position: absolute;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.6), 0 0 12px rgba(255, 224, 130, 0.5);
+  border: 2px solid rgba(255, 224, 130, 0.8);
+}
+
+/* Kelereng Cadangan Berikutnya */
+.zuma-container .player .marble-2 {
+  position: absolute;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  z-index: 5;
+  border: 2px solid rgba(255, 224, 130, 0.6);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
+}
+
+.zuma-container .player .marble-2-left {
+  top: 92px;
+  left: 50%;
+  transform: translateX(calc(-50% - 32px));
+}
+
+.zuma-container .player .marble-2-center {
+  width: 26px;
+  height: 26px;
+  top: 110px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.zuma-container .player .marble-2-right {
+  top: 92px;
+  left: 50%;
+  transform: translateX(calc(-50% + 32px));
+}
+
+/* --- Modal Overlays & Cards --- */
+.zuma-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  background: rgba(6, 24, 18, 0.82);
+  backdrop-filter: blur(6px);
+  animation: zuma-fade-in 0.25s ease-out;
+}
+
+@keyframes zuma-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.zuma-modal-card {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  background: linear-gradient(145deg, #120A0C 0%, #201014 100%);
+  border: 2.5px solid #D49B2A;
+  border-radius: 20px;
+  padding: 28px 24px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.75), 0 0 24px rgba(212, 155, 42, 0.25);
+  color: #F7F4D5;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  animation: zuma-pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.2);
+}
+
+@keyframes zuma-pop-in {
+  from { opacity: 0; transform: scale(0.9) translateY(16px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.zuma-modal__ornament-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.ornament-divider {
+  color: #D49B2A;
+  font-size: 0.9rem;
+}
+
+.zuma-modal__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #FFE082;
+  margin-bottom: 6px;
+}
+
+.zuma-modal__title {
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #FFE082;
+  margin: 0 0 10px;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
+
+.zuma-modal__desc {
+  font-size: 0.9rem;
+  color: rgba(247, 244, 213, 0.88);
+  line-height: 1.6;
+  margin: 0 0 18px;
+}
+
+/* Guide box di start screen */
+.zuma-guide-box {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(212, 155, 42, 0.3);
+  border-radius: 12px;
+  padding: 12px 16px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+
+.zuma-guide-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: rgba(247, 244, 213, 0.9);
+  line-height: 1.4;
+}
+
+.zuma-guide-icon {
+  color: #FFE082;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Tombol Modal */
+.btn-zuma-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 160px;
+  height: 48px;
+  padding: 0 24px;
+  background: linear-gradient(135deg, #F2C94C 0%, #D49B2A 100%);
+  color: #0A3323 !important;
+  border: 2px solid #8C5E0B;
+  border-radius: 14px;
+  font-weight: 800;
+  font-size: 0.95rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(212, 155, 42, 0.4);
+  transition: all 0.2s ease;
+}
+
+.btn-zuma-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #FFE082 0%, #F2C94C 100%);
+  box-shadow: 0 6px 18px rgba(212, 155, 42, 0.55);
+}
+
+.btn-zuma-primary:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+.btn-zuma--lg {
+  min-width: 220px;
+  height: 52px;
+  font-size: 1.05rem;
+}
+
+.btn-zuma-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 160px;
+  height: 44px;
+  padding: 0 20px;
+  background: rgba(247, 244, 213, 0.08);
+  color: #F7F4D5;
+  border: 1.5px solid rgba(212, 155, 42, 0.5);
+  border-radius: 12px;
+  font-weight: 700;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-zuma-secondary:hover {
+  background: rgba(212, 155, 42, 0.2);
+  border-color: #FFE082;
+  color: #FFE082;
+}
+
+.btn-zuma-tertiary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 16px;
+  background: transparent;
+  color: rgba(247, 244, 213, 0.7);
+  border: none;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-zuma-tertiary:hover {
+  color: #FF5252;
+}
+
+.zuma-modal__actions-stacked {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 280px;
+}
+
+.zuma-modal__actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  width: 100%;
+  margin-top: 10px;
+}
+
+/* --- Reflection Overlay Specifics --- */
+.zuma-modal-card--reflection {
+  max-width: 560px;
+}
+
+.zuma-reflection__context {
+  font-style: italic;
+  font-size: 0.85rem;
+  color: rgba(247, 244, 213, 0.8);
+  background: rgba(10, 51, 35, 0.4);
+  border-left: 3px solid #D49B2A;
+  padding: 8px 12px;
+  border-radius: 6px;
+  margin: 0 0 14px;
+  text-align: left;
+  width: 100%;
+}
+
+.zuma-reflection__question {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #FFE082;
+  margin: 0 0 14px;
+  text-align: left;
+  width: 100%;
+}
+
+.zuma-reflection__options {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 14px;
+}
+
+.zuma-reflection__option-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: rgba(0, 0, 0, 0.35);
+  border: 1.5px solid rgba(212, 155, 42, 0.3);
+  border-radius: 12px;
+  color: #F7F4D5;
+  cursor: pointer;
+  text-align: left;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  transition: all 0.2s ease;
+}
+
+.zuma-reflection__option-card:hover {
+  border-color: #D49B2A;
+  background: rgba(212, 155, 42, 0.12);
+  transform: translateX(2px);
+}
+
+.zuma-reflection__option-card.is-selected {
+  border-color: #FFE082;
+  background: rgba(212, 155, 42, 0.24);
+  box-shadow: 0 0 12px rgba(212, 155, 42, 0.3);
+}
+
+.zuma-reflection__radio {
+  color: #FFE082;
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.radio-circle {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid rgba(212, 155, 42, 0.6);
+  display: block;
+}
+
+.zuma-reflection__feedback {
+  background: rgba(10, 51, 35, 0.6);
+  border: 1px solid #1B4D3E;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: #FFE082;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+/* --- Finish Screen Specifics --- */
+.zuma-finish__score-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 24px;
+  background: rgba(0, 0, 0, 0.45);
+  border: 2px solid #D49B2A;
+  border-radius: 16px;
+  margin-bottom: 16px;
+}
+
+.zuma-finish__score-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #FFE082;
+}
+
+.zuma-finish__score-val {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'DM Serif Display', Georgia, serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #FFFFFF;
+}
+
+.zuma-finish__star-icon {
+  color: #F2C94C;
+  fill: #F2C94C;
+}
+
+/* --- Mobile Controls (Touch) --- */
+.zuma-mobile-controls {
+  position: absolute;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 16px;
+}
+
+.zuma-mobile-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  background: rgba(10, 51, 35, 0.85);
+  color: #FFE082;
+  border: 2px solid #D49B2A;
+  border-radius: 50%;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.6);
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.zuma-mobile-btn:active {
+  transform: scale(0.94);
+  background: #D49B2A;
+  color: #0A3323;
+}
+
+.btn-mobile-sub {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.zuma-mobile-btn--pause {
+  align-self: flex-end;
+  width: 44px;
+  height: 44px;
+}
+
+.zuma-mobile-actions-left {
+  position: absolute;
+  bottom: 20px;
+  left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  pointer-events: auto;
+}
+
+.zuma-mobile-btn--switch {
+  width: 56px;
+  height: 56px;
+}
+
+.zuma-mobile-btn--shoot {
+  width: 64px;
+  height: 64px;
+  background: linear-gradient(135deg, #F2C94C 0%, #D49B2A 100%);
+  color: #0A3323;
+  border-color: #8C5E0B;
+}
+
+.zuma-mobile-actions-right {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  pointer-events: auto;
+}
+
+.zuma-mobile-aimpad {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(10, 51, 35, 0.7);
+  border: 2px dashed #D49B2A;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #FFE082;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+  touch-action: none;
+}
+
+.aimpad-cross {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.aimpad-hint {
+  font-size: 0.55rem;
+  text-align: center;
+  max-width: 60px;
+  font-weight: 700;
+  opacity: 0.85;
+}
+
+/* Responsif Mobile Header & Viewport */
+@media (max-width: 640px) {
+  .zuma-hud {
+    padding: 10px 14px;
+    flex-wrap: wrap;
+  }
+
+  .zuma-hud__center {
+    order: 3;
+    max-width: 100%;
+    flex: 1 1 100%;
+    margin-top: 4px;
+  }
+
+  .btn-text-desktop {
+    display: none;
+  }
+
+  .zuma-modal-card {
+    padding: 20px 16px;
+  }
+
+  .zuma-modal__title {
+    font-size: 1.4rem;
+  }
+}

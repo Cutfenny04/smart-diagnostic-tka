@@ -8,6 +8,7 @@ import BankSoal from './pages/BankSoal';
 import DetailSoal from './pages/DetailSoal';
 import SmartDiagnostic from './pages/SmartDiagnostic';
 import HasilDiagnostik from './pages/HasilDiagnostik';
+import GameRefleksi from './pages/GameRefleksi';
 import Profil from './pages/Profil';
 import UbahPassword from './pages/UbahPassword';
 import NotFound from './pages/NotFound';
@@ -47,6 +48,7 @@ function App() {
           <Route path="/bank-soal" element={protect(<BankSoal />)} />
           <Route path="/bank-soal/tka/baru" element={protect(<DetailSoal />)} />
           <Route path="/bank-soal/tka/:id/edit" element={protect(<DetailSoalEditRoute />)} />
+          <Route path="/game-refleksi" element={protect(<GameRefleksi />)} />
           <Route path="/smart-diagnostic" element={protect(<SmartDiagnostic />)} />
           <Route path="/hasil-diagnostik" element={protect(<HasilDiagnostik />)} />
           <Route path="/profil" element={protect(<Profil />)} />
