@@ -280,9 +280,6 @@ function BankSoal() {
           <h1 className="page-header__title">Bank Soal Berbasis Budaya Aceh</h1>
           <p className="page-header__desc">Jelajahi paket soal budaya Aceh (TKA lewat Wordwall, Non-TKA lewat game interaktif) untuk digunakan pada Smart Diagnostic.</p>
         </div>
-        <div className="page-header__actions">
-          <Link to="/bank-soal/tka/baru" className="btn btn-primary"><PlusCircle size={18} /> Tambah Paket TKA</Link>
-        </div>
       </div>
 
       <div className="type-tabs" role="tablist" aria-label="Tipe Paket Soal">
@@ -323,6 +320,13 @@ function BankSoal() {
               ))}
         </div>
       </section>
+
+      {/* Centered Action Bar (Opsi B: Tombol Tambah Paket TKA Terpusat di Tengah) */}
+      <div className="bank-soal-center-action">
+        <Link to="/bank-soal/tka/baru" className="btn-tka-prominent">
+          <PlusCircle size={19} /> Tambah Paket TKA
+        </Link>
+      </div>
 
       <section className="catalog-controls card-light" aria-label="Cari dan Saring Paket Soal">
         <div className="catalog-search">
@@ -398,7 +402,12 @@ function BankSoal() {
                   <div className="empty-state">
                     <div className="empty-state__icon"><Inbox size={28} /></div>
                     <h3 className="empty-state__title">Belum ada paket soal</h3>
-                    <p className="empty-state__desc">Tambahkan paket TKA pertama Anda lewat tombol "Tambah Paket TKA" di atas.</p>
+                    <p className="empty-state__desc">Mulai daftarkan paket TKA pertama Anda sekarang.</p>
+                    <div className="empty-state__actions" style={{ marginTop: 'var(--space-4)' }}>
+                      <Link to="/bank-soal/tka/baru" className="btn-tka-prominent">
+                        <PlusCircle size={18} /> Tambah Paket TKA
+                      </Link>
+                    </div>
                   </div>
                 )}
               </div>
