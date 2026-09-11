@@ -356,22 +356,36 @@
     min-width: 0;
 }
 
-/* Layout 2 kolom desktop HANYA kalau soal punya gambar (lihat §16 brief) --
-   di bawah 1024px atau tanpa gambar, tetap 1 kolom lewat flex-column di atas. */
-@media (min-width: 1024px) {
-    .question-board__inner--split {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-        grid-template-areas:
-            "header header"
-            "stimulus question";
-        column-gap: var(--space-6);
-        row-gap: var(--space-5);
-    }
+/* Layout Question Board & Mascot Companion */
+.question-board__layout {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+}
 
-    .question-board__inner--split .question-board__header { grid-area: header; }
-    .question-board__inner--split .question-board__stimulus-col { grid-area: stimulus; }
-    .question-board__inner--split .question-board__question-col { grid-area: question; }
+.question-board__main-col {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-5);
+    min-width: 0;
+}
+
+.question-board__mascot-side {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: sticky;
+    top: var(--space-4);
+    z-index: 2;
+}
+
+@media (min-width: 1024px) {
+    .question-board__layout {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 280px;
+        column-gap: var(--space-6);
+        align-items: start;
+    }
 }
 
 /* --- Stimulus: prosa vs. pseudo-tabel (lihat komentar di NonTkaGame.jsx
@@ -558,6 +572,19 @@
     transform: translateY(-2px);
 }
 
+.answer-card--selected {
+    border-color: var(--color-gold);
+    background: rgba(201, 161, 92, 0.14);
+    box-shadow: 0 0 0 2px var(--color-gold), var(--shadow-sm);
+    transform: translateY(-1px);
+}
+
+.answer-card--selected .answer-card__key {
+    background: var(--color-gold);
+    color: var(--color-white);
+    border-color: var(--color-gold);
+}
+
 .answer-card__key {
     flex-shrink: 0;
     width: 36px;
@@ -620,6 +647,58 @@
 
 .answer-card--incorrect .answer-card__icon {
     color: var(--color-danger);
+}
+
+/* --- Tombol Submit Jawaban --- */
+.game-submit-area {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-2);
+}
+
+.btn-jawab {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    padding: var(--space-3) var(--space-6);
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-white);
+    font-family: var(--font-headings);
+    font-size: var(--text-body);
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    border: 1.5px solid var(--color-gold);
+    border-radius: var(--radius-lg);
+    cursor: pointer;
+    box-shadow: 0 4px 14px rgba(10, 51, 35, 0.25);
+    transition: var(--transition-fast);
+}
+
+.btn-jawab:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(10, 51, 35, 0.35);
+    border-color: #E2C07D;
+    background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+}
+
+.btn-jawab:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.btn-jawab:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    filter: grayscale(25%);
+    box-shadow: none;
+}
+
+.game-submit-area__hint {
+    font-size: var(--text-small);
+    color: var(--text-muted-on-light);
+    font-style: italic;
 }
 
 /* --- Feedback + Pembahasan --- */
@@ -766,6 +845,294 @@
     display: flex;
     gap: var(--space-3);
     margin-top: var(--space-2);
+}
+
+/* ==========================================================================
+   MASCOT COMPANION & ANIMATIONS (Ekspresi: Berpikir, Senang, Kecewa)
+   ========================================================================== */
+.mascot-companion {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    max-width: 280px;
+    gap: var(--space-3);
+}
+
+.mascot-bubble {
+    position: relative;
+    background: rgba(255, 255, 255, 0.98);
+    border: 1.5px solid var(--color-gold);
+    border-radius: var(--radius-xl);
+    padding: var(--space-3) var(--space-4);
+    box-shadow: 0 8px 24px rgba(6, 36, 24, 0.14);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    text-align: center;
+    animation: mascot-bubble-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes mascot-bubble-pop {
+    0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(6px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.mascot-bubble__tail {
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid var(--color-gold);
+}
+
+.mascot-bubble__tail::after {
+    content: '';
+    position: absolute;
+    bottom: 1.5px;
+    left: -7px;
+    width: 0;
+    height: 0;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-top: 7px solid rgba(255, 255, 255, 0.98);
+}
+
+.mascot-bubble__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    font-size: var(--text-micro);
+    font-weight: 700;
+    padding: 3px 12px;
+    border-radius: var(--radius-pill);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.mascot-badge--thinking {
+    background: rgba(201, 161, 92, 0.18);
+    color: var(--color-gold-deep);
+}
+
+.mascot-badge--happy {
+    background: rgba(131, 153, 88, 0.22);
+    color: #4A7A36;
+}
+
+.mascot-badge--disappointed {
+    background: rgba(255, 82, 82, 0.15);
+    color: #D32F2F;
+}
+
+.mascot-bubble__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-small);
+    font-weight: 700;
+    color: var(--text-on-light);
+    line-height: 1.35;
+    margin: 0;
+}
+
+.mascot-bubble__desc {
+    font-size: var(--text-micro);
+    color: var(--text-muted-on-light);
+    line-height: 1.45;
+    margin: 0;
+}
+
+.mascot-figure {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding-top: var(--space-2);
+}
+
+.mascot-figure__img {
+    display: block;
+    width: 100%;
+    max-width: 220px;
+    height: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px rgba(6, 36, 24, 0.25));
+    user-select: none;
+    pointer-events: none;
+}
+
+/* Animasi 1: Thinking (Idle floating / breathing) */
+.mascot-figure__img--thinking {
+    animation: mascot-idle-think 3.5s ease-in-out infinite;
+    transform-origin: bottom center;
+}
+
+@keyframes mascot-idle-think {
+    0%, 100% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(-8px) rotate(-1.5deg);
+    }
+}
+
+/* Animasi 2: Happy (Melompat / Bounce gembira & sparkle) */
+.mascot-figure__img--happy {
+    animation: mascot-happy-jump 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, mascot-happy-sway 2s ease-in-out 0.8s infinite alternate;
+    transform-origin: bottom center;
+}
+
+@keyframes mascot-happy-jump {
+    0% {
+        transform: scale(0.85) translateY(20px);
+    }
+    40% {
+        transform: scale(1.12) translateY(-24px);
+    }
+    70% {
+        transform: scale(0.96) translateY(4px);
+    }
+    100% {
+        transform: scale(1) translateY(0);
+    }
+}
+
+@keyframes mascot-happy-sway {
+    0% {
+        transform: translateY(0) rotate(-2.5deg);
+    }
+    100% {
+        transform: translateY(-6px) rotate(2.5deg);
+    }
+}
+
+.mascot-figure__sparkles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.sparkle {
+    position: absolute;
+    font-size: 22px;
+    animation: sparkle-twinkle 1.4s ease-in-out infinite alternate;
+}
+
+.sparkle--1 { top: 12%; left: 8%; animation-delay: 0s; }
+.sparkle--2 { top: 4%; right: 12%; animation-delay: 0.4s; font-size: 24px; }
+.sparkle--3 { top: 28%; right: 4%; animation-delay: 0.8s; }
+
+@keyframes sparkle-twinkle {
+    0% {
+        opacity: 0.2;
+        transform: scale(0.6) rotate(0deg);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1.25) rotate(25deg);
+    }
+}
+
+/* Animasi 3: Disappointed (Menunduk sedih perlahan) */
+.mascot-figure__img--disappointed {
+    animation: mascot-disappointed-drop 0.7s cubic-bezier(0.25, 1, 0.5, 1) both, mascot-disappointed-sigh 4s ease-in-out 0.7s infinite alternate;
+    transform-origin: bottom center;
+}
+
+@keyframes mascot-disappointed-drop {
+    0% {
+        transform: translateY(0) rotate(0deg);
+    }
+    50% {
+        transform: translateY(12px) rotate(2deg);
+    }
+    100% {
+        transform: translateY(6px) rotate(1deg);
+    }
+}
+
+@keyframes mascot-disappointed-sigh {
+    0% {
+        transform: translateY(6px) rotate(1deg);
+    }
+    100% {
+        transform: translateY(10px) rotate(-1deg);
+    }
+}
+
+.mascot-figure__shadow {
+    width: 140px;
+    height: 12px;
+    background: radial-gradient(ellipse at center, rgba(6, 36, 24, 0.3) 0%, rgba(6, 36, 24, 0) 70%);
+    border-radius: 50%;
+    margin-top: -6px;
+}
+
+/* Responsif Mobile & Tablet untuk Maskot */
+@media (max-width: 1023px) {
+    .question-board__mascot-side {
+        position: static;
+        width: 100%;
+        max-width: 100%;
+        margin-top: var(--space-2);
+    }
+
+    .mascot-companion {
+        flex-direction: row;
+        max-width: 100%;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.92);
+        border-radius: var(--radius-xl);
+        padding: var(--space-3) var(--space-4);
+        border: 1.5px solid var(--color-gold);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .mascot-bubble {
+        width: auto;
+        flex: 1;
+        text-align: left;
+        border: none;
+        box-shadow: none;
+        background: transparent;
+        padding: 0;
+    }
+
+    .mascot-bubble__tail {
+        display: none;
+    }
+
+    .mascot-bubble__badge {
+        align-self: flex-start;
+    }
+
+    .mascot-figure {
+        width: 110px;
+        flex-shrink: 0;
+        padding-top: 0;
+    }
+
+    .mascot-figure__img {
+        max-width: 96px;
+    }
+
+    .mascot-figure__shadow {
+        width: 80px;
+    }
 }
 
 /* ==========================================================================

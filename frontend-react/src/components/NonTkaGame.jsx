@@ -66,6 +66,38 @@ const SIGN_BACK = encodeURI('/assets/assets bank soal non tka/sign-back.png');
 const SIGN_NEXT = encodeURI('/assets/assets bank soal non tka/sign-next.png');
 const MASCOT_ALT = encodeURI('/assets/assets bank soal non tka/mascot-anak-1.png');
 
+/* Maskot Interaktif Non-TKA (3 State: Thinking, Happy, Disappointed) */
+const MASCOT_THINKING = encodeURI('/assets/assets bank soal non tka/mascot-thinking.png');
+const MASCOT_HAPPY = encodeURI('/assets/assets bank soal non tka/mascot-happy.png');
+const MASCOT_DISAPPOINTED = encodeURI('/assets/assets bank soal non tka/mascot-disappointed.png');
+
+const MASCOT_MESSAGES = {
+  thinking: {
+    src: MASCOT_THINKING,
+    badge: '🤔 Berpikir',
+    badgeClass: 'mascot-badge--thinking',
+    title: 'Coba pikirkan baik-baik...',
+    desc: 'Pilih jawaban yang paling tepat sebelum menekan Jawab.',
+    alt: 'Maskot adat Aceh sedang berpikir meletakkan tangan di dagu',
+  },
+  happy: {
+    src: MASCOT_HAPPY,
+    badge: '🥳 Hebat!',
+    badgeClass: 'mascot-badge--happy',
+    title: 'Benar! Hebat!',
+    desc: 'Analisis kamu tepat sekali. Luar biasa!',
+    alt: 'Maskot gembira melompat merayakan jawaban benar',
+  },
+  disappointed: {
+    src: MASCOT_DISAPPOINTED,
+    badge: '😔 Tetap Semangat',
+    badgeClass: 'mascot-badge--disappointed',
+    title: 'Belum tepat. Yuk, lihat pembahasannya.',
+    desc: 'Mari pelajari pembahasannya agar lebih paham.',
+    alt: 'Maskot sedih menyemangati pengguna membaca pembahasan',
+  },
+};
+
 /* Tombol papan kayu gantung (teks "BACK"/"NEXT" sudah baku di dalam
    gambarnya, tidak bisa diganti per-konteks) -- makna sebenarnya untuk
    screen reader tetap dikirim lewat aria-label dinamis (mis. "Lihat hasil
@@ -78,8 +110,10 @@ function SignButton({ src, label, onClick, className }) {
   );
 }
 
-function optionState(optionKey, selectedKey, correctAnswer) {
-  if (!selectedKey) return 'idle';
+function optionState(optionKey, selectedKey, isSubmitted, correctAnswer) {
+  if (!isSubmitted) {
+    return optionKey === selectedKey ? 'selected' : 'idle';
+  }
   if (optionKey === correctAnswer) return 'correct';
   if (optionKey === selectedKey) return 'incorrect';
   return 'disabled';
@@ -227,19 +261,53 @@ function GameScene({ background, className, landmark, mascot, children }) {
   );
 }
 
-function AnswerCard({ option, state, onSelect }) {
+function AnswerCard({ option, state, onSelect, disabled }) {
   return (
     <button
       type="button"
       className={'answer-card answer-card--' + state}
       onClick={() => onSelect(option.key)}
-      disabled={state !== 'idle'}
+      disabled={disabled}
     >
       <span className="answer-card__key">{option.key}</span>
       <span className="answer-card__text">{option.text}</span>
       {state === 'correct' && <CheckCircle2 className="answer-card__icon" size={20} />}
       {state === 'incorrect' && <XCircle className="answer-card__icon" size={20} />}
     </button>
+  );
+}
+
+function MascotCompanion({ state }) {
+  const currentInfo = MASCOT_MESSAGES[state] || MASCOT_MESSAGES.thinking;
+
+  return (
+    <aside className={`mascot-companion mascot-companion--${state}`} aria-live="polite">
+      <div className="mascot-bubble">
+        <span className={`mascot-bubble__badge ${currentInfo.badgeClass}`}>
+          {currentInfo.badge}
+        </span>
+        <h3 className="mascot-bubble__title">{currentInfo.title}</h3>
+        <p className="mascot-bubble__desc">{currentInfo.desc}</p>
+        <div className="mascot-bubble__tail" aria-hidden="true" />
+      </div>
+
+      <div className="mascot-figure">
+        {state === 'happy' && (
+          <div className="mascot-figure__sparkles" aria-hidden="true">
+            <span className="sparkle sparkle--1">✨</span>
+            <span className="sparkle sparkle--2">⭐</span>
+            <span className="sparkle sparkle--3">✨</span>
+          </div>
+        )}
+        <img
+          key={state}
+          className={`mascot-figure__img mascot-figure__img--${state}`}
+          src={currentInfo.src}
+          alt={currentInfo.alt}
+        />
+        <div className="mascot-figure__shadow" aria-hidden="true" />
+      </div>
+    </aside>
   );
 }
 
@@ -304,6 +372,8 @@ function NonTkaGame({ paket, onExit }) {
   const [soalList, setSoalList] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedKey, setSelectedKey] = useState(null);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [mascotState, setMascotState] = useState('thinking');
   const [answers, setAnswers] = useState([]);
   const [finished, setFinished] = useState(false);
   const [startedAt, setStartedAt] = useState(() => new Date().toISOString());
@@ -321,17 +391,26 @@ function NonTkaGame({ paket, onExit }) {
   function resetGame() {
     setCurrentIndex(0);
     setSelectedKey(null);
+    setIsSubmitted(false);
+    setMascotState('thinking');
     setAnswers([]);
     setFinished(false);
     setStartedAt(new Date().toISOString());
   }
 
-  function selectAnswer(key) {
-    if (selectedKey) return;
-    const current = soalList[currentIndex];
-    const isCorrect = key === current.correctAnswer;
+  function handleSelectOption(key) {
+    if (isSubmitted) return;
     setSelectedKey(key);
-    setAnswers((prev) => [...prev, { soalId: current.id, selectedKey: key, isCorrect }]);
+    playClick();
+  }
+
+  function handleSubmitAnswer() {
+    if (!selectedKey || isSubmitted) return;
+    const current = soalList[currentIndex];
+    const isCorrect = selectedKey === current.correctAnswer;
+    setIsSubmitted(true);
+    setMascotState(isCorrect ? 'happy' : 'disappointed');
+    setAnswers((prev) => [...prev, { soalId: current.id, selectedKey, isCorrect }]);
     if (isCorrect) playCorrect(); else playIncorrect();
   }
 
@@ -364,6 +443,8 @@ function NonTkaGame({ paket, onExit }) {
     }
     setCurrentIndex((i) => i + 1);
     setSelectedKey(null);
+    setIsSubmitted(false);
+    setMascotState('thinking');
   }
 
   if (soalList === null) {
@@ -398,8 +479,8 @@ function NonTkaGame({ paket, onExit }) {
 
   const current = soalList[currentIndex];
   const currentNumber = currentIndex + 1;
-  const progressPercent = Math.round(((currentIndex + (selectedKey ? 1 : 0)) / soalList.length) * 100);
-  const currentIsCorrect = selectedKey ? selectedKey === current.correctAnswer : null;
+  const progressPercent = Math.round(((currentIndex + (isSubmitted ? 1 : 0)) / soalList.length) * 100);
+  const currentIsCorrect = isSubmitted ? selectedKey === current.correctAnswer : null;
   const isAcehContext = hasAcehContext(current.question, current.stimulus);
   const correctSoFar = answers.filter((a) => a.isCorrect).length;
   const hasImage = Boolean(current.image);
@@ -419,52 +500,80 @@ function NonTkaGame({ paket, onExit }) {
       />
 
       <div className="question-board">
-        <div className={'question-board__inner' + ((hasImage || hasTable) ? ' question-board__inner--split' : '')}>
+        <div className="question-board__inner">
           <CardCornerFrame />
 
-          <div className="question-board__header">
-            <div className="question-board__eyebrow-wrap">
-              <img className="question-board__eyebrow-board" src={WOOD_BOARD} alt="" aria-hidden="true" />
-              <span className="question-board__eyebrow">Tantangan {String(currentNumber).padStart(2, '0')}</span>
+          <div className="question-board__layout">
+            <div className="question-board__main-col">
+              <div className="question-board__header">
+                <div className="question-board__eyebrow-wrap">
+                  <img className="question-board__eyebrow-board" src={WOOD_BOARD} alt="" aria-hidden="true" />
+                  <span className="question-board__eyebrow">Tantangan {String(currentNumber).padStart(2, '0')}</span>
+                </div>
+                <div className="question-board__badges">
+                  <span className="badge badge--info">{paket.subject}</span>
+                  <span className={'badge ' + hotsBadgeClass(paket.hotsLevel)}>{paket.hotsLevel}</span>
+                  {isAcehContext && <span className="game-panel__aceh-badge"><Leaf size={14} /> Konteks Budaya Aceh</span>}
+                </div>
+              </div>
+
+              {(current.stimulus || hasTable || hasImage) && (
+                <div className="question-board__stimulus-col">
+                  <StimulusBlock stimulus={current.stimulus} />
+                  {hasTable && <TableBlock tableData={current.tableData} />}
+                  {hasImage && (
+                    <GameImage key={current.id} src={current.image} alt={'Ilustrasi Tantangan ' + currentNumber + ' - ' + paket.title} />
+                  )}
+                </div>
+              )}
+
+              <div className="question-board__question-col">
+                <h2 className="question-board__question">{current.question}</h2>
+
+                <div className="game-options">
+                  {current.options.map((opt) => (
+                    <AnswerCard
+                      key={opt.key}
+                      option={opt}
+                      state={optionState(opt.key, selectedKey, isSubmitted, current.correctAnswer)}
+                      onSelect={handleSelectOption}
+                      disabled={isSubmitted}
+                    />
+                  ))}
+                </div>
+
+                {!isSubmitted && (
+                  <div className="game-submit-area">
+                    <button
+                      type="button"
+                      className="btn-jawab"
+                      disabled={!selectedKey}
+                      onClick={handleSubmitAnswer}
+                    >
+                      <CheckCircle2 size={18} />
+                      <span>Jawab</span>
+                    </button>
+                    {!selectedKey && (
+                      <span className="game-submit-area__hint">Pilih salah satu jawaban di atas</span>
+                    )}
+                  </div>
+                )}
+
+                {isSubmitted && (
+                  <FeedbackPanel
+                    isCorrect={currentIsCorrect}
+                    correctAnswer={current.correctAnswer}
+                    explanation={current.explanation}
+                    isLast={currentNumber >= soalList.length}
+                    onNext={goNext}
+                  />
+                )}
+              </div>
             </div>
-            <div className="question-board__badges">
-              <span className="badge badge--info">{paket.subject}</span>
-              <span className={'badge ' + hotsBadgeClass(paket.hotsLevel)}>{paket.hotsLevel}</span>
-              {isAcehContext && <span className="game-panel__aceh-badge"><Leaf size={14} /> Konteks Budaya Aceh</span>}
+
+            <div className="question-board__mascot-side">
+              <MascotCompanion state={mascotState} />
             </div>
-          </div>
-
-          <div className="question-board__stimulus-col">
-            <StimulusBlock stimulus={current.stimulus} />
-            {hasTable && <TableBlock tableData={current.tableData} />}
-            {hasImage && (
-              <GameImage key={current.id} src={current.image} alt={'Ilustrasi Tantangan ' + currentNumber + ' - ' + paket.title} />
-            )}
-          </div>
-
-          <div className="question-board__question-col">
-            <h2 className="question-board__question">{current.question}</h2>
-
-            <div className="game-options">
-              {current.options.map((opt) => (
-                <AnswerCard
-                  key={opt.key}
-                  option={opt}
-                  state={optionState(opt.key, selectedKey, current.correctAnswer)}
-                  onSelect={selectAnswer}
-                />
-              ))}
-            </div>
-
-            {selectedKey && (
-              <FeedbackPanel
-                isCorrect={currentIsCorrect}
-                correctAnswer={current.correctAnswer}
-                explanation={current.explanation}
-                isLast={currentNumber >= soalList.length}
-                onNext={goNext}
-              />
-            )}
           </div>
         </div>
       </div>
