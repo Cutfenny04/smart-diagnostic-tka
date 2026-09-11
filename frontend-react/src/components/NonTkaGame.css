@@ -185,8 +185,8 @@
 .game-hud__paket-title {
     font-family: var(--font-headings);
     font-size: var(--text-small);
-    font-weight: 700;
-    color: var(--text-on-light);
+    font-weight: 800;
+    color: #000000;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -213,16 +213,16 @@
     align-items: center;
     gap: 4px;
     font-size: var(--text-micro);
-    font-weight: 700;
+    font-weight: 800;
     text-transform: uppercase;
     letter-spacing: 0.06em;
-    color: var(--color-gold-deep);
+    color: #000000;
 }
 
 .game-hud__count {
     font-size: var(--text-small);
-    font-weight: 700;
-    color: var(--text-on-light);
+    font-weight: 800;
+    color: #000000;
 }
 
 .game-hud__stars {
@@ -336,8 +336,8 @@
     font-family: var(--font-headings);
     font-size: var(--text-body-lg);
     font-weight: 800;
-    color: #000000 !important;
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
+    color: #000000;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.45);
     padding-bottom: 6px;
 }
 
@@ -361,13 +361,13 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 4px 10px 4px 6px;
+    padding: 4px 12px 4px 6px;
     border-radius: var(--radius-pill);
-    background: #FFF9E6;
-    border: 1.5px solid #000000;
-    color: #000000 !important;
+    background: #FFFDF5;
+    border: 1.5px solid #C9A15C;
+    color: #000000;
     font-size: var(--text-micro);
-    font-weight: 800;
+    font-weight: 700;
 }
 
 .mascot-think-chip__img {
@@ -380,7 +380,8 @@
 
 .mascot-think-chip__text {
     letter-spacing: 0.02em;
-    color: #000000 !important;
+    color: #000000;
+    font-weight: 700;
 }
 
 /* --- Stimulus: prosa vs. pseudo-tabel (lihat komentar di NonTkaGame.jsx
@@ -392,32 +393,35 @@
 .game-stimulus--prose {
     font-style: normal;
     font-size: 1rem;
-    color: #000000 !important;
+    color: #000000;
     font-weight: 500;
-    line-height: 1.75;
-    background: #FFFFFF;
-    border-left: 4px solid #0A3323;
+    line-height: 1.7;
+    background: var(--surface-card-tint);
+    border-left: 4px solid var(--color-gold);
     border-radius: var(--radius-md);
     padding: var(--space-4) var(--space-5);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+}
+
+.game-stimulus--prose p,
+.game-stimulus--prose strong {
+    color: #000000;
 }
 
 /* --- Tabel soal asli (soal.table_data, roadmap item #10 2026-08-22) ---
    Menggantikan .game-stimulus--table/__list lama yang cuma daftar bernomor
    hasil parsing teks -- sekarang <table> HTML sungguhan. */
 .game-table {
-    background: #FFFFFF;
-    border: 1.5px solid #000000;
-    border-left: 4px solid #0A3323;
+    background: var(--surface-card-tint);
+    border: 1px solid var(--border-on-light);
+    border-left: 4px solid var(--color-gold);
     border-radius: var(--radius-md);
     padding: var(--space-4) var(--space-5);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .game-table__caption {
     font-weight: 800;
     font-size: var(--text-small);
-    color: #000000 !important;
+    color: #000000;
     margin-bottom: var(--space-3);
 }
 
@@ -430,20 +434,21 @@
     min-width: 320px;
     border-collapse: collapse;
     font-size: var(--text-body);
-    color: #000000 !important;
+    color: #000000;
 }
 
 .game-table__table th,
 .game-table__table td {
     padding: var(--space-2) var(--space-3);
     text-align: left;
-    border-bottom: 1px solid #D0D0D0;
-    color: #000000 !important;
+    border-bottom: 1px solid var(--border-on-light);
+    color: #000000;
 }
 
 .game-table__table th {
     font-weight: 800;
-    color: #000000 !important;
+    color: #000000;
+    background: #EFEBD9;
     white-space: nowrap;
 }
 
@@ -539,10 +544,10 @@
 /* --- Pertanyaan: font body, TIDAK dekoratif (lihat §8 brief) --- */
 .question-board__question {
     font-family: var(--font-body);
-    font-weight: 700;
-    font-size: var(--text-h3);
-    color: var(--text-on-light);
-    line-height: 1.5;
+    font-weight: 800;
+    font-size: 1.2rem;
+    color: #000000;
+    line-height: 1.55;
 }
 
 /* --- Kartu jawaban --- */
@@ -559,51 +564,59 @@
     text-align: left;
     padding: var(--space-4) var(--space-5);
     border-radius: var(--radius-lg);
-    border: 1.5px solid var(--border-on-light);
-    background: var(--surface-card);
+    border: 2px solid #D1D5DB;
+    background: #FFFFFF;
     cursor: pointer;
     transition: var(--transition-fast);
 }
 
 .answer-card--idle:hover {
-    border-color: var(--color-gold);
-    box-shadow: var(--shadow-glow);
+    border-color: #B8860B;
+    background: #FFFDF7;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transform: translateY(-2px);
 }
 
 .answer-card--selected {
-    border-color: var(--color-gold);
-    background: rgba(201, 161, 92, 0.14);
-    box-shadow: 0 0 0 2px var(--color-gold), var(--shadow-sm);
+    border-color: #B8860B !important;
+    background: #FFF9E6 !important;
+    box-shadow: 0 0 0 2px #B8860B, 0 4px 14px rgba(184, 134, 11, 0.25) !important;
     transform: translateY(-1px);
 }
 
 .answer-card--selected .answer-card__key {
-    background: var(--color-gold);
-    color: var(--color-white);
-    border-color: var(--color-gold);
+    background: #F2C94C !important;
+    color: #000000 !important;
+    border-color: #9E7410 !important;
+    font-weight: 800;
+}
+
+.answer-card--selected .answer-card__text {
+    color: #000000 !important;
+    font-weight: 700;
 }
 
 .answer-card__key {
     flex-shrink: 0;
-    width: 36px;
-    height: 36px;
+    width: 38px;
+    height: 38px;
     border-radius: var(--radius-md);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-weight: 700;
-    font-size: var(--text-body);
-    background: var(--surface-card-tint);
-    color: var(--text-on-light);
-    border: 1.5px solid var(--border-on-light);
+    font-weight: 800;
+    font-size: 1rem;
+    background: #F3F4F6;
+    color: #000000 !important;
+    border: 2px solid #D1D5DB;
     transition: var(--transition-fast);
 }
 
 .answer-card__text {
     flex: 1;
-    font-size: var(--text-body);
-    color: var(--text-on-light);
+    font-size: 0.95rem;
+    color: #000000 !important;
+    font-weight: 600;
     line-height: 1.5;
 }
 
@@ -617,35 +630,47 @@
 }
 
 .answer-card--correct {
-    border-color: var(--color-moss);
-    background: rgba(131, 153, 88, 0.12);
+    border-color: #2E7D32 !important;
+    background: #E8F5E9 !important;
     cursor: default;
 }
 
 .answer-card--correct .answer-card__key {
-    background: var(--color-moss);
-    color: var(--color-white);
-    border-color: var(--color-moss);
+    background: #2E7D32 !important;
+    color: #FFFFFF !important;
+    border-color: #2E7D32 !important;
+    font-weight: 800;
+}
+
+.answer-card--correct .answer-card__text {
+    color: #000000 !important;
+    font-weight: 700;
 }
 
 .answer-card--correct .answer-card__icon {
-    color: #5C6B3A;
+    color: #2E7D32;
 }
 
 .answer-card--incorrect {
-    border-color: var(--color-danger);
-    background: rgba(255, 82, 82, 0.10);
+    border-color: #C62828 !important;
+    background: #FFEBEE !important;
     cursor: default;
 }
 
 .answer-card--incorrect .answer-card__key {
-    background: var(--color-danger);
-    color: var(--color-white);
-    border-color: var(--color-danger);
+    background: #C62828 !important;
+    color: #FFFFFF !important;
+    border-color: #C62828 !important;
+    font-weight: 800;
+}
+
+.answer-card--incorrect .answer-card__text {
+    color: #000000 !important;
+    font-weight: 700;
 }
 
 .answer-card--incorrect .answer-card__icon {
-    color: var(--color-danger);
+    color: #C62828;
 }
 
 /* --- Tombol Submit Jawaban --- */
@@ -663,27 +688,33 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-2);
-    min-width: 160px;
-    height: 48px;
+    min-width: 170px;
+    height: 50px;
     padding: 0 var(--space-6);
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-    color: var(--color-white);
-    font-family: var(--font-headings);
-    font-size: var(--text-body);
-    font-weight: 700;
-    letter-spacing: 0.05em;
-    border: 2px solid var(--color-gold);
+    background: #F2C94C;
+    color: #000000 !important;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    border: 2.5px solid #9E7410;
     border-radius: var(--radius-lg);
     cursor: pointer;
-    box-shadow: 0 4px 14px rgba(10, 51, 35, 0.25);
+    box-shadow: 0 4px 14px rgba(158, 116, 16, 0.35);
     transition: var(--transition-fast);
+}
+
+.btn-jawab svg {
+    stroke: #000000 !important;
+    color: #000000 !important;
+    stroke-width: 2.5px;
 }
 
 .btn-jawab:hover:not(:disabled) {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(10, 51, 35, 0.35);
-    border-color: #E2C07D;
-    background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+    background: #E5B838;
+    border-color: #7A5808;
+    box-shadow: 0 6px 18px rgba(158, 116, 16, 0.45);
 }
 
 .btn-jawab:active:not(:disabled) {
@@ -691,18 +722,23 @@
 }
 
 .btn-jawab:disabled {
-    background: rgba(131, 153, 88, 0.12);
-    color: var(--text-muted-on-light);
-    border-color: var(--border-on-light);
+    background: #E2E8F0;
+    color: #475569 !important;
+    border: 2px solid #CBD5E1;
     cursor: not-allowed;
     box-shadow: none;
-    opacity: 0.75;
+    opacity: 0.85;
+}
+
+.btn-jawab:disabled svg {
+    stroke: #475569 !important;
+    color: #475569 !important;
 }
 
 .game-submit-area__hint {
     font-size: var(--text-small);
-    color: var(--text-muted-on-light);
-    font-style: italic;
+    color: #000000 !important;
+    font-weight: 600;
 }
 
 /* --- Feedback + Pembahasan --- */
@@ -740,25 +776,53 @@
 }
 
 .feedback-panel__title {
-    font-weight: 700;
-    color: var(--text-on-light);
+    font-weight: 800;
+    color: #000000;
     font-size: var(--text-body);
 }
 
 .feedback-panel__correction {
     font-size: var(--text-body);
-    color: var(--text-on-light);
+    color: #000000;
+    font-weight: 600;
 }
 
-.feedback-panel__next {
+.feedback-panel__correction strong {
+    color: #000000;
+    font-weight: 800;
+}
+
+.feedback-panel__next-btn {
     margin-top: var(--space-2);
+    min-height: 48px;
+    font-size: 1rem;
+    font-weight: 800;
+    padding: 0 var(--space-6);
+    background: #0A3323;
+    color: #FFFFFF !important;
+    border: 2px solid #0A3323;
+    border-radius: var(--radius-lg);
+    box-shadow: 0 4px 14px rgba(10, 51, 35, 0.3);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    transition: var(--transition-fast);
+}
+
+.feedback-panel__next-btn:hover {
+    transform: translateY(-2px);
+    background: #105666;
+    border-color: #105666;
+    box-shadow: 0 6px 18px rgba(10, 51, 35, 0.4);
 }
 
 .pembahasan-card {
     width: 100%;
-    background: var(--surface-card-tint);
-    border: 1px solid var(--border-on-light);
-    border-left: 3px solid var(--color-gold);
+    background: #FFFFFF;
+    border: 1.5px solid #CBD5E1;
+    border-left: 4px solid var(--color-gold);
     border-radius: var(--radius-md);
     padding: var(--space-4);
 }
@@ -767,17 +831,18 @@
     display: flex;
     align-items: center;
     gap: var(--space-2);
-    font-weight: 700;
+    font-weight: 800;
     font-size: var(--text-small);
     text-transform: uppercase;
     letter-spacing: 0.04em;
-    color: var(--color-gold-deep);
+    color: #000000;
     margin-bottom: var(--space-2);
 }
 
 .pembahasan-card__text {
     font-size: var(--text-body);
-    color: var(--text-muted-on-light);
+    color: #000000;
+    font-weight: 500;
     line-height: 1.7;
 }
 
@@ -792,7 +857,7 @@
     text-align: center;
     gap: var(--space-2);
     padding: var(--space-8) var(--space-6);
-    background: rgba(9, 56, 6, 0.96);
+    background: rgba(255, 255, 255, 0.96);
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-lg);
     max-width: 480px;
@@ -874,7 +939,7 @@
 
 .mascot-modal-card {
     position: relative;
-    background: #ab5858fa;
+    background: rgba(255, 255, 255, 0.98);
     border: 2px solid var(--color-gold);
     border-radius: var(--radius-2xl);
     padding: var(--space-6) var(--space-6) var(--space-5);
@@ -1030,14 +1095,15 @@
 .mascot-modal__title {
     font-family: var(--font-headings);
     font-size: var(--text-h2);
-    font-weight: 700;
-    color: var(--text-on-light);
+    font-weight: 800;
+    color: #000000;
     margin: 0;
 }
 
 .mascot-modal__desc {
     font-size: var(--text-body);
-    color: var(--text-muted-on-light);
+    color: #000000;
+    font-weight: 500;
     line-height: 1.5;
     margin: 0 0 var(--space-3);
     max-width: 32ch;
@@ -1056,40 +1122,49 @@
     gap: var(--space-2);
     width: 100%;
     max-width: 260px;
-    height: 48px;
+    height: 50px;
     padding: 0 var(--space-5);
     border-radius: var(--radius-lg);
-    font-family: var(--font-headings);
-    font-size: var(--text-body);
-    font-weight: 700;
+    font-family: var(--font-body);
+    font-size: 1.05rem;
+    font-weight: 800;
     letter-spacing: 0.02em;
     cursor: pointer;
     transition: var(--transition-fast);
 }
 
 .btn-modal-action--next {
-    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
-    color: var(--color-white);
-    border: 1.5px solid var(--color-gold);
-    box-shadow: 0 4px 14px rgba(10, 51, 35, 0.28);
+    background: #0A3323;
+    color: #FFFFFF !important;
+    border: 2px solid #0A3323;
+    box-shadow: 0 4px 14px rgba(10, 51, 35, 0.35);
 }
 
 .btn-modal-action--next:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(10, 51, 35, 0.38);
-    background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+    background: #105666;
+    border-color: #105666;
+    box-shadow: 0 6px 18px rgba(10, 51, 35, 0.45);
 }
 
 .btn-modal-action--explain {
-    background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-deep) 100%);
-    color: var(--color-white);
-    border: 1.5px solid #8C6A2E;
-    box-shadow: 0 4px 14px rgba(168, 130, 63, 0.35);
+    background: #F2C94C;
+    color: #000000 !important;
+    border: 2.5px solid #9E7410;
+    box-shadow: 0 4px 14px rgba(158, 116, 16, 0.35);
+}
+
+.btn-modal-action--explain svg {
+    stroke: #000000 !important;
+    color: #000000 !important;
+    stroke-width: 2.5px;
 }
 
 .btn-modal-action--explain:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 18px rgba(168, 130, 63, 0.45);
+    background: #E5B838;
+    border-color: #7A5808;
+    box-shadow: 0 6px 18px rgba(158, 116, 16, 0.45);
 }
 
 .btn-modal-action:active {

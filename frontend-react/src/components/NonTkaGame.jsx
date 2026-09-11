@@ -600,7 +600,7 @@ function NonTkaGame({ paket, onExit }) {
                   onClick={handleSubmitAnswer}
                 >
                   <CheckCircle2 size={20} />
-                  <span>✓ JAWAB</span>
+                  <span>Jawab</span>
                 </button>
                 {!selectedKey && (
                   <span className="game-submit-area__hint">Pilih salah satu jawaban di atas</span>
