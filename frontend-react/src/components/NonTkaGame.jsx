@@ -321,7 +321,7 @@ function MascotReactionModal({ isOpen, state, isLast, onContinue, onShowExplanat
                 className="btn-modal-action btn-modal-action--next"
                 onClick={onContinue}
               >
-                <span>{isLast ? 'Lihat Hasil Ekspedisi 🏆' : 'Lanjut →'}</span>
+                <span>{isLast ? 'Lihat Hasil Ekspedisi 🏆' : 'Lanjut'}</span>
               </button>
             ) : (
               <button
