@@ -356,36 +356,30 @@
     min-width: 0;
 }
 
-/* Layout Question Board & Mascot Companion */
-.question-board__layout {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-}
-
-.question-board__main-col {
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-5);
-    min-width: 0;
-}
-
-.question-board__mascot-side {
-    display: flex;
-    flex-direction: column;
+/* Mascot Think Chip (Companion halus di question header) */
+.mascot-think-chip {
+    display: inline-flex;
     align-items: center;
-    position: sticky;
-    top: var(--space-4);
-    z-index: 2;
+    gap: 6px;
+    padding: 3px 10px 3px 6px;
+    border-radius: var(--radius-pill);
+    background: rgba(201, 161, 92, 0.15);
+    border: 1px solid rgba(201, 161, 92, 0.4);
+    color: var(--color-gold-deep);
+    font-size: var(--text-micro);
+    font-weight: 700;
 }
 
-@media (min-width: 1024px) {
-    .question-board__layout {
-        display: grid;
-        grid-template-columns: minmax(0, 1fr) 280px;
-        column-gap: var(--space-6);
-        align-items: start;
-    }
+.mascot-think-chip__img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+    border-radius: 50%;
+    filter: drop-shadow(0 2px 4px rgba(6, 36, 24, 0.18));
+}
+
+.mascot-think-chip__text {
+    letter-spacing: 0.02em;
 }
 
 /* --- Stimulus: prosa vs. pseudo-tabel (lihat komentar di NonTkaGame.jsx
@@ -652,10 +646,11 @@
 /* --- Tombol Submit Jawaban --- */
 .game-submit-area {
     display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: var(--space-3);
-    margin-top: var(--space-2);
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-2);
+    margin-top: var(--space-5);
+    width: 100%;
 }
 
 .btn-jawab {
@@ -663,14 +658,16 @@
     align-items: center;
     justify-content: center;
     gap: var(--space-2);
-    padding: var(--space-3) var(--space-6);
+    min-width: 160px;
+    height: 48px;
+    padding: 0 var(--space-6);
     background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
     color: var(--color-white);
     font-family: var(--font-headings);
     font-size: var(--text-body);
     font-weight: 700;
-    letter-spacing: 0.04em;
-    border: 1.5px solid var(--color-gold);
+    letter-spacing: 0.05em;
+    border: 2px solid var(--color-gold);
     border-radius: var(--radius-lg);
     cursor: pointer;
     box-shadow: 0 4px 14px rgba(10, 51, 35, 0.25);
@@ -689,10 +686,12 @@
 }
 
 .btn-jawab:disabled {
-    opacity: 0.55;
+    background: rgba(131, 153, 88, 0.12);
+    color: var(--text-muted-on-light);
+    border-color: var(--border-on-light);
     cursor: not-allowed;
-    filter: grayscale(25%);
     box-shadow: none;
+    opacity: 0.75;
 }
 
 .game-submit-area__hint {
@@ -848,149 +847,75 @@
 }
 
 /* ==========================================================================
-   MASCOT COMPANION & ANIMATIONS (Ekspresi: Berpikir, Senang, Kecewa)
+   MASCOT REACTION POPUP (MODAL OVERLAY)
    ========================================================================== */
-.mascot-companion {
+.mascot-modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    background: rgba(6, 36, 24, 0.62);
+    backdrop-filter: blur(4px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--space-4);
+    animation: mascot-fade-in 0.22s ease-out forwards;
+}
+
+@keyframes mascot-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.mascot-modal-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.98);
+    border: 2px solid var(--color-gold);
+    border-radius: var(--radius-2xl);
+    padding: var(--space-6) var(--space-6) var(--space-5);
+    box-shadow: 0 20px 48px rgba(6, 36, 24, 0.35);
+    width: 100%;
+    max-width: 380px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 100%;
-    max-width: 280px;
-    gap: var(--space-3);
-}
-
-.mascot-bubble {
-    position: relative;
-    background: rgba(255, 255, 255, 0.98);
-    border: 1.5px solid var(--color-gold);
-    border-radius: var(--radius-xl);
-    padding: var(--space-3) var(--space-4);
-    box-shadow: 0 8px 24px rgba(6, 36, 24, 0.14);
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-1);
     text-align: center;
-    animation: mascot-bubble-pop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    animation: mascot-pop-in 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
 }
 
-@keyframes mascot-bubble-pop {
-    0% {
+@keyframes mascot-pop-in {
+    from {
         opacity: 0;
-        transform: scale(0.92) translateY(6px);
+        transform: scale(0.85) translateY(20px);
     }
-    100% {
+    to {
         opacity: 1;
         transform: scale(1) translateY(0);
     }
 }
 
-.mascot-bubble__tail {
-    position: absolute;
-    bottom: -8px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid var(--color-gold);
-}
-
-.mascot-bubble__tail::after {
-    content: '';
-    position: absolute;
-    bottom: 1.5px;
-    left: -7px;
-    width: 0;
-    height: 0;
-    border-left: 7px solid transparent;
-    border-right: 7px solid transparent;
-    border-top: 7px solid rgba(255, 255, 255, 0.98);
-}
-
-.mascot-bubble__badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    align-self: center;
-    font-size: var(--text-micro);
-    font-weight: 700;
-    padding: 3px 12px;
-    border-radius: var(--radius-pill);
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
-
-.mascot-badge--thinking {
-    background: rgba(201, 161, 92, 0.18);
-    color: var(--color-gold-deep);
-}
-
-.mascot-badge--happy {
-    background: rgba(131, 153, 88, 0.22);
-    color: #4A7A36;
-}
-
-.mascot-badge--disappointed {
-    background: rgba(255, 82, 82, 0.15);
-    color: #D32F2F;
-}
-
-.mascot-bubble__title {
-    font-family: var(--font-headings);
-    font-size: var(--text-small);
-    font-weight: 700;
-    color: var(--text-on-light);
-    line-height: 1.35;
-    margin: 0;
-}
-
-.mascot-bubble__desc {
-    font-size: var(--text-micro);
-    color: var(--text-muted-on-light);
-    line-height: 1.45;
-    margin: 0;
-}
-
-.mascot-figure {
+.mascot-modal__figure-area {
     position: relative;
     display: flex;
-    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
-    padding-top: var(--space-2);
+    margin-bottom: var(--space-2);
 }
 
-.mascot-figure__img {
+.mascot-modal__img {
     display: block;
-    width: 100%;
-    max-width: 220px;
-    height: auto;
+    width: auto;
+    height: 190px;
+    max-height: 30vh;
     object-fit: contain;
     filter: drop-shadow(0 10px 20px rgba(6, 36, 24, 0.25));
     user-select: none;
     pointer-events: none;
 }
 
-/* Animasi 1: Thinking (Idle floating / breathing) */
-.mascot-figure__img--thinking {
-    animation: mascot-idle-think 3.5s ease-in-out infinite;
-    transform-origin: bottom center;
-}
-
-@keyframes mascot-idle-think {
-    0%, 100% {
-        transform: translateY(0) rotate(0deg);
-    }
-    50% {
-        transform: translateY(-8px) rotate(-1.5deg);
-    }
-}
-
-/* Animasi 2: Happy (Melompat / Bounce gembira & sparkle) */
-.mascot-figure__img--happy {
+/* Animasi Happy: melompat & goyang */
+.mascot-modal__img--happy {
     animation: mascot-happy-jump 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) both, mascot-happy-sway 2s ease-in-out 0.8s infinite alternate;
     transform-origin: bottom center;
 }
@@ -1000,7 +925,7 @@
         transform: scale(0.85) translateY(20px);
     }
     40% {
-        transform: scale(1.12) translateY(-24px);
+        transform: scale(1.12) translateY(-22px);
     }
     70% {
         transform: scale(0.96) translateY(4px);
@@ -1019,7 +944,8 @@
     }
 }
 
-.mascot-figure__sparkles {
+/* Sparkles untuk Happy */
+.mascot-modal__sparkles {
     position: absolute;
     inset: 0;
     pointer-events: none;
@@ -1031,9 +957,9 @@
     animation: sparkle-twinkle 1.4s ease-in-out infinite alternate;
 }
 
-.sparkle--1 { top: 12%; left: 8%; animation-delay: 0s; }
-.sparkle--2 { top: 4%; right: 12%; animation-delay: 0.4s; font-size: 24px; }
-.sparkle--3 { top: 28%; right: 4%; animation-delay: 0.8s; }
+.sparkle--1 { top: 10%; left: 10%; animation-delay: 0s; }
+.sparkle--2 { top: 2%; right: 14%; animation-delay: 0.4s; font-size: 24px; }
+.sparkle--3 { top: 26%; right: 6%; animation-delay: 0.8s; }
 
 @keyframes sparkle-twinkle {
     0% {
@@ -1046,9 +972,9 @@
     }
 }
 
-/* Animasi 3: Disappointed (Menunduk sedih perlahan) */
-.mascot-figure__img--disappointed {
-    animation: mascot-disappointed-drop 0.7s cubic-bezier(0.25, 1, 0.5, 1) both, mascot-disappointed-sigh 4s ease-in-out 0.7s infinite alternate;
+/* Animasi Disappointed: menunduk sedih */
+.mascot-modal__img--disappointed {
+    animation: mascot-disappointed-drop 0.7s cubic-bezier(0.25, 1, 0.5, 1) both;
     transform-origin: bottom center;
 }
 
@@ -1064,74 +990,124 @@
     }
 }
 
-@keyframes mascot-disappointed-sigh {
-    0% {
-        transform: translateY(6px) rotate(1deg);
-    }
-    100% {
-        transform: translateY(10px) rotate(-1deg);
-    }
+/* Isi Teks Modal */
+.mascot-modal__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-2);
+    width: 100%;
 }
 
-.mascot-figure__shadow {
-    width: 140px;
-    height: 12px;
-    background: radial-gradient(ellipse at center, rgba(6, 36, 24, 0.3) 0%, rgba(6, 36, 24, 0) 70%);
-    border-radius: 50%;
-    margin-top: -6px;
+.mascot-modal__badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 14px;
+    border-radius: var(--radius-pill);
+    font-size: var(--text-small);
+    font-weight: 700;
+    letter-spacing: 0.04em;
 }
 
-/* Responsif Mobile & Tablet untuk Maskot */
-@media (max-width: 1023px) {
-    .question-board__mascot-side {
-        position: static;
-        width: 100%;
-        max-width: 100%;
-        margin-top: var(--space-2);
+.mascot-modal__badge.badge--happy {
+    background: rgba(131, 153, 88, 0.2);
+    color: #3E6B2A;
+    border: 1px solid rgba(131, 153, 88, 0.4);
+}
+
+.mascot-modal__badge.badge--disappointed {
+    background: rgba(255, 82, 82, 0.14);
+    color: #D32F2F;
+    border: 1px solid rgba(255, 82, 82, 0.35);
+}
+
+.mascot-modal__title {
+    font-family: var(--font-headings);
+    font-size: var(--text-h2);
+    font-weight: 700;
+    color: var(--text-on-light);
+    margin: 0;
+}
+
+.mascot-modal__desc {
+    font-size: var(--text-body);
+    color: var(--text-muted-on-light);
+    line-height: 1.5;
+    margin: 0 0 var(--space-3);
+    max-width: 32ch;
+}
+
+.mascot-modal__actions {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.btn-modal-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-2);
+    width: 100%;
+    max-width: 260px;
+    height: 48px;
+    padding: 0 var(--space-5);
+    border-radius: var(--radius-lg);
+    font-family: var(--font-headings);
+    font-size: var(--text-body);
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.btn-modal-action--next {
+    background: linear-gradient(135deg, var(--color-primary) 0%, var(--color-primary-dark) 100%);
+    color: var(--color-white);
+    border: 1.5px solid var(--color-gold);
+    box-shadow: 0 4px 14px rgba(10, 51, 35, 0.28);
+}
+
+.btn-modal-action--next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(10, 51, 35, 0.38);
+    background: linear-gradient(135deg, var(--color-primary-light) 0%, var(--color-primary) 100%);
+}
+
+.btn-modal-action--explain {
+    background: linear-gradient(135deg, var(--color-gold) 0%, var(--color-gold-deep) 100%);
+    color: var(--color-white);
+    border: 1.5px solid #8C6A2E;
+    box-shadow: 0 4px 14px rgba(168, 130, 63, 0.35);
+}
+
+.btn-modal-action--explain:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px rgba(168, 130, 63, 0.45);
+}
+
+.btn-modal-action:active {
+    transform: translateY(0);
+}
+
+/* Responsif Mobile untuk Modal */
+@media (max-width: 480px) {
+    .mascot-modal-card {
+        padding: var(--space-5) var(--space-4) var(--space-4);
+        max-width: 320px;
     }
 
-    .mascot-companion {
-        flex-direction: row;
-        max-width: 100%;
-        align-items: center;
-        justify-content: center;
-        background: rgba(255, 255, 255, 0.92);
-        border-radius: var(--radius-xl);
-        padding: var(--space-3) var(--space-4);
-        border: 1.5px solid var(--color-gold);
-        box-shadow: var(--shadow-sm);
+    .mascot-modal__img {
+        height: 150px;
     }
 
-    .mascot-bubble {
-        width: auto;
-        flex: 1;
-        text-align: left;
-        border: none;
-        box-shadow: none;
-        background: transparent;
-        padding: 0;
+    .mascot-modal__title {
+        font-size: var(--text-h3);
     }
 
-    .mascot-bubble__tail {
-        display: none;
-    }
-
-    .mascot-bubble__badge {
-        align-self: flex-start;
-    }
-
-    .mascot-figure {
-        width: 110px;
-        flex-shrink: 0;
-        padding-top: 0;
-    }
-
-    .mascot-figure__img {
-        max-width: 96px;
-    }
-
-    .mascot-figure__shadow {
-        width: 80px;
+    .mascot-modal__desc {
+        font-size: var(--text-small);
     }
 }
 

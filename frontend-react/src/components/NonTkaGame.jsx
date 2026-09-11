@@ -277,37 +277,66 @@ function AnswerCard({ option, state, onSelect, disabled }) {
   );
 }
 
-function MascotCompanion({ state }) {
-  const currentInfo = MASCOT_MESSAGES[state] || MASCOT_MESSAGES.thinking;
+function MascotReactionModal({ isOpen, state, isLast, onContinue, onShowExplanation }) {
+  if (!isOpen) return null;
+  const isCorrect = state === 'happy';
 
   return (
-    <aside className={`mascot-companion mascot-companion--${state}`} aria-live="polite">
-      <div className="mascot-bubble">
-        <span className={`mascot-bubble__badge ${currentInfo.badgeClass}`}>
-          {currentInfo.badge}
-        </span>
-        <h3 className="mascot-bubble__title">{currentInfo.title}</h3>
-        <p className="mascot-bubble__desc">{currentInfo.desc}</p>
-        <div className="mascot-bubble__tail" aria-hidden="true" />
-      </div>
+    <div className="mascot-modal-backdrop" role="dialog" aria-modal="true">
+      <div className={`mascot-modal-card mascot-modal-card--${state}`}>
+        <CardCornerFrame />
 
-      <div className="mascot-figure">
-        {state === 'happy' && (
-          <div className="mascot-figure__sparkles" aria-hidden="true">
-            <span className="sparkle sparkle--1">✨</span>
-            <span className="sparkle sparkle--2">⭐</span>
-            <span className="sparkle sparkle--3">✨</span>
+        <div className="mascot-modal__figure-area">
+          {isCorrect && (
+            <div className="mascot-modal__sparkles" aria-hidden="true">
+              <span className="sparkle sparkle--1">✨</span>
+              <span className="sparkle sparkle--2">⭐</span>
+              <span className="sparkle sparkle--3">✨</span>
+            </div>
+          )}
+          <img
+            className={`mascot-modal__img mascot-modal__img--${state}`}
+            src={isCorrect ? MASCOT_HAPPY : MASCOT_DISAPPOINTED}
+            alt={isCorrect ? 'Maskot bersorak gembira' : 'Maskot sedih'}
+          />
+        </div>
+
+        <div className="mascot-modal__content">
+          <span className={`mascot-modal__badge badge--${state}`}>
+            {isCorrect ? '🥳 Benar! Hebat! 🎉' : '😔 Belum Tepat'}
+          </span>
+          <h3 className="mascot-modal__title">
+            {isCorrect ? 'Benar! Hebat!' : 'Belum tepat...'}
+          </h3>
+          <p className="mascot-modal__desc">
+            {isCorrect
+              ? 'Jawaban kamu tepat. Yuk lanjut ke tantangan berikutnya!'
+              : 'Belum tepat. Yuk, lihat pembahasannya.'}
+          </p>
+
+          <div className="mascot-modal__actions">
+            {isCorrect ? (
+              <button
+                type="button"
+                className="btn-modal-action btn-modal-action--next"
+                onClick={onContinue}
+              >
+                <span>{isLast ? 'Lihat Hasil Ekspedisi 🏆' : 'Lanjut →'}</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                className="btn-modal-action btn-modal-action--explain"
+                onClick={onShowExplanation}
+              >
+                <Lightbulb size={18} />
+                <span>Lihat Pembahasan</span>
+              </button>
+            )}
           </div>
-        )}
-        <img
-          key={state}
-          className={`mascot-figure__img mascot-figure__img--${state}`}
-          src={currentInfo.src}
-          alt={currentInfo.alt}
-        />
-        <div className="mascot-figure__shadow" aria-hidden="true" />
+        </div>
       </div>
-    </aside>
+    </div>
   );
 }
 
@@ -316,7 +345,7 @@ function FeedbackPanel({ isCorrect, correctAnswer, explanation, isLast, onNext }
     <div className={'feedback-panel ' + (isCorrect ? 'is-correct' : 'is-incorrect')}>
       <div className="feedback-panel__head">
         {isCorrect ? <CheckCircle2 size={22} /> : <XCircle size={22} />}
-        <p className="feedback-panel__title">{isCorrect ? 'Jawaban benar!' : 'Jawaban kurang tepat.'}</p>
+        <p className="feedback-panel__title">{isCorrect ? 'Jawaban Benar!' : 'Jawaban Kurang Tepat'}</p>
       </div>
       {!isCorrect && (
         <p className="feedback-panel__correction">Jawaban yang benar: <strong>{correctAnswer}</strong></p>
@@ -327,12 +356,13 @@ function FeedbackPanel({ isCorrect, correctAnswer, explanation, isLast, onNext }
           <p className="pembahasan-card__text">{explanation}</p>
         </div>
       )}
-      <SignButton
-        src={SIGN_NEXT}
-        label={isLast ? 'Lihat hasil ekspedisi' : 'Lanjut ke tantangan berikutnya'}
+      <button
+        type="button"
+        className="btn btn-primary feedback-panel__next-btn"
         onClick={onNext}
-        className="feedback-panel__next"
-      />
+      >
+        <span>{isLast ? 'Lihat Hasil Ekspedisi 🏆' : 'Soal Berikutnya →'}</span>
+      </button>
     </div>
   );
 }
@@ -373,6 +403,8 @@ function NonTkaGame({ paket, onExit }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [selectedKey, setSelectedKey] = useState(null);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [showReactionModal, setShowReactionModal] = useState(false);
+  const [showExplanation, setShowExplanation] = useState(false);
   const [mascotState, setMascotState] = useState('thinking');
   const [answers, setAnswers] = useState([]);
   const [finished, setFinished] = useState(false);
@@ -392,6 +424,8 @@ function NonTkaGame({ paket, onExit }) {
     setCurrentIndex(0);
     setSelectedKey(null);
     setIsSubmitted(false);
+    setShowReactionModal(false);
+    setShowExplanation(false);
     setMascotState('thinking');
     setAnswers([]);
     setFinished(false);
@@ -412,6 +446,17 @@ function NonTkaGame({ paket, onExit }) {
     setMascotState(isCorrect ? 'happy' : 'disappointed');
     setAnswers((prev) => [...prev, { soalId: current.id, selectedKey, isCorrect }]);
     if (isCorrect) playCorrect(); else playIncorrect();
+    setShowReactionModal(true);
+  }
+
+  function handleModalContinue() {
+    setShowReactionModal(false);
+    goNext();
+  }
+
+  function handleModalShowExplanation() {
+    setShowReactionModal(false);
+    setShowExplanation(true);
   }
 
   function finishGame(finalAnswers) {
@@ -444,6 +489,8 @@ function NonTkaGame({ paket, onExit }) {
     setCurrentIndex((i) => i + 1);
     setSelectedKey(null);
     setIsSubmitted(false);
+    setShowReactionModal(false);
+    setShowExplanation(false);
     setMascotState('thinking');
   }
 
@@ -503,80 +550,84 @@ function NonTkaGame({ paket, onExit }) {
         <div className="question-board__inner">
           <CardCornerFrame />
 
-          <div className="question-board__layout">
-            <div className="question-board__main-col">
-              <div className="question-board__header">
-                <div className="question-board__eyebrow-wrap">
-                  <img className="question-board__eyebrow-board" src={WOOD_BOARD} alt="" aria-hidden="true" />
-                  <span className="question-board__eyebrow">Tantangan {String(currentNumber).padStart(2, '0')}</span>
-                </div>
-                <div className="question-board__badges">
-                  <span className="badge badge--info">{paket.subject}</span>
-                  <span className={'badge ' + hotsBadgeClass(paket.hotsLevel)}>{paket.hotsLevel}</span>
-                  {isAcehContext && <span className="game-panel__aceh-badge"><Leaf size={14} /> Konteks Budaya Aceh</span>}
-                </div>
+          <div className="question-board__header">
+            <div className="question-board__eyebrow-wrap">
+              <img className="question-board__eyebrow-board" src={WOOD_BOARD} alt="" aria-hidden="true" />
+              <span className="question-board__eyebrow">Tantangan {String(currentNumber).padStart(2, '0')}</span>
+            </div>
+            <div className="question-board__badges">
+              <span className="badge badge--info">{paket.subject}</span>
+              <span className={'badge ' + hotsBadgeClass(paket.hotsLevel)}>{paket.hotsLevel}</span>
+              {isAcehContext && <span className="game-panel__aceh-badge"><Leaf size={14} /> Konteks Budaya Aceh</span>}
+              <div className="mascot-think-chip" title="Maskot sedang berpikir">
+                <img className="mascot-think-chip__img" src={MASCOT_THINKING} alt="" aria-hidden="true" />
+                <span className="mascot-think-chip__text">Pikirkan baik-baik...</span>
               </div>
+            </div>
+          </div>
 
-              {(current.stimulus || hasTable || hasImage) && (
-                <div className="question-board__stimulus-col">
-                  <StimulusBlock stimulus={current.stimulus} />
-                  {hasTable && <TableBlock tableData={current.tableData} />}
-                  {hasImage && (
-                    <GameImage key={current.id} src={current.image} alt={'Ilustrasi Tantangan ' + currentNumber + ' - ' + paket.title} />
-                  )}
-                </div>
+          {(current.stimulus || hasTable || hasImage) && (
+            <div className="question-board__stimulus-col">
+              <StimulusBlock stimulus={current.stimulus} />
+              {hasTable && <TableBlock tableData={current.tableData} />}
+              {hasImage && (
+                <GameImage key={current.id} src={current.image} alt={'Ilustrasi Tantangan ' + currentNumber + ' - ' + paket.title} />
               )}
+            </div>
+          )}
 
-              <div className="question-board__question-col">
-                <h2 className="question-board__question">{current.question}</h2>
+          <div className="question-board__question-col">
+            <h2 className="question-board__question">{current.question}</h2>
 
-                <div className="game-options">
-                  {current.options.map((opt) => (
-                    <AnswerCard
-                      key={opt.key}
-                      option={opt}
-                      state={optionState(opt.key, selectedKey, isSubmitted, current.correctAnswer)}
-                      onSelect={handleSelectOption}
-                      disabled={isSubmitted}
-                    />
-                  ))}
-                </div>
+            <div className="game-options">
+              {current.options.map((opt) => (
+                <AnswerCard
+                  key={opt.key}
+                  option={opt}
+                  state={optionState(opt.key, selectedKey, isSubmitted && showExplanation, current.correctAnswer)}
+                  onSelect={handleSelectOption}
+                  disabled={isSubmitted}
+                />
+              ))}
+            </div>
 
-                {!isSubmitted && (
-                  <div className="game-submit-area">
-                    <button
-                      type="button"
-                      className="btn-jawab"
-                      disabled={!selectedKey}
-                      onClick={handleSubmitAnswer}
-                    >
-                      <CheckCircle2 size={18} />
-                      <span>Jawab</span>
-                    </button>
-                    {!selectedKey && (
-                      <span className="game-submit-area__hint">Pilih salah satu jawaban di atas</span>
-                    )}
-                  </div>
-                )}
-
-                {isSubmitted && (
-                  <FeedbackPanel
-                    isCorrect={currentIsCorrect}
-                    correctAnswer={current.correctAnswer}
-                    explanation={current.explanation}
-                    isLast={currentNumber >= soalList.length}
-                    onNext={goNext}
-                  />
+            {!showExplanation && (
+              <div className="game-submit-area">
+                <button
+                  type="button"
+                  className="btn-jawab"
+                  disabled={!selectedKey || isSubmitted}
+                  onClick={handleSubmitAnswer}
+                >
+                  <CheckCircle2 size={20} />
+                  <span>✓ JAWAB</span>
+                </button>
+                {!selectedKey && (
+                  <span className="game-submit-area__hint">Pilih salah satu jawaban di atas</span>
                 )}
               </div>
-            </div>
+            )}
 
-            <div className="question-board__mascot-side">
-              <MascotCompanion state={mascotState} />
-            </div>
+            {showExplanation && (
+              <FeedbackPanel
+                isCorrect={currentIsCorrect}
+                correctAnswer={current.correctAnswer}
+                explanation={current.explanation}
+                isLast={currentNumber >= soalList.length}
+                onNext={goNext}
+              />
+            )}
           </div>
         </div>
       </div>
+
+      <MascotReactionModal
+        isOpen={showReactionModal}
+        state={mascotState}
+        isLast={currentNumber >= soalList.length}
+        onContinue={handleModalContinue}
+        onShowExplanation={handleModalShowExplanation}
+      />
     </GameScene>
   );
 }
