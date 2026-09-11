@@ -335,9 +335,9 @@
     z-index: 1;
     font-family: var(--font-headings);
     font-size: var(--text-body-lg);
-    font-weight: 700;
-    color: var(--text-on-light);
-    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+    font-weight: 800;
+    color: #000000 !important;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.6);
     padding-bottom: 6px;
 }
 
@@ -361,13 +361,13 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    padding: 3px 10px 3px 6px;
+    padding: 4px 10px 4px 6px;
     border-radius: var(--radius-pill);
-    background: rgba(201, 161, 92, 0.15);
-    border: 1px solid rgba(201, 161, 92, 0.4);
-    color: var(--color-gold-deep);
+    background: #FFF9E6;
+    border: 1.5px solid #000000;
+    color: #000000 !important;
     font-size: var(--text-micro);
-    font-weight: 700;
+    font-weight: 800;
 }
 
 .mascot-think-chip__img {
@@ -380,6 +380,7 @@
 
 .mascot-think-chip__text {
     letter-spacing: 0.02em;
+    color: #000000 !important;
 }
 
 /* --- Stimulus: prosa vs. pseudo-tabel (lihat komentar di NonTkaGame.jsx
@@ -390,30 +391,33 @@
 
 .game-stimulus--prose {
     font-style: normal;
-    font-size: var(--text-body);
-    color: var(--text-on-light);
-    line-height: 1.7;
-    background: var(--surface-card-tint);
-    border-left: 3px solid var(--color-gold);
+    font-size: 1rem;
+    color: #000000 !important;
+    font-weight: 500;
+    line-height: 1.75;
+    background: #FFFFFF;
+    border-left: 4px solid #0A3323;
     border-radius: var(--radius-md);
     padding: var(--space-4) var(--space-5);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 /* --- Tabel soal asli (soal.table_data, roadmap item #10 2026-08-22) ---
    Menggantikan .game-stimulus--table/__list lama yang cuma daftar bernomor
    hasil parsing teks -- sekarang <table> HTML sungguhan. */
 .game-table {
-    background: var(--surface-card-tint);
-    border: 1px solid var(--border-on-light);
-    border-left: 3px solid var(--color-gold);
+    background: #FFFFFF;
+    border: 1.5px solid #000000;
+    border-left: 4px solid #0A3323;
     border-radius: var(--radius-md);
     padding: var(--space-4) var(--space-5);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
 .game-table__caption {
-    font-weight: 700;
+    font-weight: 800;
     font-size: var(--text-small);
-    color: var(--text-on-light);
+    color: #000000 !important;
     margin-bottom: var(--space-3);
 }
 
@@ -426,19 +430,20 @@
     min-width: 320px;
     border-collapse: collapse;
     font-size: var(--text-body);
-    color: var(--text-on-light);
+    color: #000000 !important;
 }
 
 .game-table__table th,
 .game-table__table td {
     padding: var(--space-2) var(--space-3);
     text-align: left;
-    border-bottom: 1px solid var(--border-on-light);
+    border-bottom: 1px solid #D0D0D0;
+    color: #000000 !important;
 }
 
 .game-table__table th {
-    font-weight: 700;
-    color: var(--color-gold-deep);
+    font-weight: 800;
+    color: #000000 !important;
     white-space: nowrap;
 }
 
@@ -787,7 +792,7 @@
     text-align: center;
     gap: var(--space-2);
     padding: var(--space-8) var(--space-6);
-    background: rgba(255, 255, 255, 0.96);
+    background: rgba(9, 56, 6, 0.96);
     border-radius: var(--radius-2xl);
     box-shadow: var(--shadow-lg);
     max-width: 480px;
