@@ -112,13 +112,13 @@ function GameSelectionHub({ onSelectGame }) {
 
             <ul className="game-card__tags" aria-label="Karakteristik Game">
               <li className="game-tag">
-                <span>🧩 Puzzle Menembak 3D</span>
+                <span>Puzzle Menembak 3D</span>
               </li>
               <li className="game-tag">
-                <span>🏛️ 2 Titik Refleksi Nilai</span>
+                <span>2 Titik Refleksi Nilai</span>
               </li>
               <li className="game-tag">
-                <span>⭐ Skor & Konsentrasi</span>
+                <span>Skor & Konsentrasi</span>
               </li>
             </ul>
 
@@ -177,13 +177,10 @@ function GameSelectionHub({ onSelectGame }) {
 
             <ul className="game-card__tags" aria-label="Karakteristik Game">
               <li className="game-tag">
-                <span>🦅 Burung Rangkong Budaya</span>
+                <span>Burung Rangkong Budaya</span>
               </li>
               <li className="game-tag">
-                <span>🕌 Pilar Megah Baiturrahman</span>
-              </li>
-              <li className="game-tag">
-                <span>🏆 Rekor Tertinggi Pribadi</span>
+                <span>Rekor Tertinggi</span>
               </li>
             </ul>
 
