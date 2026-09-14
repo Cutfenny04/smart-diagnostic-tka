@@ -94,7 +94,7 @@ function GameSelectionHub({ onSelectGame }) {
             <div className="game-card__media-badge game-card__media-badge--moss">
               <Compass size={14} /> Strategi & Refleksi
             </div>
-            <div className="game-card__media-icon" aria-hidden="true">💎</div>
+            <div className="game-card__media-icon" aria-hidden="true"></div>
           </div>
 
           <div className="game-card__body">
@@ -159,7 +159,7 @@ function GameSelectionHub({ onSelectGame }) {
                 <Trophy size={13} /> {flappyHighScore} Poin
               </div>
             )}
-            <div className="game-card__media-icon" aria-hidden="true">🦅</div>
+            <div className="game-card__media-icon" aria-hidden="true"></div>
           </div>
 
           <div className="game-card__body">
