@@ -5,9 +5,10 @@
    ========================================================================== */
 
 import React from 'react';
-import { Trophy, Star, RotateCcw, Home } from 'lucide-react';
+import { Trophy, Star, RotateCcw, LayoutGrid, Home } from 'lucide-react';
+import { GAME_MASCOTS } from '../../data/gameRefleksiData';
 
-function GameFinishOverlay({ score, onRestart, onExit }) {
+function GameFinishOverlay({ score, onRestart, onBackToHub, onExit }) {
   return (
     <div className="zuma-overlay zuma-overlay--finish" role="dialog" aria-modal="true">
       <div className="zuma-modal-card zuma-modal-card--finish">
@@ -19,8 +20,23 @@ function GameFinishOverlay({ score, onRestart, onExit }) {
           <span>🎉</span>
         </div>
 
+        {/* Maskot Gembira Selebrasi */}
+        <div className="zuma-mascot-greeting">
+          <img
+            src={GAME_MASCOTS.happy}
+            alt="Maskot Gembira"
+            className="zuma-mascot-greeting__img"
+          />
+          <div className="zuma-mascot-greeting__bubble">
+            <span className="zuma-bubble__tag">Apresiasi Luhur</span>
+            <p className="zuma-bubble__text">
+              "Luar biasa! Kamu menyelesaikan ekspedisi Takat Kelereng dengan penuh ketekunan!"
+            </p>
+          </div>
+        </div>
+
         <span className="zuma-modal__eyebrow">
-          <Trophy size={16} /> Ekspedisi Berhasil
+          <Trophy size={16} /> Ekspedisi Takat Kelereng Berhasil
         </span>
 
         <h2 className="zuma-modal__title">Perjalanan Selesai!</h2>
@@ -34,7 +50,7 @@ function GameFinishOverlay({ score, onRestart, onExit }) {
         </div>
 
         <p className="zuma-modal__desc">
-          Kamu telah berhasil menyelesaikan perjalanan Jelajah Budaya Aceh.
+          Kamu telah berhasil menyelesaikan perjalanan Takat Kelereng Budaya Aceh.
           Semoga refleksi dan nilai-nilai kearifan yang ditemui membawa inspirasi
           serta semangat dalam pembelajaran sehari-hari.
         </p>
@@ -50,13 +66,24 @@ function GameFinishOverlay({ score, onRestart, onExit }) {
             <span>Main Lagi</span>
           </button>
 
+          {onBackToHub && (
+            <button
+              type="button"
+              className="btn-zuma-secondary"
+              onClick={onBackToHub}
+            >
+              <LayoutGrid size={18} />
+              <span>Pilihan Game</span>
+            </button>
+          )}
+
           <button
             type="button"
             className="btn-zuma-secondary"
             onClick={onExit}
           >
             <Home size={18} />
-            <span>Keluar ke Dashboard</span>
+            <span>Dashboard</span>
           </button>
         </div>
       </div>

@@ -4,6 +4,7 @@
 
 import React from 'react';
 import { Play, Sparkles, Compass, MousePointer, Smartphone } from 'lucide-react';
+import { GAME_MASCOTS } from '../../data/gameRefleksiData';
 
 function GameStartOverlay({ onStart }) {
   return (
@@ -12,16 +13,31 @@ function GameStartOverlay({ onStart }) {
         <div className="zuma-modal__ornament-top" aria-hidden="true">
           <span>🌿</span>
           <span className="ornament-divider">❖</span>
-          <span>⭐</span>
+          <span>💎</span>
           <span className="ornament-divider">❖</span>
           <span>🌿</span>
         </div>
 
+        {/* Maskot Anak Aceh */}
+        <div className="zuma-mascot-greeting">
+          <img
+            src={GAME_MASCOTS.welcome}
+            alt="Maskot Anak Aceh"
+            className="zuma-mascot-greeting__img"
+          />
+          <div className="zuma-mascot-greeting__bubble">
+            <span className="zuma-bubble__tag">Kearifan Aceh</span>
+            <p className="zuma-bubble__text">
+              "Takat Kelereng mengasah ketelitian dan kesabaran, seperti merangkai ornamen Pinto Aceh!"
+            </p>
+          </div>
+        </div>
+
         <span className="zuma-modal__eyebrow">
-          <Compass size={14} /> Permainan Interaktif Reflektif
+          <Compass size={14} /> Permainan Refleksi Budaya Aceh
         </span>
 
-        <h2 className="zuma-modal__title">Jelajah Budaya Aceh</h2>
+        <h2 className="zuma-modal__title">Takat Kelereng</h2>
 
         <p className="zuma-modal__desc">
           Jelajahi keindahan seni, arsitektur, dan kearifan nilai luhur Aceh melalui

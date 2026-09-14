@@ -34,6 +34,27 @@
   gap: 12px;
 }
 
+.zuma-hud__btn-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  background: rgba(247, 244, 213, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 10px;
+  color: #F7F4D5;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.zuma-hud__btn-back:hover {
+  background: rgba(212, 175, 55, 0.25);
+  border-color: #FFE082;
+  transform: translateX(-2px);
+}
+
 .zuma-hud__icon {
   font-size: 1.5rem;
 }
@@ -362,6 +383,51 @@
   font-size: 1.1rem;
   margin-bottom: 8px;
 }
+
+/* Maskot Greeting dalam Overlay Zuma */
+.zuma-mascot-greeting {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  background: rgba(10, 51, 35, 0.45);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 14px;
+  padding: 10px 14px;
+  text-align: left;
+  margin-bottom: 10px;
+}
+
+.zuma-mascot-greeting__img {
+  width: 54px;
+  height: 54px;
+  object-fit: contain;
+  flex-shrink: 0;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.4));
+}
+
+.zuma-mascot-greeting__bubble {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.zuma-bubble__tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #FFE082;
+}
+
+.zuma-bubble__text {
+  font-size: 0.78rem;
+  color: #F7F4D5;
+  font-style: italic;
+  line-height: 1.35;
+  margin: 0;
+}
+
 
 .ornament-divider {
   color: #D49B2A;

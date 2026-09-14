@@ -5,6 +5,7 @@
 
 import React, { useState } from 'react';
 import { Sparkles, ArrowRight, CheckCircle } from 'lucide-react';
+import { GAME_MASCOTS } from '../../data/gameRefleksiData';
 
 function GameReflectionOverlay({ pointData, onContinue }) {
   const [selectedOptionId, setSelectedOptionId] = useState(null);
@@ -20,6 +21,21 @@ function GameReflectionOverlay({ pointData, onContinue }) {
           <span>🏛️</span>
           <span className="ornament-divider">❖</span>
           <span>✨</span>
+        </div>
+
+        {/* Maskot Refleksi */}
+        <div className="zuma-mascot-greeting">
+          <img
+            src={GAME_MASCOTS.thinking}
+            alt="Maskot Refleksi"
+            className="zuma-mascot-greeting__img"
+          />
+          <div className="zuma-mascot-greeting__bubble">
+            <span className="zuma-bubble__tag">Ruang Perenungan</span>
+            <p className="zuma-bubble__text">
+              "Mari hayati nilai luhur di balik setiap jejak kearifan budaya tanah rencong."
+            </p>
+          </div>
         </div>
 
         <span className="zuma-modal__eyebrow">

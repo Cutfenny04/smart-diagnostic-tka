@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <link rel="icon" type="image/png" href="images/burung.png"/>
+    <title>Flappy Bird: Petualangan Burung Rangkong</title>
+    <!-- Google Fonts for Acehnese Majesty typography -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Background Scene: Masjid Raya Baiturrahman & Rumoh Aceh -->
+    <div class="background"></div>
+    <div class="ground-layer"></div>
+
+    <!-- Top In-game HUD -->
+    <header class="hud">
+        <div class="score-badge">
+            <span class="hud-label">SKOR</span>
+            <span class="score_val" id="current-score">0</span>
+        </div>
+        <div class="high-score-badge">
+            <span class="hud-label">SKOR TERTINGGI</span>
+            <span class="high_score_val" id="high-score">0</span>
+        </div>
+        <button id="sound-toggle" class="hud-btn" aria-label="Pengaturan Suara" title="Suara Nyala/Mati">
+            <span id="sound-icon">🔊</span>
+        </button>
+    </header>
+
+    <!-- Player Bird (Burung Rangkong) -->
+    <div class="bird-wrapper" id="bird-wrapper">
+        <img src="images/burung.png" alt="Burung Rangkong" class="bird" id="bird-1">
+    </div>
+
+    <!-- Start Screen Modal -->
+    <div class="modal active" id="start-screen">
+        <div class="modal-card">
+            <div class="ornament-header">
+                <!-- Motif Pinto Aceh / Islamic Arch Stylized SVG -->
+                <svg class="aceh-motif-icon" viewBox="0 0 100 60" width="80" height="48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 5 C38 18, 20 22, 10 45 C30 38, 45 48, 50 55 C55 48, 70 38, 90 45 C80 22, 62 18, 50 5 Z" fill="#D4AF37" stroke="#FFF8DC" stroke-width="2"/>
+                    <circle cx="50" cy="30" r="8" fill="#FFF8DC" stroke="#B8860B" stroke-width="2"/>
+                    <path d="M50 12 L50 22 M40 30 L30 30 M60 30 L70 30 M50 38 L50 48" stroke="#D4AF37" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </div>
+            <h1 class="game-title">Flappy Bird</h1>
+            <p class="game-subtitle">Petualangan Burung Rangkong di Tanah Rencong</p>
+
+            <button class="btn-primary" id="btn-start">
+                <span class="btn-text">Mulai!</span>
+                <span class="btn-shine"></span>
+            </button>
+
+            <div class="best-score-preview">
+                🏆 Rekor Tertinggi: <span id="start-best-score">0</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="modal" id="game-over-screen">
+        <div class="modal-card">
+            <div class="game-over-badge">YAAHHH!</div>
+            <h2 class="game-over-title">Game Over</h2>
+
+            <div class="result-box">
+                <div class="result-row">
+                    <span class="result-label">Skor :</span>
+                    <span class="result-value" id="final-score">0</span>
+                </div>
+                <div class="result-row highlight">
+                    <span class="result-label">🏆 Rekor Tertinggi :</span>
+                    <span class="result-value" id="final-best-score">0</span>
+                </div>
+            </div>
+
+            <p class="motivation-text" id="motivation-text">Jangan putus asa, coba lagi!</p>
+
+            <button class="btn-primary" id="btn-restart">
+                <span class="btn-text">Main Lagi</span>
+                <span class="btn-shine"></span>
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

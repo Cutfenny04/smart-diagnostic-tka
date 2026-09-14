@@ -36,3 +36,38 @@ export const REFLECTION_POINTS = [
     appreciation: 'Nilai yang sangat menginspirasi! Satu langkah lagi menuju puncak perjalanan Jelajah Aceh.',
   },
 ];
+
+export const GAME_MASCOTS = {
+  welcome: encodeURI('/assets/assets bank soal non tka/mascot-anak-aceh.png'),
+  happy: encodeURI('/assets/assets bank soal non tka/mascot-happy.png'),
+  thinking: encodeURI('/assets/assets bank soal non tka/mascot-thinking.png'),
+  disappointed: encodeURI('/assets/assets bank soal non tka/mascot-disappointed.png'),
+  standing: encodeURI('/assets/assets bank soal non tka/mascot-anak-1.png'),
+};
+
+export const GAMES_INFO = [
+  {
+    id: 'zuma',
+    title: 'Takat Kelereng',
+    subtitle: 'Permainan Refleksi Kelereng Permata Warisan Rencong',
+    description: 'Tembak dan cocokkan kelereng permata sebelum mencapai gerbang akhir. Temukan titik singgah refleksi nilai arsitektur Rumoh Aceh dan kearifan tradisi.',
+    badge: 'Strategi & Refleksi',
+    badgeVariant: 'moss',
+    icon: '💎',
+    tags: ['Puzzle Kelereng', 'Nilai Budaya Aceh', 'Refleksi Filosofis'],
+    accentColor: '#105666',
+    previewImg: '/assets/assets bank soal non tka/rumoh-aceh-ilustrasi.png',
+  },
+  {
+    id: 'flappy',
+    title: 'Melingka di Tanoh Rencong',
+    subtitle: 'Petualangan Burung Rangkong Menembus Pilar Megah Aceh',
+    description: 'Bantu Burung Rangkong terbang melintasi pilar-pilar megah bernuansa arsitektur Aceh. Uji konsentrasi, ketangkasan refleks, dan raih rekor terbang tertinggi!',
+    badge: 'Ketangkasan & Refleks',
+    badgeVariant: 'gold',
+    icon: '🦅',
+    tags: ['Arcade Ketangkasan', 'Burung Rangkong', 'Pilar Arsitektur'],
+    accentColor: '#D4AF37',
+    previewImg: '/assets/flappy-bird/images/burung.png',
+  },
+];

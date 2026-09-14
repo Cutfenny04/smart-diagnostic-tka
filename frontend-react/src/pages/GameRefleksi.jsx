@@ -1,29 +1,56 @@
 /* ==========================================================================
    GAME REFLEKSI BUDAYA ACEH — REACT PAGE WRAPPER
-   Menghubungkan Zuma Engine dengan siklus hidup React, overlay interaktif,
-   dan sistem navigasi platform Smart Diagnostic TKA.
+   Menyediakan pilihan 2 wahana game interaktif:
+   1. Takat Kelereng (Zuma Heritage Engine)
+   2. Melingka di Tanoh Rencong (Flappy Bird Aceh Engine)
+   Terintegrasi penuh dengan GameSelectionHub dan maskot budaya Aceh.
    ========================================================================== */
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import Layout from '../components/Layout';
 import { Zuma } from '../games/zuma/ZumaGame';
 import { ZUMA_CONFIG } from '../games/zuma/gameConfig';
 import { mobileCheck } from '../games/zuma/utils';
 import { REFLECTION_POINTS } from '../data/gameRefleksiData';
+import GameSelectionHub from '../components/game-refleksi/GameSelectionHub';
+import FlappyBirdGame from '../components/game-refleksi/flappy/FlappyBirdGame';
 import GameStartOverlay from '../components/game-refleksi/GameStartOverlay';
 import GamePauseOverlay from '../components/game-refleksi/GamePauseOverlay';
 import GameReflectionOverlay from '../components/game-refleksi/GameReflectionOverlay';
 import GameFinishOverlay from '../components/game-refleksi/GameFinishOverlay';
 import GameMobileControls from '../components/game-refleksi/GameMobileControls';
 import { useDocumentTitle } from '../hooks/useDocumentTitle';
-import { Star, Pause, RotateCcw, Volume2, VolumeX } from 'lucide-react';
+import { Star, Pause, ArrowLeft } from 'lucide-react';
 import './GameRefleksi.css';
 
 function GameRefleksi() {
-  useDocumentTitle('Game Refleksi Budaya Aceh - Smart Diagnostic TKA');
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
+  // Ambil mode game dari query parameter (?game=zuma atau ?game=flappy)
+  const gameParam = searchParams.get('game');
+  const activeGame = ['zuma', 'flappy'].includes(gameParam) ? gameParam : null;
+
+  // Title dokumen dinamis
+  const pageTitle =
+    activeGame === 'flappy'
+      ? 'Melingka di Tanoh Rencong - Game Refleksi Budaya Aceh'
+      : activeGame === 'zuma'
+      ? 'Takat Kelereng - Game Refleksi Budaya Aceh'
+      : 'Game Refleksi Budaya Aceh - Smart Diagnostic TKA';
+
+  useDocumentTitle(pageTitle);
+
+  // Breadcrumb dinamis
+  const breadcrumbText =
+    activeGame === 'flappy'
+      ? 'Game Refleksi / Melingka di Tanoh Rencong'
+      : activeGame === 'zuma'
+      ? 'Game Refleksi / Takat Kelereng'
+      : 'Game Refleksi Budaya Aceh';
+
+  // State Zuma Game
   const containerRef = useRef(null);
   const zumaRef = useRef(null);
 
@@ -33,8 +60,26 @@ function GameRefleksi() {
   const [activeReflection, setActiveReflection] = useState(null);
   const [isMobileDevice, setIsMobileDevice] = useState(false);
 
-  // Inisialisasi Zuma Engine
+  // Navigasi Pilihan Game
+  const handleSelectGame = useCallback((gameId) => {
+    if (gameId) {
+      setSearchParams({ game: gameId });
+    } else {
+      setSearchParams({});
+    }
+  }, [setSearchParams]);
+
+  const handleBackToHub = useCallback(() => {
+    if (zumaRef.current && zumaRef.current.isStart) {
+      zumaRef.current.stop();
+    }
+    setSearchParams({});
+  }, [setSearchParams]);
+
+  // Inisialisasi Zuma Engine (Hanya aktif jika activeGame === 'zuma')
   useEffect(() => {
+    if (activeGame !== 'zuma') return;
+
     const isMobile = mobileCheck();
     setIsMobileDevice(isMobile);
 
@@ -78,7 +123,6 @@ function GameRefleksi() {
       game.appendTo(containerRef.current);
     }
 
-    // Auto-scale handler sesuai ukuran layar pembungkus
     function handleResize() {
       if (!containerRef.current || !game) return;
       const rect = containerRef.current.getBoundingClientRect();
@@ -95,14 +139,12 @@ function GameRefleksi() {
     window.addEventListener('resize', handleResize);
     handleResize();
 
-    // Event mouse desktop
     function handleMouseMove(e) {
       if (!game || !game.isStart) return;
       game.lookAt(e.pageX, e.pageY);
     }
 
     function handleClick(e) {
-      // Hanya tembak jika sedang fase playing dan bukan mengklik tombol kontrol
       if (!game || !game.isStart) return;
       if (e.target.closest('button') || e.target.closest('.zuma-overlay') || e.target.closest('.zuma-mobile-controls')) {
         return;
@@ -129,7 +171,6 @@ function GameRefleksi() {
       window.addEventListener('keydown', handleKeyDown);
     }
 
-    // Clean Unmount (memastikan tidak ada kebocoran proses di background)
     return () => {
       window.removeEventListener('resize', handleResize);
       if (!isMobile) {
@@ -140,9 +181,9 @@ function GameRefleksi() {
       game.destroy();
       zumaRef.current = null;
     };
-  }, []);
+  }, [activeGame]);
 
-  // Handlers Aksi Game
+  // Handlers Aksi Zuma
   const handleStartGame = useCallback(() => {
     setGameState('playing');
     if (zumaRef.current) {
@@ -189,7 +230,6 @@ function GameRefleksi() {
     navigate('/dashboard');
   }, [navigate]);
 
-  // Handler kontrol mobile
   const handleMobileShoot = useCallback(() => {
     if (zumaRef.current && zumaRef.current.isStart) {
       zumaRef.current.attack();
@@ -209,93 +249,112 @@ function GameRefleksi() {
   }, []);
 
   return (
-    <Layout breadcrumb="Game Refleksi Budaya Aceh">
-      <div className="game-refleksi-page">
-        {/* HUD Game Atas */}
-        <header className="zuma-hud" aria-label="Status Permainan">
-          <div className="zuma-hud__left">
-            <span className="zuma-hud__icon">🌿</span>
-            <div className="zuma-hud__title-wrap">
-              <h1 className="zuma-hud__title">JELAJAH BUDAYA ACEH</h1>
-              <span className="zuma-hud__subtitle">Permainan Refleksi Kelereng Permata</span>
-            </div>
-          </div>
+    <Layout breadcrumb={breadcrumbText}>
+      {/* 1. TAMPILAN UTAMA: GAME SELECTION HUB (PILIHAN 2 GAME) */}
+      {!activeGame && <GameSelectionHub onSelectGame={handleSelectGame} />}
 
-          <div className="zuma-hud__center">
-            <div className="zuma-hud__progress-wrap" title={`Progres: ${Math.round(progressRatio * 100)}%`}>
-              <span className="zuma-hud__progress-label">Progres Jelajah</span>
-              <div className="zuma-hud__progress-bar">
-                <div
-                  className="zuma-hud__progress-fill"
-                  style={{ width: `${Math.round(progressRatio * 100)}%` }}
-                />
-              </div>
-            </div>
-          </div>
+      {/* 2. GAME 2: MELINGKA DI TANOH RENCONG (FLAPPY BIRD ACEH) */}
+      {activeGame === 'flappy' && <FlappyBirdGame onBackToHub={handleBackToHub} />}
 
-          <div className="zuma-hud__right">
-            <div className="zuma-hud__score-badge" title="Skor permainan sesi ini">
-              <Star className="zuma-hud__star-icon" size={16} />
-              <span className="zuma-hud__score-text">{score}</span>
-            </div>
-
-            {gameState === 'playing' && (
+      {/* 3. GAME 1: TAKAT KELERENG (ZUMA HERITAGE ENGINE) */}
+      {activeGame === 'zuma' && (
+        <div className="game-refleksi-page">
+          {/* HUD Game Atas */}
+          <header className="zuma-hud" aria-label="Status Permainan Takat Kelereng">
+            <div className="zuma-hud__left">
               <button
                 type="button"
-                className="zuma-hud__btn-pause"
-                onClick={handlePauseGame}
-                aria-label="Jeda permainan"
-                title="Jeda (Esc)"
+                className="zuma-hud__btn-back"
+                onClick={handleBackToHub}
+                title="Kembali ke Pilihan Game"
               >
-                <Pause size={16} />
-                <span className="btn-text-desktop">Jeda</span>
+                <ArrowLeft size={16} />
+                <span className="btn-text-desktop">Pilihan Game</span>
               </button>
-            )}
-          </div>
-        </header>
 
-        {/* Viewport Kontainer Game */}
-        <div className="zuma-viewport" tabIndex={0}>
-          {/* Layer Latar Belakang & Efek */}
-          <div className="zuma-stage">
-            {/* Kontainer Engine Canvas Zuma */}
-            <div ref={containerRef} className="zuma-canvas-anchor" />
+              <span className="zuma-hud__icon">💎</span>
+              <div className="zuma-hud__title-wrap">
+                <h1 className="zuma-hud__title">TAKAT KELERENG</h1>
+                <span className="zuma-hud__subtitle">Permainan Refleksi Kelereng Permata</span>
+              </div>
+            </div>
 
-            {/* Kontrol Mobile (Tampil di layar sentuh) */}
-            {isMobileDevice && gameState === 'playing' && (
-              <GameMobileControls
-                onShoot={handleMobileShoot}
-                onSwitch={handleMobileSwitch}
-                onPause={handlePauseGame}
-                onAimVector={handleMobileAimVector}
-              />
-            )}
+            <div className="zuma-hud__center">
+              <div className="zuma-hud__progress-wrap" title={`Progres: ${Math.round(progressRatio * 100)}%`}>
+                <span className="zuma-hud__progress-label">Progres Jelajah</span>
+                <div className="zuma-hud__progress-bar">
+                  <div
+                    className="zuma-hud__progress-fill"
+                    style={{ width: `${Math.round(progressRatio * 100)}%` }}
+                  />
+                </div>
+              </div>
+            </div>
 
-            {/* Overlays Sesuai Status Game */}
-            {gameState === 'start' && <GameStartOverlay onStart={handleStartGame} />}
-            {gameState === 'paused' && (
-              <GamePauseOverlay
-                onResume={handleResumeGame}
-                onRestart={handleRestartGame}
-                onExit={handleExitGame}
-              />
-            )}
-            {gameState === 'reflection' && activeReflection && (
-              <GameReflectionOverlay
-                pointData={activeReflection}
-                onContinue={handleContinueFromReflection}
-              />
-            )}
-            {gameState === 'finished' && (
-              <GameFinishOverlay
-                score={score}
-                onRestart={handleRestartGame}
-                onExit={handleExitGame}
-              />
-            )}
+            <div className="zuma-hud__right">
+              <div className="zuma-hud__score-badge" title="Skor permainan sesi ini">
+                <Star className="zuma-hud__star-icon" size={16} />
+                <span className="zuma-hud__score-text">{score}</span>
+              </div>
+
+              {gameState === 'playing' && (
+                <button
+                  type="button"
+                  className="zuma-hud__btn-pause"
+                  onClick={handlePauseGame}
+                  aria-label="Jeda permainan"
+                  title="Jeda (Esc)"
+                >
+                  <Pause size={16} />
+                  <span className="btn-text-desktop">Jeda</span>
+                </button>
+              )}
+            </div>
+          </header>
+
+          {/* Viewport Kontainer Game */}
+          <div className="zuma-viewport" tabIndex={0}>
+            <div className="zuma-stage">
+              <div ref={containerRef} className="zuma-canvas-anchor" />
+
+              {/* Kontrol Mobile */}
+              {isMobileDevice && gameState === 'playing' && (
+                <GameMobileControls
+                  onShoot={handleMobileShoot}
+                  onSwitch={handleMobileSwitch}
+                  onPause={handlePauseGame}
+                  onAimVector={handleMobileAimVector}
+                />
+              )}
+
+              {/* Overlays */}
+              {gameState === 'start' && <GameStartOverlay onStart={handleStartGame} />}
+              {gameState === 'paused' && (
+                <GamePauseOverlay
+                  onResume={handleResumeGame}
+                  onRestart={handleRestartGame}
+                  onBackToHub={handleBackToHub}
+                  onExit={handleExitGame}
+                />
+              )}
+              {gameState === 'reflection' && activeReflection && (
+                <GameReflectionOverlay
+                  pointData={activeReflection}
+                  onContinue={handleContinueFromReflection}
+                />
+              )}
+              {gameState === 'finished' && (
+                <GameFinishOverlay
+                  score={score}
+                  onRestart={handleRestartGame}
+                  onBackToHub={handleBackToHub}
+                  onExit={handleExitGame}
+                />
+              )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </Layout>
   );
 }
