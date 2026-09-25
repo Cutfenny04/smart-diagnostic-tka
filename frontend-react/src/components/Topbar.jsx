@@ -103,7 +103,7 @@ function Topbar({ onOpenDrawer }) {
           <span className="topbar__avatar" aria-hidden="true">{profileAvatar}</span>
           <span className="topbar__profile-info">
             <span className="topbar__profile-name">{profileName}</span>
-            <span className="topbar__profile-role">Guru IPA</span>
+            <span className="topbar__profile-role">Guru SMPN 3 Ingin Jaya</span>
           </span>
           <ChevronDown size={16} className="topbar__profile-caret" />
         </button>

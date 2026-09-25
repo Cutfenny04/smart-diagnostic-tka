@@ -52,7 +52,7 @@ function Profil() {
               <span className="profil-avatar" aria-hidden="true">{initial(profile.nama)}</span>
               <div>
                 <h2 className="profil-card__name">{profile.nama}</h2>
-                <span className="badge badge--info">Guru IPA</span>
+                <span className="badge badge--info">Guru SMPN 3 Ingin Jaya</span>
               </div>
             </div>
             <div className="profil-info-list">
